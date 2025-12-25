@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { Badge } from 'antd'
 import {
   CalendarOutlined,
   FieldTimeOutlined,
@@ -9,13 +8,17 @@ import {
 } from '@ant-design/icons'
 import { useTheme } from '@/contexts/ThemeContext'
 import { SettingsModal } from './SettingsModal'
+import { SearchInput } from './SearchInput'
+import { CollapseArrow } from './CollapseArrow'
+import { ProjectColorDot } from './ProjectColorDot'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
-import { formatDateStr, extractDateStr } from '@/utils/date'
+import { useRelativeDates } from '@/hooks/useRelativeDates'
+import { extractDateStr } from '@/utils/date'
 import { findInboxProject } from '@/utils/project'
 import type { ThemeType } from '@/themes'
 import type { Task, Project } from '@/types'
 
-// 主题配置：使用各主题的 bgSidebar 颜色
+// 主题配置
 const themeOptions: { type: ThemeType; color: string; name: string }[] = [
   { type: 'journal', color: '#E8E4DF', name: '手帐' },
   { type: 'ocean', color: '#D8E3E8', name: '海洋' },
@@ -27,6 +30,7 @@ interface SidebarProps {
   projects: Project[]
   selectedFilter: string
   onFilterChange: (filter: string) => void
+  onSearch?: (query: string) => void
 }
 
 interface SmartFilter {
@@ -44,7 +48,6 @@ interface FolderGroup {
   id: string
   name: string
   projects: ProjectWithCount[]
-  totalCount: number
 }
 
 interface FilterItemProps {
@@ -70,9 +73,10 @@ function FilterItem({
     <div
       onClick={onClick}
       className={`
-        flex items-center gap-2.5 py-2 px-3 cursor-pointer rounded-lg my-0.5 transition-all
+        flex items-center gap-2.5 py-2 px-3 cursor-pointer rounded-lg my-0.5
+        transition-all duration-200 ease-out
         ${nested ? 'pl-7' : ''}
-        ${active ? 'bg-black/[0.06]' : 'hover:bg-black/[0.04]'}
+        ${active ? 'bg-black/[0.06]' : 'hover:bg-black/[0.04] hover:translate-x-0.5'}
       `}
     >
       {icon ? (
@@ -82,25 +86,24 @@ function FilterItem({
           {icon}
         </span>
       ) : (
-        <span
-          className="w-2 h-2 rounded-full shrink-0"
-          style={{ background: color || 'var(--accent)' }}
-        />
+        <ProjectColorDot color={color} />
       )}
       <span className="flex-1 text-[13px] text-[var(--text-primary)] truncate">
         {name}
       </span>
       {count > 0 && (
-        <Badge
-          count={count}
-          overflowCount={99}
+        <span
           className={`
-            [&_.ant-badge-count]:bg-transparent [&_.ant-badge-count]:text-[var(--text-secondary)]
-            [&_.ant-badge-count]:text-xs [&_.ant-badge-count]:font-normal [&_.ant-badge-count]:shadow-none
-            [&_.ant-badge-count]:min-w-0 [&_.ant-badge-count]:h-auto [&_.ant-badge-count]:leading-none [&_.ant-badge-count]:p-0
-            ${active ? '[&_.ant-badge-count]:!bg-[var(--text-primary)] [&_.ant-badge-count]:!text-white [&_.ant-badge-count]:!min-w-[18px] [&_.ant-badge-count]:!h-[18px] [&_.ant-badge-count]:!leading-[18px] [&_.ant-badge-count]:!rounded-[9px] [&_.ant-badge-count]:!px-1.5' : ''}
+            text-xs font-normal
+            ${
+              active
+                ? 'bg-black/20 text-white min-w-[18px] h-[18px] leading-[18px] rounded-[9px] px-1.5 text-center'
+                : 'text-[var(--text-secondary)]'
+            }
           `}
-        />
+        >
+          {count > 99 ? '99+' : count}
+        </span>
       )}
     </div>
   )
@@ -111,24 +114,20 @@ export function Sidebar({
   projects,
   selectedFilter,
   onFilterChange,
+  onSearch,
 }: SidebarProps) {
   const { themeType, setThemeType } = useTheme()
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const [collapsedFolders, toggleFolder] = usePersistedSet(
     'sidebarFoldersCollapsed'
   )
 
-  const smartFilters = useMemo<SmartFilter[]>(() => {
-    const now = new Date()
-    const todayStr = formatDateStr(now)
-    const tomorrow = new Date(now)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    const tomorrowStr = formatDateStr(tomorrow)
-    const nextWeek = new Date(now)
-    nextWeek.setDate(nextWeek.getDate() + 7)
-    const nextWeekStr = formatDateStr(nextWeek)
+  // 使用统一的日期 Hook
+  const { todayStr, tomorrowStr, nextWeekStr } = useRelativeDates()
 
-    return [
+  const smartFilters = useMemo<SmartFilter[]>(
+    () => [
       {
         id: 'today',
         name: '今天',
@@ -163,8 +162,9 @@ export function Sidebar({
           (t) => t.dueDate && extractDateStr(t.dueDate) < todayStr
         ).length,
       },
-    ]
-  }, [tasks])
+    ],
+    [tasks, todayStr, tomorrowStr, nextWeekStr]
+  )
 
   const { folders, ungroupedProjects } = useMemo(() => {
     const projectsWithCount: ProjectWithCount[] = projects
@@ -188,13 +188,11 @@ export function Sidebar({
 
     const folderList: FolderGroup[] = []
     folderMap.forEach((projectList, groupId) => {
-      const totalCount = projectList.reduce((sum, p) => sum + p.count, 0)
       const firstProject = projectList[0]
       folderList.push({
         id: groupId,
         name: firstProject?.name?.split('/')[0] || '文件夹',
         projects: projectList.sort((a, b) => a.sortOrder - b.sortOrder),
-        totalCount,
       })
     })
 
@@ -208,6 +206,11 @@ export function Sidebar({
   const otherProjects = ungroupedProjects.filter(
     (p) => p.kind !== 'INBOX' && p.name !== '收集箱'
   )
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value)
+    onSearch?.(value)
+  }
 
   return (
     <aside className="w-[240px] bg-[var(--bg-sidebar)] h-full flex flex-col shrink-0">
@@ -234,6 +237,9 @@ export function Sidebar({
           </div>
         </div>
       </div>
+
+      {/* 搜索框 */}
+      <SearchInput value={searchQuery} onChange={handleSearch} />
 
       {/* 可滚动内容区 */}
       <div className="flex-1 overflow-y-auto px-2 scrollbar-thin scrollbar-thumb-[var(--border)] scrollbar-track-transparent">
@@ -289,13 +295,9 @@ export function Sidebar({
               <div key={folder.id} className="my-1">
                 <div
                   onClick={() => toggleFolder(folder.id)}
-                  className={`flex items-center gap-1 py-2 px-3 cursor-pointer rounded-lg transition-all hover:bg-black/[0.04] select-none ${isCollapsed ? 'opacity-80' : ''}`}
+                  className={`flex items-center gap-1 py-2 px-3 cursor-pointer rounded-lg transition-all duration-200 ease-out hover:bg-black/[0.04] hover:translate-x-0.5 select-none ${isCollapsed ? 'opacity-80' : ''}`}
                 >
-                  <span
-                    className={`text-xs text-[var(--text-secondary)] w-3.5 text-center transition-transform ${isCollapsed ? '' : '-rotate-90'}`}
-                  >
-                    ›
-                  </span>
+                  <CollapseArrow isCollapsed={isCollapsed} />
                   <span className="text-[11px] font-medium text-[var(--text-secondary)] tracking-wide">
                     {folder.name.toUpperCase()}
                   </span>
@@ -325,7 +327,7 @@ export function Sidebar({
       <div className="p-3 border-t border-[var(--border)]">
         <button
           onClick={() => setSettingsOpen(true)}
-          className="flex items-center gap-2 w-full py-2 px-3 text-[13px] text-[var(--text-secondary)] rounded-lg hover:bg-black/[0.04] transition-all cursor-pointer border-0 bg-transparent"
+          className="flex items-center gap-2 w-full py-2 px-3 text-[13px] text-[var(--text-secondary)] rounded-lg hover:bg-black/[0.04] hover:translate-x-0.5 transition-all duration-200 ease-out cursor-pointer border-0 bg-transparent"
         >
           <SettingOutlined />
           <span>设置</span>

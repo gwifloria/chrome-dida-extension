@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Button, Space, Popconfirm } from 'antd'
+import { Button, Popconfirm } from 'antd'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { formatDateStr, extractDateStr, formatShortDate } from '@/utils/date'
-import { TASK_PRIORITY } from '@/constants/task'
+import { getPriorityColor } from '@/constants/task'
+import { ProjectColorDot } from './ProjectColorDot'
 import type { Task, Project } from '@/types'
 
 interface TaskItemProps {
@@ -11,13 +12,6 @@ interface TaskItemProps {
   onComplete: (task: Task) => void
   onDelete: (task: Task) => void
   onEdit: (task: Task) => void
-}
-
-const getPriorityColor = (priority: number) => {
-  if (priority >= TASK_PRIORITY.HIGH) return 'var(--priority-high)'
-  if (priority >= TASK_PRIORITY.MEDIUM) return 'var(--priority-medium)'
-  if (priority >= TASK_PRIORITY.LOW) return 'var(--priority-low)'
-  return 'var(--border)'
 }
 
 export function TaskItem({
@@ -46,7 +40,9 @@ export function TaskItem({
   return (
     <div
       className={`
-        group flex items-start justify-between py-3 transition-all
+        group flex items-start justify-between py-3 px-3 -mx-3 rounded-lg
+        transition-all duration-200 ease-out
+        hover:bg-black/[0.02] hover:-translate-y-0.5
         ${completing ? 'animate-[taskComplete_0.3s_ease_forwards]' : ''}
       `}
     >
@@ -82,10 +78,7 @@ export function TaskItem({
           <div className="flex items-center gap-3 flex-wrap">
             {project && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--bg-secondary)] rounded text-xs">
-                <span
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ background: project.color || 'var(--accent)' }}
-                />
+                <ProjectColorDot color={project.color} size="xs" />
                 <span className="text-[var(--text-secondary)]">
                   #{project.name}
                 </span>
@@ -93,7 +86,7 @@ export function TaskItem({
             )}
             {task.dueDate && (
               <span
-                className={`text-xs ${isOverdue() ? 'text-[var(--danger)]' : 'text-[var(--accent)]'}`}
+                className={`text-xs ${isOverdue() ? 'text-[var(--danger)]/70' : 'text-[var(--accent)]'}`}
               >
                 {formatShortDate(task.dueDate)}
               </span>
@@ -102,10 +95,7 @@ export function TaskItem({
         </div>
       </div>
 
-      <Space
-        size={4}
-        className="opacity-0 group-hover:opacity-100 transition-opacity"
-      >
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <Button
           type="text"
           size="small"
@@ -124,10 +114,10 @@ export function TaskItem({
             size="small"
             danger
             icon={<DeleteOutlined />}
-            className="!w-7 !h-7 !text-[var(--text-secondary)] hover:!text-[var(--danger)] hover:!bg-red-500/10"
+            className="!w-7 !h-7 !text-[var(--text-secondary)] hover:!text-[var(--danger)]/70 hover:!bg-[var(--danger)]/5"
           />
         </Popconfirm>
-      </Space>
+      </div>
     </div>
   )
 }

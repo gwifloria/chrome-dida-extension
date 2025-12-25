@@ -14,7 +14,6 @@ function AppContent() {
     projects,
     loading: tasksLoading,
     error,
-    refresh,
     completeTask,
     deleteTask,
     updateTask,
@@ -22,6 +21,7 @@ function AppContent() {
   } = useTasks(isLoggedIn)
 
   const [selectedFilter, setSelectedFilter] = useState('today')
+  const [searchQuery, setSearchQuery] = useState('')
 
   if (!isLoggedIn) {
     return <LoginButton loading={authLoading} onLogin={login} />
@@ -35,6 +35,7 @@ function AppContent() {
         projects={projects}
         selectedFilter={selectedFilter}
         onFilterChange={setSelectedFilter}
+        onSearch={setSearchQuery}
       />
 
       {/* 右侧内容区域 - 有外边距 */}
@@ -58,11 +59,11 @@ function AppContent() {
               loading={tasksLoading}
               error={error}
               filter={selectedFilter}
+              searchQuery={searchQuery}
               onComplete={completeTask}
               onDelete={deleteTask}
               onUpdate={updateTask}
               onCreate={createTask}
-              onRefresh={refresh}
             />
           </main>
         </div>
