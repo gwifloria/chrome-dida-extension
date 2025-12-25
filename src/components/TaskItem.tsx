@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Button, Space, Popconfirm } from 'antd'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
+import { formatDateStr, extractDateStr, formatShortDate } from '@/utils/date'
+import { TASK_PRIORITY } from '@/constants/task'
 import type { Task, Project } from '@/types'
 
 interface TaskItemProps {
@@ -12,9 +14,9 @@ interface TaskItemProps {
 }
 
 const getPriorityColor = (priority: number) => {
-  if (priority >= 5) return 'var(--priority-high)'
-  if (priority >= 3) return 'var(--priority-medium)'
-  if (priority >= 1) return 'var(--priority-low)'
+  if (priority >= TASK_PRIORITY.HIGH) return 'var(--priority-high)'
+  if (priority >= TASK_PRIORITY.MEDIUM) return 'var(--priority-medium)'
+  if (priority >= TASK_PRIORITY.LOW) return 'var(--priority-low)'
   return 'var(--border)'
 }
 
@@ -27,18 +29,10 @@ export function TaskItem({
 }: TaskItemProps) {
   const [completing, setCompleting] = useState(false)
 
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return null
-    const taskDate = dateStr.slice(0, 10)
-    const [, month, day] = taskDate.split('-')
-    return `${parseInt(month)}/${parseInt(day)}`
-  }
-
   const isOverdue = () => {
     if (!task.dueDate) return false
-    const taskDate = task.dueDate.slice(0, 10)
-    const now = new Date()
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+    const taskDate = extractDateStr(task.dueDate)
+    const todayStr = formatDateStr(new Date())
     return taskDate < todayStr
   }
 
@@ -101,7 +95,7 @@ export function TaskItem({
               <span
                 className={`text-xs ${isOverdue() ? 'text-[var(--danger)]' : 'text-[var(--accent)]'}`}
               >
-                {formatDate(task.dueDate)}
+                {formatShortDate(task.dueDate)}
               </span>
             )}
           </div>

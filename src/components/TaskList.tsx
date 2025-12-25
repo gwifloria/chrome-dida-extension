@@ -2,6 +2,15 @@ import { useState, useMemo, useEffect } from 'react'
 import { Spin, Empty, Alert, Input } from 'antd'
 import { TaskItem } from './TaskItem'
 import { TaskEditor } from './TaskEditor'
+import { useSettings } from '@/contexts/SettingsContext'
+import { usePersistedSet } from '@/hooks/usePersistedSet'
+import {
+  formatDateStr,
+  extractDateStr,
+  formatDisplayDate,
+  formatTime,
+} from '@/utils/date'
+import { findInboxProject } from '@/utils/project'
 import type { Task, Project } from '@/types'
 
 interface TaskListProps {
@@ -34,6 +43,7 @@ export function TaskList({
   onUpdate,
   onCreate,
 }: TaskListProps) {
+  const { settings } = useSettings()
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [isEditorOpen, setIsEditorOpen] = useState(false)
   const [quickAddValue, setQuickAddValue] = useState('')
@@ -48,53 +58,20 @@ export function TaskList({
   }, [])
 
   // 分组折叠状态
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => {
-    try {
-      const saved = localStorage.getItem('taskGroupCollapsed')
-      return saved ? new Set(JSON.parse(saved)) : new Set()
-    } catch {
-      return new Set()
-    }
-  })
-
-  const toggleGroup = (groupId: string) => {
-    setCollapsedGroups((prev) => {
-      const next = new Set(prev)
-      if (next.has(groupId)) {
-        next.delete(groupId)
-      } else {
-        next.add(groupId)
-      }
-      localStorage.setItem('taskGroupCollapsed', JSON.stringify([...next]))
-      return next
-    })
-  }
-
-  // 获取日期字符串 (YYYY-MM-DD 格式)，避免时区问题
-  const getDateStr = (date: Date) => {
-    const y = date.getFullYear()
-    const m = String(date.getMonth() + 1).padStart(2, '0')
-    const d = String(date.getDate()).padStart(2, '0')
-    return `${y}-${m}-${d}`
-  }
-
-  // 从任务的 dueDate 提取日期字符串 (只取 YYYY-MM-DD 部分)
-  const getTaskDateStr = (dueDate: string) => {
-    return dueDate.slice(0, 10)
-  }
+  const [collapsedGroups, toggleGroup] = usePersistedSet('taskGroupCollapsed')
 
   // 根据 filter 过滤任务
   const filteredTasks = useMemo(() => {
     const now = new Date()
-    const todayStr = getDateStr(now)
+    const todayStr = formatDateStr(now)
 
     const tomorrow = new Date(now)
     tomorrow.setDate(tomorrow.getDate() + 1)
-    const tomorrowStr = getDateStr(tomorrow)
+    const tomorrowStr = formatDateStr(tomorrow)
 
     const nextWeek = new Date(now)
     nextWeek.setDate(nextWeek.getDate() + 7)
-    const nextWeekStr = getDateStr(nextWeek)
+    const nextWeekStr = formatDateStr(nextWeek)
 
     if (filter.startsWith('project:')) {
       const projectId = filter.replace('project:', '')
@@ -105,25 +82,25 @@ export function TaskList({
       case 'today':
         return tasks.filter((t) => {
           if (!t.dueDate) return false
-          const taskDateStr = getTaskDateStr(t.dueDate)
+          const taskDateStr = extractDateStr(t.dueDate)
           return taskDateStr === todayStr
         })
       case 'tomorrow':
         return tasks.filter((t) => {
           if (!t.dueDate) return false
-          const taskDateStr = getTaskDateStr(t.dueDate)
+          const taskDateStr = extractDateStr(t.dueDate)
           return taskDateStr === tomorrowStr
         })
       case 'week':
         return tasks.filter((t) => {
           if (!t.dueDate) return false
-          const taskDateStr = getTaskDateStr(t.dueDate)
+          const taskDateStr = extractDateStr(t.dueDate)
           return taskDateStr >= todayStr && taskDateStr < nextWeekStr
         })
       case 'overdue':
         return tasks.filter((t) => {
           if (!t.dueDate) return false
-          const taskDateStr = getTaskDateStr(t.dueDate)
+          const taskDateStr = extractDateStr(t.dueDate)
           return taskDateStr < todayStr
         })
       case 'nodate':
@@ -136,15 +113,15 @@ export function TaskList({
   // 按日期分组
   const groupedTasks = useMemo<TaskGroup[]>(() => {
     const now = new Date()
-    const todayStr = getDateStr(now)
+    const todayStr = formatDateStr(now)
 
     const tomorrow = new Date(now)
     tomorrow.setDate(tomorrow.getDate() + 1)
-    const tomorrowStr = getDateStr(tomorrow)
+    const tomorrowStr = formatDateStr(tomorrow)
 
     const dayAfter = new Date(now)
     dayAfter.setDate(dayAfter.getDate() + 2)
-    const dayAfterStr = getDateStr(dayAfter)
+    const dayAfterStr = formatDateStr(dayAfter)
 
     const groups: TaskGroup[] = []
 
@@ -164,7 +141,7 @@ export function TaskList({
     // 已过期
     const overdue = unpinned.filter((t) => {
       if (!t.dueDate) return false
-      const taskDateStr = getTaskDateStr(t.dueDate)
+      const taskDateStr = extractDateStr(t.dueDate)
       return taskDateStr < todayStr
     })
     if (overdue.length > 0) {
@@ -178,7 +155,7 @@ export function TaskList({
     // 今天
     const todayTasks = unpinned.filter((t) => {
       if (!t.dueDate) return false
-      const taskDateStr = getTaskDateStr(t.dueDate)
+      const taskDateStr = extractDateStr(t.dueDate)
       return taskDateStr === todayStr
     })
     if (todayTasks.length > 0) {
@@ -192,7 +169,7 @@ export function TaskList({
     // 明天
     const tomorrowTasks = unpinned.filter((t) => {
       if (!t.dueDate) return false
-      const taskDateStr = getTaskDateStr(t.dueDate)
+      const taskDateStr = extractDateStr(t.dueDate)
       return taskDateStr === tomorrowStr
     })
     if (tomorrowTasks.length > 0) {
@@ -206,7 +183,7 @@ export function TaskList({
     // 之后
     const later = unpinned.filter((t) => {
       if (!t.dueDate) return false
-      const taskDateStr = getTaskDateStr(t.dueDate)
+      const taskDateStr = extractDateStr(t.dueDate)
       return taskDateStr >= dayAfterStr
     })
     if (later.length > 0) {
@@ -260,9 +237,20 @@ export function TaskList({
 
   const handleQuickAdd = async () => {
     if (!quickAddValue.trim()) return
-    const projectId = filter.startsWith('project:')
-      ? filter.replace('project:', '')
-      : projects[0]?.id
+
+    let projectId: string | undefined
+    if (filter.startsWith('project:')) {
+      // 在项目视图中，使用当前项目
+      projectId = filter.replace('project:', '')
+    } else if (settings.defaultProjectId) {
+      // 使用用户设置的默认项目
+      projectId = settings.defaultProjectId
+    } else {
+      // 默认使用收集箱
+      const inbox = findInboxProject(projects)
+      projectId = inbox?.id || projects[0]?.id
+    }
+
     await onCreate({
       title: quickAddValue.trim(),
       projectId,
@@ -297,25 +285,8 @@ export function TaskList({
     return 'SMART LIST'
   }
 
-  // 格式化时间
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('zh-CN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    })
-  }
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('zh-CN', {
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long',
-    })
-  }
-
   return (
-    <div className="flex flex-col h-full bg-[var(--bg-card)] relative py-10 px-[60px] overflow-hidden max-md:p-5">
+    <div className="flex flex-col h-full bg-transparent relative py-10 px-[60px] overflow-hidden max-md:p-5">
       {/* 头部 */}
       <div className="flex justify-between items-start mb-8">
         <div className="flex flex-col gap-1">
@@ -340,7 +311,7 @@ export function TaskList({
             {formatTime(currentTime)}
           </div>
           <div className="text-xs text-[var(--text-secondary)] mt-1">
-            {formatDate(currentTime)}
+            {formatDisplayDate(currentTime)}
           </div>
         </div>
       </div>

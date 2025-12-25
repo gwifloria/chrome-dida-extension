@@ -5,8 +5,22 @@ import {
   FieldTimeOutlined,
   ClockCircleOutlined,
   InboxOutlined,
+  SettingOutlined,
 } from '@ant-design/icons'
+import { useTheme } from '@/contexts/ThemeContext'
+import { SettingsModal } from './SettingsModal'
+import { usePersistedSet } from '@/hooks/usePersistedSet'
+import { formatDateStr, extractDateStr } from '@/utils/date'
+import { findInboxProject } from '@/utils/project'
+import type { ThemeType } from '@/themes'
 import type { Task, Project } from '@/types'
+
+// 主题配置：使用各主题的 bgSidebar 颜色
+const themeOptions: { type: ThemeType; color: string; name: string }[] = [
+  { type: 'journal', color: '#E8E4DF', name: '手帐' },
+  { type: 'ocean', color: '#D8E3E8', name: '海洋' },
+  { type: 'tech', color: '#1C1C1E', name: '暗黑' },
+]
 
 interface SidebarProps {
   tasks: Task[]
@@ -32,15 +46,6 @@ interface FolderGroup {
   projects: ProjectWithCount[]
   totalCount: number
 }
-
-const getDateStr = (date: Date) => {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
-}
-
-const getTaskDateStr = (dueDate: string) => dueDate.slice(0, 10)
 
 interface FilterItemProps {
   active: boolean
@@ -107,34 +112,21 @@ export function Sidebar({
   selectedFilter,
   onFilterChange,
 }: SidebarProps) {
-  const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(() => {
-    try {
-      const saved = localStorage.getItem('sidebarFoldersCollapsed')
-      return saved ? new Set(JSON.parse(saved)) : new Set()
-    } catch {
-      return new Set()
-    }
-  })
-
-  const toggleFolder = (folderId: string) => {
-    setCollapsedFolders((prev) => {
-      const next = new Set(prev)
-      if (next.has(folderId)) next.delete(folderId)
-      else next.add(folderId)
-      localStorage.setItem('sidebarFoldersCollapsed', JSON.stringify([...next]))
-      return next
-    })
-  }
+  const { themeType, setThemeType } = useTheme()
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [collapsedFolders, toggleFolder] = usePersistedSet(
+    'sidebarFoldersCollapsed'
+  )
 
   const smartFilters = useMemo<SmartFilter[]>(() => {
     const now = new Date()
-    const todayStr = getDateStr(now)
+    const todayStr = formatDateStr(now)
     const tomorrow = new Date(now)
     tomorrow.setDate(tomorrow.getDate() + 1)
-    const tomorrowStr = getDateStr(tomorrow)
+    const tomorrowStr = formatDateStr(tomorrow)
     const nextWeek = new Date(now)
     nextWeek.setDate(nextWeek.getDate() + 7)
-    const nextWeekStr = getDateStr(nextWeek)
+    const nextWeekStr = formatDateStr(nextWeek)
 
     return [
       {
@@ -142,7 +134,7 @@ export function Sidebar({
         name: '今天',
         icon: <FieldTimeOutlined />,
         count: tasks.filter(
-          (t) => t.dueDate && getTaskDateStr(t.dueDate) === todayStr
+          (t) => t.dueDate && extractDateStr(t.dueDate) === todayStr
         ).length,
       },
       {
@@ -150,7 +142,7 @@ export function Sidebar({
         name: '明天',
         icon: <CalendarOutlined />,
         count: tasks.filter(
-          (t) => t.dueDate && getTaskDateStr(t.dueDate) === tomorrowStr
+          (t) => t.dueDate && extractDateStr(t.dueDate) === tomorrowStr
         ).length,
       },
       {
@@ -159,7 +151,7 @@ export function Sidebar({
         icon: <CalendarOutlined />,
         count: tasks.filter((t) => {
           if (!t.dueDate) return false
-          const d = getTaskDateStr(t.dueDate)
+          const d = extractDateStr(t.dueDate)
           return d >= todayStr && d < nextWeekStr
         }).length,
       },
@@ -168,7 +160,7 @@ export function Sidebar({
         name: '已过期',
         icon: <ClockCircleOutlined />,
         count: tasks.filter(
-          (t) => t.dueDate && getTaskDateStr(t.dueDate) < todayStr
+          (t) => t.dueDate && extractDateStr(t.dueDate) < todayStr
         ).length,
       },
     ]
@@ -212,92 +204,140 @@ export function Sidebar({
     }
   }, [projects, tasks])
 
-  const inboxProject = ungroupedProjects.find(
-    (p) => p.kind === 'INBOX' || p.name === '收集箱'
-  )
+  const inboxProject = findInboxProject(ungroupedProjects)
   const otherProjects = ungroupedProjects.filter(
     (p) => p.kind !== 'INBOX' && p.name !== '收集箱'
   )
 
   return (
-    <aside className="w-[200px] bg-[var(--bg-secondary)] h-full overflow-y-auto p-2 shrink-0 scrollbar-thin scrollbar-thumb-[var(--border)] scrollbar-track-transparent">
-      {/* 智能清单 */}
-      <div className="mb-4">
-        {smartFilters.map((filter) => (
-          <FilterItem
-            key={filter.id}
-            active={selectedFilter === filter.id}
-            onClick={() => onFilterChange(filter.id)}
-            icon={filter.icon}
-            name={filter.name}
-            count={filter.count}
-          />
-        ))}
+    <aside className="w-[240px] bg-[var(--bg-sidebar)] h-full flex flex-col shrink-0">
+      {/* 头部 */}
+      <div className="p-4 pb-2">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-lg">🌸</span>
+          <span className="font-medium text-[var(--text-primary)]">
+            Wonderland
+          </span>
+          <div className="flex items-center gap-1.5 ml-2">
+            {themeOptions.map((option) => (
+              <button
+                key={option.type}
+                onClick={() => setThemeType(option.type)}
+                title={option.name}
+                className={`
+                  w-3 h-3 rounded-full transition-all cursor-pointer border-0 p-0
+                  ${themeType === option.type ? 'ring-2 ring-offset-1 ring-[var(--text-secondary)] scale-110' : 'opacity-70 hover:opacity-100 hover:scale-110'}
+                `}
+                style={{ backgroundColor: option.color }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* 清单 */}
-      <div className="mb-4">
-        <div className="px-3 py-2 text-xs font-medium text-[var(--text-secondary)]">
-          清单
+      {/* 可滚动内容区 */}
+      <div className="flex-1 overflow-y-auto px-2 scrollbar-thin scrollbar-thumb-[var(--border)] scrollbar-track-transparent">
+        {/* 智能清单 */}
+        <div className="mb-2">
+          <div className="px-3 py-2 text-[11px] font-medium text-[var(--text-secondary)] tracking-wide flex items-center gap-1">
+            <span className="text-xs">›</span>
+            智能清单
+          </div>
+          {smartFilters.map((filter) => (
+            <FilterItem
+              key={filter.id}
+              active={selectedFilter === filter.id}
+              onClick={() => onFilterChange(filter.id)}
+              icon={filter.icon}
+              name={filter.name}
+              count={filter.count}
+            />
+          ))}
         </div>
 
-        {inboxProject && (
-          <FilterItem
-            active={selectedFilter === `project:${inboxProject.id}`}
-            onClick={() => onFilterChange(`project:${inboxProject.id}`)}
-            icon={<InboxOutlined />}
-            name={inboxProject.name}
-            count={inboxProject.count}
-          />
-        )}
+        {/* 清单 */}
+        <div className="mb-4">
+          <div className="px-3 py-2 text-[11px] font-medium text-[var(--text-secondary)] tracking-wide flex items-center gap-1">
+            <span className="text-xs">›</span>
+            清单
+          </div>
 
-        {otherProjects.map((project) => (
-          <FilterItem
-            key={project.id}
-            active={selectedFilter === `project:${project.id}`}
-            onClick={() => onFilterChange(`project:${project.id}`)}
-            name={project.name}
-            count={project.count}
-            color={project.color}
-          />
-        ))}
+          {inboxProject && (
+            <FilterItem
+              active={selectedFilter === `project:${inboxProject.id}`}
+              onClick={() => onFilterChange(`project:${inboxProject.id}`)}
+              icon={<InboxOutlined />}
+              name={inboxProject.name}
+              count={inboxProject.count}
+            />
+          )}
 
-        {folders.map((folder) => {
-          const isCollapsed = collapsedFolders.has(folder.id)
-          return (
-            <div key={folder.id} className="my-1">
-              <div
-                onClick={() => toggleFolder(folder.id)}
-                className={`flex items-center gap-1 py-2 px-3 cursor-pointer rounded-lg transition-all hover:bg-black/[0.04] select-none ${isCollapsed ? 'opacity-80' : ''}`}
-              >
-                <span
-                  className={`text-xs text-[var(--text-secondary)] w-3.5 text-center transition-transform ${isCollapsed ? '' : '-rotate-90'}`}
+          {otherProjects.map((project) => (
+            <FilterItem
+              key={project.id}
+              active={selectedFilter === `project:${project.id}`}
+              onClick={() => onFilterChange(`project:${project.id}`)}
+              name={project.name}
+              count={project.count}
+              color={project.color}
+            />
+          ))}
+
+          {folders.map((folder) => {
+            const isCollapsed = collapsedFolders.has(folder.id)
+            return (
+              <div key={folder.id} className="my-1">
+                <div
+                  onClick={() => toggleFolder(folder.id)}
+                  className={`flex items-center gap-1 py-2 px-3 cursor-pointer rounded-lg transition-all hover:bg-black/[0.04] select-none ${isCollapsed ? 'opacity-80' : ''}`}
                 >
-                  ›
-                </span>
-                <span className="text-[11px] font-medium text-[var(--text-secondary)] tracking-wide">
-                  {folder.name.toUpperCase()}
-                </span>
-              </div>
-              {!isCollapsed && (
-                <div className="ml-1">
-                  {folder.projects.map((project) => (
-                    <FilterItem
-                      key={project.id}
-                      active={selectedFilter === `project:${project.id}`}
-                      onClick={() => onFilterChange(`project:${project.id}`)}
-                      name={project.name}
-                      count={project.count}
-                      color={project.color}
-                      nested
-                    />
-                  ))}
+                  <span
+                    className={`text-xs text-[var(--text-secondary)] w-3.5 text-center transition-transform ${isCollapsed ? '' : '-rotate-90'}`}
+                  >
+                    ›
+                  </span>
+                  <span className="text-[11px] font-medium text-[var(--text-secondary)] tracking-wide">
+                    {folder.name.toUpperCase()}
+                  </span>
                 </div>
-              )}
-            </div>
-          )
-        })}
+                {!isCollapsed && (
+                  <div className="ml-1">
+                    {folder.projects.map((project) => (
+                      <FilterItem
+                        key={project.id}
+                        active={selectedFilter === `project:${project.id}`}
+                        onClick={() => onFilterChange(`project:${project.id}`)}
+                        name={project.name}
+                        count={project.count}
+                        color={project.color}
+                        nested
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </div>
+
+      {/* 底部设置按钮 */}
+      <div className="p-3 border-t border-[var(--border)]">
+        <button
+          onClick={() => setSettingsOpen(true)}
+          className="flex items-center gap-2 w-full py-2 px-3 text-[13px] text-[var(--text-secondary)] rounded-lg hover:bg-black/[0.04] transition-all cursor-pointer border-0 bg-transparent"
+        >
+          <SettingOutlined />
+          <span>设置</span>
+        </button>
+      </div>
+
+      {/* 设置弹窗 */}
+      <SettingsModal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        projects={projects}
+      />
     </aside>
   )
 }

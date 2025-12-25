@@ -17,8 +17,10 @@
 
 :root {
   /* 默认主题变量会被 ThemeContext 覆盖 */
-  --bg-primary: #fdf8f3;
+  --bg-primary: #e8e4df;
   --bg-secondary: #f5ede4;
+  --bg-sidebar: #e8e4df;
+  --bg-content: #f8f6f3;
   --bg-card: #ffffff;
   --text-primary: #5d4e4e;
   --text-secondary: #9b8b8b;
@@ -117,4 +119,14 @@ body {
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+/* 背景纹理 - 点状图案 */
+.bg-dotted {
+  background-image: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0.03) 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
 }

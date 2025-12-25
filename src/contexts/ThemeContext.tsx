@@ -6,10 +6,17 @@ import {
   useCallback,
   type ReactNode,
 } from 'react'
-import { type Theme, type ThemeType, journalTheme, techTheme } from '@/themes'
+import {
+  type Theme,
+  type ThemeType,
+  journalTheme,
+  oceanTheme,
+  techTheme,
+} from '@/themes'
 
 const themes: Record<ThemeType, Theme> = {
   journal: journalTheme,
+  ocean: oceanTheme,
   tech: techTheme,
 }
 
@@ -52,6 +59,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const root = document.documentElement
     root.style.setProperty('--bg-primary', theme.colors.bgPrimary)
     root.style.setProperty('--bg-secondary', theme.colors.bgSecondary)
+    root.style.setProperty('--bg-sidebar', theme.colors.bgSidebar)
+    root.style.setProperty('--bg-content', theme.colors.bgContent)
     root.style.setProperty('--bg-card', theme.colors.bgCard)
     root.style.setProperty('--text-primary', theme.colors.textPrimary)
     root.style.setProperty('--text-secondary', theme.colors.textSecondary)

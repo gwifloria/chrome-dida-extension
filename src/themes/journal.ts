@@ -3,8 +3,10 @@ import type { Theme } from './index'
 export const journalTheme: Theme = {
   name: '日系手帐',
   colors: {
-    bgPrimary: '#FDF8F3', // 温暖奶油色
+    bgPrimary: '#E8E4DF', // 外层背景 - 浅灰棕
     bgSecondary: '#F5EDE4', // 浅米色
+    bgSidebar: '#E8E4DF', // 侧边栏背景
+    bgContent: '#F8F6F3', // 内容区背景 - 米白色带纹理
     bgCard: '#FFFFFF',
     textPrimary: '#5D4E4E', // 深棕色
     textSecondary: '#9B8B8B', // 浅棕色

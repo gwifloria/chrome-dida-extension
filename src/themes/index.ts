@@ -3,6 +3,8 @@ export interface Theme {
   colors: {
     bgPrimary: string
     bgSecondary: string
+    bgSidebar: string
+    bgContent: string
     bgCard: string
     textPrimary: string
     textSecondary: string
@@ -32,7 +34,8 @@ export interface Theme {
   }
 }
 
-export type ThemeType = 'journal' | 'tech'
+export type ThemeType = 'journal' | 'ocean' | 'tech'
 
 export { journalTheme } from './journal'
+export { oceanTheme } from './ocean'
 export { techTheme } from './tech'

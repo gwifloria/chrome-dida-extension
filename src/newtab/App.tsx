@@ -6,7 +6,6 @@ import { useTasks } from '@/hooks/useTasks'
 import { TaskList } from '@/components/TaskList'
 import { Sidebar } from '@/components/Sidebar'
 import { LoginButton } from '@/components/LoginButton'
-import { ThemeSwitch } from '@/components/ThemeSwitch'
 
 function AppContent() {
   const { isLoggedIn, loading: authLoading, login, logout } = useAuth()
@@ -29,41 +28,44 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] relative flex flex-col">
-      {/* 控制按钮 */}
-      <div className="fixed top-3 right-3 z-50 flex items-center gap-2">
-        <ThemeSwitch />
-        <Button
-          type="text"
-          size="small"
-          icon={<LogoutOutlined />}
-          onClick={logout}
-          className="text-[var(--text-secondary)] text-xs hover:text-[var(--accent)]"
-        />
-      </div>
+    <div className="h-screen bg-[var(--bg-primary)] flex overflow-hidden">
+      {/* 侧边栏 */}
+      <Sidebar
+        tasks={tasks}
+        projects={projects}
+        selectedFilter={selectedFilter}
+        onFilterChange={setSelectedFilter}
+      />
 
-      {/* 主内容区 */}
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          tasks={tasks}
-          projects={projects}
-          selectedFilter={selectedFilter}
-          onFilterChange={setSelectedFilter}
-        />
-        <main className="flex-1 overflow-y-auto bg-[var(--bg-card)]">
-          <TaskList
-            tasks={tasks}
-            projects={projects}
-            loading={tasksLoading}
-            error={error}
-            filter={selectedFilter}
-            onComplete={completeTask}
-            onDelete={deleteTask}
-            onUpdate={updateTask}
-            onCreate={createTask}
-            onRefresh={refresh}
-          />
-        </main>
+      {/* 右侧内容区域 - 有外边距 */}
+      <div className="flex-1 p-3 pl-0 min-h-0">
+        <div className="h-full bg-[var(--bg-content)] bg-dotted rounded-2xl overflow-hidden relative shadow-[var(--shadow-small)]">
+          {/* 登出按钮 */}
+          <div className="absolute top-3 right-3 z-50">
+            <Button
+              type="text"
+              size="small"
+              icon={<LogoutOutlined />}
+              onClick={logout}
+              className="text-[var(--text-secondary)] text-xs hover:text-[var(--accent)]"
+            />
+          </div>
+
+          <main className="h-full overflow-y-auto">
+            <TaskList
+              tasks={tasks}
+              projects={projects}
+              loading={tasksLoading}
+              error={error}
+              filter={selectedFilter}
+              onComplete={completeTask}
+              onDelete={deleteTask}
+              onUpdate={updateTask}
+              onCreate={createTask}
+              onRefresh={refresh}
+            />
+          </main>
+        </div>
       </div>
     </div>
   )
