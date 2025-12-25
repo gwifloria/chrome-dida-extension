@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "滴答清单 New Tab",
+  "description": "在新标签页展示滴答清单任务",
+  "version": "1.0.0",
+  "chrome_url_overrides": {
+    "newtab": "newtab/index.html"
+  },
+  "background": {
+    "service_worker": "background/index.js",
+    "type": "module"
+  },
+  "permissions": ["storage", "identity"],
+  "host_permissions": ["https://api.dida365.com/*", "https://dida365.com/*"]
+}
