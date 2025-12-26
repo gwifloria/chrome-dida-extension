@@ -69,8 +69,8 @@ export const api = {
       }
     }
 
-    // 尝试获取收集箱任务（硬编码测试）
-    const inboxId = 'inbox1024271155'
+    // 尝试获取收集箱任务
+    const inboxId = 'inbox'
     try {
       const inboxData = await this.getProjectData(inboxId)
       if (inboxData.tasks) {

@@ -19,9 +19,8 @@ export function SettingsModal({ open, onClose, projects }: SettingsModalProps) {
     updateSettings({ defaultProjectId: value })
   }
 
-  // 当前值：使用设置的值或第一个项目
-  const currentValue =
-    settings.defaultProjectId || availableProjects[0]?.id || ''
+  // 当前值：使用设置的值，默认为收集箱
+  const currentValue = settings.defaultProjectId || 'inbox'
 
   return (
     <Modal
@@ -44,6 +43,16 @@ export function SettingsModal({ open, onClose, projects }: SettingsModalProps) {
             className="w-full"
             popupClassName="[&_.ant-select-item]:!text-[var(--text-primary)]"
           >
+            {/* 收集箱选项 */}
+            <Select.Option key="inbox" value="inbox">
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: '#888' }}
+                />
+                <span>收集箱</span>
+              </div>
+            </Select.Option>
             {availableProjects.map((project) => (
               <Select.Option key={project.id} value={project.id}>
                 <div className="flex items-center gap-2">
