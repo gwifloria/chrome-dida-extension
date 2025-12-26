@@ -321,12 +321,18 @@ export function Sidebar({
 
     const folderList: FolderGroup[] = []
     folderMap.forEach((projectList, groupId) => {
-      const firstProject = projectList[0]
-      folderList.push({
-        id: groupId,
-        name: firstProject?.name?.split('/')[0] || '文件夹',
-        projects: projectList.sort((a, b) => a.sortOrder - b.sortOrder),
-      })
+      // 文件夹本身也是一个项目，其 id 等于 groupId
+      const folderProject = projectsWithCount.find((p) => p.id === groupId)
+      // 从子项目中排除文件夹本身
+      const childProjects = projectList.filter((p) => p.id !== groupId)
+
+      if (childProjects.length > 0) {
+        folderList.push({
+          id: groupId,
+          name: folderProject?.name || '文件夹',
+          projects: childProjects.sort((a, b) => a.sortOrder - b.sortOrder),
+        })
+      }
     })
 
     return {
