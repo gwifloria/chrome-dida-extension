@@ -10,11 +10,11 @@ import './index.css'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ConfigProvider locale={zhCN}>
-      <ThemeProvider>
-        <SettingsProvider>
+      <SettingsProvider>
+        <ThemeProvider>
           <App />
-        </SettingsProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </SettingsProvider>
     </ConfigProvider>
   </StrictMode>
 )

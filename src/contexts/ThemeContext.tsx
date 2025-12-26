@@ -1,9 +1,8 @@
 import {
   createContext,
   useContext,
-  useState,
-  useEffect,
   useCallback,
+  useEffect,
   type ReactNode,
 } from 'react'
 import {
@@ -12,12 +11,15 @@ import {
   journalTheme,
   oceanTheme,
   techTheme,
+  roseTheme,
 } from '@/themes'
+import { useSettings } from './SettingsContext'
 
 const themes: Record<ThemeType, Theme> = {
   journal: journalTheme,
   ocean: oceanTheme,
   tech: techTheme,
+  rose: roseTheme,
 }
 
 interface ThemeContextValue {
@@ -29,24 +31,16 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
-const STORAGE_KEY = 'theme_preference'
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [themeType, setThemeTypeState] = useState<ThemeType>('journal')
+  const { settings, updateSettings } = useSettings()
+  const themeType = settings.theme
 
-  useEffect(() => {
-    // 从 storage 读取主题偏好
-    chrome.storage.local.get(STORAGE_KEY).then((result) => {
-      if (result[STORAGE_KEY]) {
-        setThemeTypeState(result[STORAGE_KEY] as ThemeType)
-      }
-    })
-  }, [])
-
-  const setThemeType = useCallback((type: ThemeType) => {
-    setThemeTypeState(type)
-    chrome.storage.local.set({ [STORAGE_KEY]: type })
-  }, [])
+  const setThemeType = useCallback(
+    (type: ThemeType) => {
+      updateSettings({ theme: type })
+    },
+    [updateSettings]
+  )
 
   const toggleTheme = useCallback(() => {
     setThemeType(themeType === 'journal' ? 'tech' : 'journal')

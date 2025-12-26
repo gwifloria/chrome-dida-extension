@@ -34,8 +34,9 @@ export interface Theme {
   }
 }
 
-export type ThemeType = 'journal' | 'ocean' | 'tech'
+export type ThemeType = 'journal' | 'ocean' | 'tech' | 'rose'
 
 export { journalTheme } from './journal'
 export { oceanTheme } from './ocean'
 export { techTheme } from './tech'
+export { roseTheme } from './rose'

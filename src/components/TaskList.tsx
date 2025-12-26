@@ -8,7 +8,6 @@ import { usePersistedSet } from '@/hooks/usePersistedSet'
 import { useRelativeDates } from '@/hooks/useRelativeDates'
 import { useFilteredTasks } from '@/hooks/useFilteredTasks'
 import { extractDateStr, formatDisplayDate, formatTime } from '@/utils/date'
-import { findInboxProject } from '@/utils/project'
 import type { Task, Project } from '@/types'
 
 interface TaskListProps {
@@ -160,18 +159,29 @@ export function TaskList({
     if (!quickAddValue.trim()) return
 
     let projectId: string | undefined
+    let dueDate: string | undefined
+
+    // 根据 filter 设置 projectId
     if (filter.startsWith('project:')) {
       projectId = filter.replace('project:', '')
     } else if (settings.defaultProjectId) {
       projectId = settings.defaultProjectId
     } else {
-      const inbox = findInboxProject(projects)
-      projectId = inbox?.id || projects[0]?.id
+      projectId = projects[0]?.id
     }
+
+    // 根据 filter 设置 dueDate
+    if (filter === 'today') {
+      dueDate = todayStr + 'T00:00:00.000+0000'
+    } else if (filter === 'tomorrow') {
+      dueDate = tomorrowStr + 'T00:00:00.000+0000'
+    }
+    // week/overdue/nodate 不设置默认日期
 
     await onCreate({
       title: quickAddValue.trim(),
       projectId,
+      dueDate,
     })
     setQuickAddValue('')
   }
