@@ -27,12 +27,16 @@ async function request<T>(
     throw new Error(error.errorMessage || `请求失败: ${response.status}`)
   }
 
-  // 204 No Content
+  // 204 No Content 或空响应体
   if (response.status === 204) {
     return undefined as T
   }
 
-  return response.json()
+  const text = await response.text()
+  if (!text) {
+    return undefined as T
+  }
+  return JSON.parse(text)
 }
 
 export const api = {
