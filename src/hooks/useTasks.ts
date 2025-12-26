@@ -70,8 +70,10 @@ export function useTasks(isLoggedIn: boolean) {
   const createTask = useCallback(async (task: Partial<Task>) => {
     try {
       const created = await api.createTask(task)
-      setTasks((prev) => [...prev, created])
-      return created
+      // 合并请求参数，确保本地数据完整（API 可能不返回 dueDate 等字段）
+      const mergedTask = { ...task, ...created } as Task
+      setTasks((prev) => [...prev, mergedTask])
+      return mergedTask
     } catch (err) {
       setError(err instanceof Error ? err.message : '创建任务失败')
       throw err
