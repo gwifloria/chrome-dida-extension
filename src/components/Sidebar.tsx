@@ -319,20 +319,17 @@ export function Sidebar({
       }
     })
 
+    // Open API 不返回文件夹项目，只返回子项目及其 groupId
+    // 因此无法获取文件夹名称，只能显示默认名称
     const folderList: FolderGroup[] = []
+    let folderIndex = 0
     folderMap.forEach((projectList, groupId) => {
-      // 文件夹本身也是一个项目，其 id 等于 groupId
-      const folderProject = projectsWithCount.find((p) => p.id === groupId)
-      // 从子项目中排除文件夹本身
-      const childProjects = projectList.filter((p) => p.id !== groupId)
-
-      if (childProjects.length > 0) {
-        folderList.push({
-          id: groupId,
-          name: folderProject?.name || '文件夹',
-          projects: childProjects.sort((a, b) => a.sortOrder - b.sortOrder),
-        })
-      }
+      folderIndex++
+      folderList.push({
+        id: groupId,
+        name: `文件夹 ${folderIndex}`,
+        projects: projectList.sort((a, b) => a.sortOrder - b.sortOrder),
+      })
     })
 
     return {
