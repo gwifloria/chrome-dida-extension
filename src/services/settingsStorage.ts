@@ -57,8 +57,6 @@ async function migrateLegacySettings(): Promise<void> {
 
     // 清理旧版数据
     await chrome.storage.local.remove([LEGACY_SETTINGS_KEY, LEGACY_THEME_KEY])
-
-    console.log('[Settings] 已从旧版迁移设置:', migratedSettings)
   }
 }
 
