@@ -15,24 +15,26 @@ interface OnboardingProps {
 
 const steps = [
   {
-    icon: <RocketOutlined className="text-4xl text-[var(--accent)]" />,
+    icon: <RocketOutlined className="text-4xl text-[var(--text-primary)]" />,
     title: '欢迎使用',
     description:
       '将新标签页变成你的专注任务面板，每次打开都能看到今天最重要的事。',
   },
   {
-    icon: <AppstoreOutlined className="text-4xl text-[var(--accent)]" />,
+    icon: <AppstoreOutlined className="text-4xl text-[var(--text-primary)]" />,
     title: '专注模式',
     description:
       '默认显示专注模式，大时钟配合今日重点任务。点击右下角「Todo」进入完整列表。',
   },
   {
-    icon: <CheckCircleOutlined className="text-4xl text-[var(--accent)]" />,
+    icon: (
+      <CheckCircleOutlined className="text-4xl text-[var(--text-primary)]" />
+    ),
     title: '快捷操作',
     description: '点击任务左侧圆圈完成任务，支持编辑、删除、新建等全部功能。',
   },
   {
-    icon: <BgColorsOutlined className="text-4xl text-[var(--accent)]" />,
+    icon: <BgColorsOutlined className="text-4xl text-[var(--text-primary)]" />,
     title: '个性主题',
     description: '提供手帐、玫瑰、海洋、暗黑四种主题，点击左上角色块切换。',
   },
@@ -89,7 +91,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
               key={index}
               className={`w-2 h-2 rounded-full transition-colors ${
                 index === currentStep
-                  ? 'bg-[var(--accent)]'
+                  ? 'bg-[var(--text-primary)]'
                   : 'bg-[var(--border)]'
               }`}
             />
@@ -121,7 +123,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           )}
           <button
             onClick={handleNext}
-            className={`${isLastStep ? 'w-full' : 'flex-1'} py-2.5 text-sm text-white bg-[var(--accent)] border-0 rounded-xl cursor-pointer hover:opacity-90 transition-opacity`}
+            className={`${isLastStep ? 'w-full' : 'flex-1'} py-2.5 text-sm text-white bg-[var(--text-primary)] border-0 rounded-xl cursor-pointer hover:opacity-90 transition-opacity`}
           >
             {isLastStep ? '开始使用' : '下一步'}
           </button>
