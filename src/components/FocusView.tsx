@@ -5,6 +5,7 @@ import { getGreeting } from '@/utils/greeting'
 import { formatTime, formatDateStr } from '@/utils/date'
 import { getRandomQuote, type Quote } from '@/data/quotes'
 import { THEME_OPTIONS } from '@/constants/theme'
+import { FocusSkeleton } from './TaskSkeleton'
 import type { Task } from '@/types'
 
 interface FocusViewProps {
@@ -98,9 +99,7 @@ export function FocusView({
           </h2>
 
           {loading ? (
-            <div className="text-center text-[var(--text-secondary)]">
-              加载中...
-            </div>
+            <FocusSkeleton />
           ) : focusTasks.length === 0 ? (
             <div className="text-center text-[var(--text-secondary)] text-lg">
               今天没有高优先级任务

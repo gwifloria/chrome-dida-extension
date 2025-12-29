@@ -7,6 +7,7 @@ import { TaskList } from '@/components/TaskList'
 import { Sidebar } from '@/components/Sidebar'
 import { FocusView } from '@/components/FocusView'
 import { LoginButton } from '@/components/LoginButton'
+import { Onboarding } from '@/components/Onboarding'
 
 type ViewMode = 'focus' | 'list'
 
@@ -33,7 +34,12 @@ function AppContent() {
   const [searchQuery, setSearchQuery] = useState('')
 
   if (!isLoggedIn) {
-    return <LoginButton loading={authLoading} onLogin={login} />
+    return (
+      <>
+        <Onboarding onComplete={() => {}} />
+        <LoginButton loading={authLoading} onLogin={login} />
+      </>
+    )
   }
 
   // 专注模式视图

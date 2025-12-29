@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Spin, Empty, Alert, Input } from 'antd'
+import { Empty, Alert, Input } from 'antd'
 import { TaskItem } from './TaskItem'
 import { TaskEditor } from './TaskEditor'
 import { CollapseArrow } from './CollapseArrow'
 import { FocusButton } from './FocusButton'
+import { TaskSkeleton } from './TaskSkeleton'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
 import { useRelativeDates } from '@/hooks/useRelativeDates'
@@ -279,12 +280,7 @@ export function TaskList({
 
       <div className="flex-1 overflow-y-auto -mx-5 px-5">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 px-5 gap-4">
-            <Spin size="large" />
-            <span className="text-[var(--text-secondary)] text-sm">
-              正在加载...
-            </span>
-          </div>
+          <TaskSkeleton count={6} />
         ) : sortedGroups.length === 0 ? (
           <Empty
             description={
