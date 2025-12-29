@@ -52,6 +52,12 @@ export const api = {
     return request(`/project/${projectId}/data`)
   },
 
+  // 获取收集箱任务
+  async getInboxTasks(): Promise<Task[]> {
+    const data = await this.getProjectData('inbox')
+    return (data.tasks || []).filter((task) => task.status === 0)
+  },
+
   // 获取所有任务
   async getAllTasks(): Promise<{ tasks: Task[]; projects: Project[] }> {
     const projects = await this.getProjects()

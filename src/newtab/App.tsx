@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { Button } from 'antd'
 import { LogoutOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import { useAuth } from '@/hooks/useAuth'
@@ -7,7 +7,6 @@ import { TaskList } from '@/components/TaskList'
 import { Sidebar } from '@/components/Sidebar'
 import { FocusView } from '@/components/FocusView'
 import { LoginButton } from '@/components/LoginButton'
-import { formatDateStr, extractDateStr } from '@/utils/date'
 
 type ViewMode = 'focus' | 'list'
 
@@ -18,23 +17,20 @@ function AppContent() {
     projects,
     loading: tasksLoading,
     error,
+    // 计算视图
+    todayFocusTasks,
+    counts,
+    // 操作
     completeTask,
     deleteTask,
     updateTask,
     createTask,
+    createInboxTask,
   } = useTasks(isLoggedIn)
 
   const [viewMode, setViewMode] = useState<ViewMode>('focus')
   const [selectedFilter, setSelectedFilter] = useState('today')
   const [searchQuery, setSearchQuery] = useState('')
-
-  // 计算今天的任务数
-  const todayTaskCount = useMemo(() => {
-    const todayStr = formatDateStr(new Date())
-    return tasks.filter(
-      (t) => t.dueDate && extractDateStr(t.dueDate) === todayStr
-    ).length
-  }, [tasks])
 
   if (!isLoggedIn) {
     return <LoginButton loading={authLoading} onLogin={login} />
@@ -44,12 +40,12 @@ function AppContent() {
   if (viewMode === 'focus') {
     return (
       <FocusView
-        tasks={tasks}
+        focusTasks={todayFocusTasks}
         loading={tasksLoading}
         onComplete={completeTask}
-        onCreate={createTask}
+        onCreate={createInboxTask}
         onSwitchView={() => setViewMode('list')}
-        todayTaskCount={todayTaskCount}
+        todayTaskCount={counts.today}
       />
     )
   }
@@ -61,6 +57,7 @@ function AppContent() {
       <Sidebar
         tasks={tasks}
         projects={projects}
+        counts={counts}
         selectedFilter={selectedFilter}
         onFilterChange={setSelectedFilter}
         onSearch={setSearchQuery}

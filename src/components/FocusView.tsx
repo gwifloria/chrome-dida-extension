@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { CheckOutlined } from '@ant-design/icons'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getGreeting } from '@/utils/greeting'
-import { formatTime, formatDateStr, extractDateStr } from '@/utils/date'
+import { formatTime, formatDateStr } from '@/utils/date'
 import { getRandomQuote, type Quote } from '@/data/quotes'
 import type { ThemeType } from '@/themes'
 import type { Task } from '@/types'
@@ -16,7 +16,7 @@ const themeOptions: { type: ThemeType; color: string; name: string }[] = [
 ]
 
 interface FocusViewProps {
-  tasks: Task[]
+  focusTasks: Task[] // 今日高优先级任务（已筛选）
   loading: boolean
   onComplete: (task: Task) => void
   onCreate: (task: Partial<Task>) => Promise<Task>
@@ -25,7 +25,7 @@ interface FocusViewProps {
 }
 
 export function FocusView({
-  tasks,
+  focusTasks,
   loading,
   onComplete,
   onCreate,
@@ -45,19 +45,6 @@ export function FocusView({
     }, 1000)
     return () => clearInterval(timer)
   }, [])
-
-  // 筛选今天的高优先级任务（priority >= 3），最多3个
-  const focusTasks = useMemo(() => {
-    const todayStr = formatDateStr(new Date())
-    return tasks
-      .filter((t) => {
-        if (t.priority < 3) return false
-        if (!t.dueDate) return false
-        return extractDateStr(t.dueDate) === todayStr
-      })
-      .sort((a, b) => b.priority - a.priority)
-      .slice(0, 3)
-  }, [tasks])
 
   const greeting = getGreeting()
 

@@ -15,10 +15,9 @@ import { CollapseArrow } from './CollapseArrow'
 import { ProjectColorDot } from './ProjectColorDot'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
 import { usePersistedBoolean } from '@/hooks/usePersistedBoolean'
-import { useRelativeDates } from '@/hooks/useRelativeDates'
-import { extractDateStr } from '@/utils/date'
 import type { ThemeType } from '@/themes'
 import type { Task, Project } from '@/types'
+import type { TaskCounts } from '@/utils/taskFilters'
 
 // 主题配置
 const themeOptions: { type: ThemeType; color: string; name: string }[] = [
@@ -31,6 +30,7 @@ const themeOptions: { type: ThemeType; color: string; name: string }[] = [
 interface SidebarProps {
   tasks: Task[]
   projects: Project[]
+  counts: TaskCounts
   selectedFilter: string
   onFilterChange: (filter: string) => void
   onSearch?: (query: string) => void
@@ -247,6 +247,7 @@ function FolderItem({
 export function Sidebar({
   tasks,
   projects,
+  counts,
   selectedFilter,
   onFilterChange,
   onSearch,
@@ -258,53 +259,39 @@ export function Sidebar({
   )
   const [collapsed, toggleCollapsed] = usePersistedBoolean('sidebarCollapsed')
 
-  const { todayStr, tomorrowStr, nextWeekStr } = useRelativeDates()
-
-  const smartFilters = useMemo<SmartFilter[]>(
-    () => [
-      {
-        id: 'inbox',
-        name: '收集箱',
-        icon: <InboxOutlined />,
-        count: tasks.filter((t) => t.projectId.startsWith('inbox')).length,
-      },
-      {
-        id: 'today',
-        name: '今天',
-        icon: <FieldTimeOutlined />,
-        count: tasks.filter(
-          (t) => t.dueDate && extractDateStr(t.dueDate) === todayStr
-        ).length,
-      },
-      {
-        id: 'tomorrow',
-        name: '明天',
-        icon: <CalendarOutlined />,
-        count: tasks.filter(
-          (t) => t.dueDate && extractDateStr(t.dueDate) === tomorrowStr
-        ).length,
-      },
-      {
-        id: 'week',
-        name: '最近7天',
-        icon: <CalendarOutlined />,
-        count: tasks.filter((t) => {
-          if (!t.dueDate) return false
-          const d = extractDateStr(t.dueDate)
-          return d >= todayStr && d < nextWeekStr
-        }).length,
-      },
-      {
-        id: 'overdue',
-        name: '已过期',
-        icon: <ClockCircleOutlined />,
-        count: tasks.filter(
-          (t) => t.dueDate && extractDateStr(t.dueDate) < todayStr
-        ).length,
-      },
-    ],
-    [tasks, todayStr, tomorrowStr, nextWeekStr]
-  )
+  // 使用预计算的 counts
+  const smartFilters: SmartFilter[] = [
+    {
+      id: 'inbox',
+      name: '收集箱',
+      icon: <InboxOutlined />,
+      count: counts.inbox,
+    },
+    {
+      id: 'today',
+      name: '今天',
+      icon: <FieldTimeOutlined />,
+      count: counts.today,
+    },
+    {
+      id: 'tomorrow',
+      name: '明天',
+      icon: <CalendarOutlined />,
+      count: counts.tomorrow,
+    },
+    {
+      id: 'week',
+      name: '最近7天',
+      icon: <CalendarOutlined />,
+      count: counts.week,
+    },
+    {
+      id: 'overdue',
+      name: '已过期',
+      icon: <ClockCircleOutlined />,
+      count: counts.overdue,
+    },
+  ]
 
   const { folders, ungroupedProjects } = useMemo(() => {
     const projectsWithCount: ProjectWithCount[] = projects

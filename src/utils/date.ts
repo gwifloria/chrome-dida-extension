@@ -14,10 +14,12 @@ export function formatDateStr(date: Date): string {
 }
 
 /**
- * 从 ISO 日期字符串中提取 YYYY-MM-DD 部分
+ * 从 ISO 日期字符串中提取本地日期的 YYYY-MM-DD 部分
+ * 处理时区问题：将 UTC 时间转换为本地时间后再提取日期
  */
 export function extractDateStr(dueDate: string): string {
-  return dueDate.slice(0, 10)
+  const date = new Date(dueDate)
+  return formatDateStr(date)
 }
 
 /**

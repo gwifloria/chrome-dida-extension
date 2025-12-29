@@ -6,7 +6,7 @@ import { CollapseArrow } from './CollapseArrow'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
 import { useRelativeDates } from '@/hooks/useRelativeDates'
-import { useFilteredTasks } from '@/hooks/useFilteredTasks'
+import { filterTasks, sortTasks } from '@/utils/taskFilters'
 import { extractDateStr, formatDisplayDate, formatTime } from '@/utils/date'
 import type { Task, Project } from '@/types'
 
@@ -61,8 +61,11 @@ export function TaskList({
   // 使用统一的日期 Hook
   const { todayStr, tomorrowStr, dayAfterStr } = useRelativeDates()
 
-  // 使用统一的过滤 Hook
-  const filteredTasks = useFilteredTasks(tasks, filter, searchQuery)
+  // 使用统一的过滤函数
+  const filteredTasks = useMemo(
+    () => sortTasks(filterTasks(tasks, filter, searchQuery), 'priority'),
+    [tasks, filter, searchQuery]
+  )
 
   // 按日期分组
   const groupedTasks = useMemo<TaskGroup[]>(() => {
