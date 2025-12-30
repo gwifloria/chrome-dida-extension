@@ -1,0 +1,45 @@
+import type { Theme } from './index'
+
+export const milkTheme: Theme = {
+  name: '椰奶白',
+  type: 'journal',
+  colors: {
+    bgPrimary: '#eeeeee',
+    bgSecondary: '#fafaf9',
+    bgSidebar: '#fcfcfc',
+    bgContent: '#ffffff',
+    bgCard: '#ffffff',
+    textPrimary: '#292524',
+    textSecondary: '#a8a29e',
+    accent: '#57534e',
+    accentLight: '#f5f5f4',
+    border: '#e7e5e4',
+    sidebarText: '#78716c',
+    sidebarHover: '#f0f0f0',
+    sidebarActive: '#e5e5e5',
+    sidebarActiveText: '#292524',
+    success: '#a8a29e',
+    warning: '#78716c',
+    danger: '#57534e',
+    priorityHigh: '#dc2626',
+    priorityMedium: '#f59e0b',
+    priorityLow: '#a8a29e',
+  },
+  borderRadius: {
+    small: '8px',
+    medium: '16px',
+    large: '24px',
+  },
+  shadow: {
+    small: '0 2px 8px rgba(0, 0, 0, 0.04)',
+    medium: '0 4px 16px rgba(0, 0, 0, 0.06)',
+    large: '0 8px 32px rgba(0, 0, 0, 0.08)',
+  },
+  font: {
+    primary: '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif',
+    secondary: '"Noto Serif SC", "STSong", serif',
+    heading: '"ZCOOL XiaoWei", "Ma Shan Zheng", cursive',
+  },
+  showTexture: true,
+  showTape: true,
+}

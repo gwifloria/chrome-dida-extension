@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* 手写字体 */
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap');
+
 /* 主题变量 */
 @theme {
   --color-primary: var(--bg-primary);
@@ -17,30 +20,40 @@
 
 :root {
   /* 默认主题变量会被 ThemeContext 覆盖 */
-  --bg-primary: #e8e4df;
-  --bg-secondary: #f5ede4;
-  --bg-sidebar: #e8e4df;
-  --bg-content: #f8f6f3;
+  --bg-primary: #eeeeee;
+  --bg-secondary: #fafaf9;
+  --bg-sidebar: #fcfcfc;
+  --bg-content: #ffffff;
   --bg-card: #ffffff;
-  --text-primary: #5d4e4e;
-  --text-secondary: #9b8b8b;
-  --accent: #e8a0a0;
-  --accent-light: #fce8e8;
-  --border: #e8ddd4;
-  --success: #a8d5a2;
-  --warning: #f5d6a8;
-  --danger: #e8a0a0;
-  --priority-high: #e8a0a0;
-  --priority-medium: #f5d6a8;
-  --priority-low: #a8d5a2;
+  --text-primary: #292524;
+  --text-secondary: #a8a29e;
+  --accent: #57534e;
+  --accent-light: #f5f5f4;
+  --border: #e7e5e4;
+  /* 侧边栏颜色 */
+  --sidebar-text: #78716c;
+  --sidebar-hover: #f0f0f0;
+  --sidebar-active: #e5e5e5;
+  --sidebar-active-text: #292524;
+  /* 状态色 */
+  --success: #a8a29e;
+  --warning: #78716c;
+  --danger: #57534e;
+  --priority-high: #dc2626;
+  --priority-medium: #f59e0b;
+  --priority-low: #a8a29e;
+  /* 圆角 */
   --radius-small: 8px;
   --radius-medium: 16px;
   --radius-large: 24px;
-  --shadow-small: 0 2px 8px rgba(93, 78, 78, 0.08);
-  --shadow-medium: 0 4px 16px rgba(93, 78, 78, 0.1);
-  --shadow-large: 0 8px 32px rgba(93, 78, 78, 0.12);
+  /* 阴影 */
+  --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-large: 0 8px 32px rgba(0, 0, 0, 0.08);
+  /* 字体 */
   --font-primary: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-secondary: 'Noto Serif SC', 'STSong', serif;
+  --font-heading: 'ZCOOL XiaoWei', 'Ma Shan Zheng', cursive;
 }
 
 body {
@@ -142,4 +155,81 @@ body {
     transparent 1px
   );
   background-size: 16px 16px;
+}
+
+/* 点阵网格背景 */
+.dot-grid {
+  background-image: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0.08) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 24px 24px;
+}
+
+/* 纸张纹理 - 细腻的纸纹效果 */
+.paper-texture {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* 胶带条装饰 */
+.tape-strip {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 253, 208, 0.7) 0%,
+    rgba(255, 253, 208, 0.5) 100%
+  );
+  transform: rotate(-2deg);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+}
+
+/* 手帐本阴影 */
+.notebook-shadow {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 10px 30px rgba(0, 0, 0, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+}
+
+/* Focus 按钮流光边框动画 */
+@keyframes border-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-border-spin {
+  animation: border-spin 4s linear infinite;
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* 隐藏滚动条但保持滚动功能 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

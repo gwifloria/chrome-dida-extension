@@ -2,7 +2,15 @@ import { defaultSettings, type AppSettings } from '@/types/settings'
 
 const STORAGE_KEY = 'app_settings'
 const VERSION_KEY = 'settings_version'
-const CURRENT_VERSION = 1
+const CURRENT_VERSION = 2
+
+// 旧主题名 -> 新主题名映射
+const THEME_MIGRATION: Record<string, string> = {
+  journal: 'beige',
+  ocean: 'blue',
+  tech: 'dark',
+  rose: 'milk',
+}
 
 // 旧版存储键（用于迁移）
 const LEGACY_SETTINGS_KEY = 'user_settings'
@@ -45,9 +53,11 @@ async function migrateLegacySettings(): Promise<void> {
 
   // 如果有旧版数据，迁移到新版
   if (legacySettings || legacyTheme) {
+    const oldTheme = legacyTheme as string
+    const newTheme = THEME_MIGRATION[oldTheme] || oldTheme || 'pink'
     const migratedSettings: AppSettings = {
       defaultProjectId: legacySettings?.defaultProjectId ?? null,
-      theme: (legacyTheme as AppSettings['theme']) ?? 'journal',
+      theme: newTheme as AppSettings['theme'],
     }
 
     await chrome.storage.sync.set({
@@ -129,6 +139,16 @@ const migrations: Record<number, (data: unknown) => Record<string, unknown>> = {
     return {
       defaultProjectId: d.defaultProjectId ?? null,
       theme: d.theme ?? 'journal',
+    }
+  },
+  // v1 -> v2: 主题名迁移 (journal/ocean/tech/rose -> milk/beige/pink/blue/dark)
+  2: (data) => {
+    const d = (data || {}) as Record<string, unknown>
+    const oldTheme = d.theme as string
+    const newTheme = THEME_MIGRATION[oldTheme] || oldTheme || 'pink'
+    return {
+      ...d,
+      theme: newTheme,
     }
   },
 }

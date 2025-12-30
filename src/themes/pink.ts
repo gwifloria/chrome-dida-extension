@@ -1,0 +1,45 @@
+import type { Theme } from './index'
+
+export const pinkTheme: Theme = {
+  name: '莫兰迪粉',
+  type: 'journal',
+  colors: {
+    bgPrimary: '#f2efee',
+    bgSecondary: '#fbf8f8',
+    bgSidebar: '#fcfaf9',
+    bgContent: '#fdfcfc',
+    bgCard: '#ffffff',
+    textPrimary: '#5d5555',
+    textSecondary: '#9c9492',
+    accent: '#d4a5a5',
+    accentLight: '#f5eeec',
+    border: '#e8e4e2',
+    sidebarText: '#8a807e',
+    sidebarHover: '#f5eeec',
+    sidebarActive: '#ebdcd9',
+    sidebarActiveText: '#6e5d5b',
+    success: '#7EC699',
+    warning: '#F0C78A',
+    danger: '#E88A8A',
+    priorityHigh: '#E88A8A',
+    priorityMedium: '#F0C78A',
+    priorityLow: '#7EC699',
+  },
+  borderRadius: {
+    small: '8px',
+    medium: '16px',
+    large: '24px',
+  },
+  shadow: {
+    small: '0 2px 8px rgba(0, 0, 0, 0.04)',
+    medium: '0 4px 16px rgba(0, 0, 0, 0.06)',
+    large: '0 8px 32px rgba(0, 0, 0, 0.08)',
+  },
+  font: {
+    primary: '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif',
+    secondary: '"Noto Serif SC", "STSong", serif',
+    heading: '"ZCOOL XiaoWei", "Ma Shan Zheng", cursive',
+  },
+  showTexture: true,
+  showTape: true,
+}

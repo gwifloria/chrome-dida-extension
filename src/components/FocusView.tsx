@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CheckOutlined } from '@ant-design/icons'
+import { CheckOutlined, MenuOutlined } from '@ant-design/icons'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getGreeting } from '@/utils/greeting'
 import { formatTime, formatDateStr } from '@/utils/date'
@@ -25,7 +25,7 @@ export function FocusView({
   onSwitchView,
   todayTaskCount,
 }: FocusViewProps) {
-  const { themeType, setThemeType } = useTheme()
+  const { theme, themeType, setThemeType } = useTheme()
   const [currentTime, setCurrentTime] = useState(new Date())
   const [quote] = useState<Quote>(() => getRandomQuote())
   const [newTaskTitle, setNewTaskTitle] = useState('')
@@ -61,18 +61,33 @@ export function FocusView({
   }
 
   return (
-    <div className="h-screen bg-[var(--bg-primary)] flex flex-col relative">
-      {/* 顶部栏 - 右上角主题切换 */}
-      <div className="flex justify-end items-center p-6">
-        <div className="flex items-center gap-2">
+    <div className="h-screen bg-[var(--bg-primary)] flex flex-col relative overflow-hidden animate-fadeIn">
+      {/* 背景纹理层 */}
+      {theme.showTexture && (
+        <div className="absolute inset-0 pointer-events-none opacity-40 paper-texture" />
+      )}
+
+      {/* 顶部栏 */}
+      <div className="flex justify-between items-center p-6 relative z-10">
+        {/* 左上角 Links 按钮 */}
+        <button
+          onClick={onSwitchView}
+          className="flex items-center gap-2 text-sm font-bold opacity-60 hover:opacity-100 transition-opacity text-[var(--text-primary)] bg-transparent border-0 cursor-pointer"
+        >
+          <MenuOutlined className="text-base" />
+          <span>Links</span>
+        </button>
+
+        {/* 右上角主题切换 */}
+        <div className="flex items-center gap-1.5">
           {THEME_OPTIONS.map((option) => (
             <button
               key={option.type}
               onClick={() => setThemeType(option.type)}
               title={option.name}
               className={`
-                w-4 h-4 rounded-full transition-all cursor-pointer border-0 p-0
-                ${themeType === option.type ? 'ring-2 ring-offset-2 ring-[var(--text-secondary)] scale-110' : 'opacity-60 hover:opacity-100 hover:scale-110'}
+                w-3 h-3 rounded-full transition-all cursor-pointer border border-black/5 p-0
+                ${themeType === option.type ? 'ring-1 ring-offset-1 ring-[var(--text-secondary)] scale-125' : 'opacity-60 hover:opacity-100 hover:scale-125'}
               `}
               style={{ backgroundColor: option.color }}
             />
@@ -81,9 +96,9 @@ export function FocusView({
       </div>
 
       {/* 主内容区 */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
         {/* 大时钟 */}
-        <div className="text-[120px] font-extralight text-[var(--text-primary)] leading-none tracking-tight">
+        <div className="text-[120px] font-extralight text-[var(--text-primary)] leading-none tracking-tight hover:scale-105 transition-transform duration-700">
           {formatTime(currentTime)}
         </div>
 
@@ -138,11 +153,17 @@ export function FocusView({
       </div>
 
       {/* 底部语录 */}
-      <div className="text-center pb-8 px-6">
-        <p className="text-sm text-[var(--text-secondary)] italic">
+      <div className="text-center pb-8 px-6 relative z-10">
+        <p
+          className="text-lg text-[var(--text-primary)] italic opacity-70 max-w-3xl mx-auto"
+          style={{
+            fontFamily:
+              theme.type === 'journal' ? 'var(--font-heading)' : 'inherit',
+          }}
+        >
           "{quote.text}"
         </p>
-        <p className="text-xs text-[var(--text-secondary)] mt-2 tracking-wider uppercase">
+        <p className="text-xs text-[var(--text-secondary)] mt-2 tracking-widest uppercase font-bold opacity-40">
           {quote.author}
         </p>
       </div>
@@ -150,7 +171,7 @@ export function FocusView({
       {/* 右下角 Todo 按钮 */}
       <button
         onClick={onSwitchView}
-        className="absolute bottom-6 right-6 bg-[var(--bg-card)] text-[var(--text-primary)] px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-[var(--border)] text-sm flex items-center gap-2"
+        className="absolute bottom-6 right-6 z-50 bg-[var(--bg-card)] text-[var(--text-primary)] px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-[var(--border)] text-sm flex items-center gap-2"
       >
         <span>Todo</span>
         <span className="bg-[var(--accent)] text-white text-xs px-2 py-0.5 rounded-full">
@@ -169,6 +190,7 @@ function FocusTaskItem({
   task: Task
   onComplete: (task: Task) => void
 }) {
+  const { theme } = useTheme()
   const [completing, setCompleting] = useState(false)
 
   const handleComplete = async () => {
@@ -193,7 +215,13 @@ function FocusTaskItem({
           <CheckOutlined className="text-xs text-[var(--accent)]" />
         )}
       </button>
-      <span className="flex-1 text-lg text-[var(--text-primary)]">
+      <span
+        className={`flex-1 text-lg text-[var(--text-primary)] ${completing ? 'line-through opacity-40' : ''}`}
+        style={{
+          fontFamily:
+            theme.type === 'journal' ? 'var(--font-heading)' : 'inherit',
+        }}
+      >
         {task.title}
       </span>
     </div>

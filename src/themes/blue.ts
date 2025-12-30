@@ -1,0 +1,45 @@
+import type { Theme } from './index'
+
+export const blueTheme: Theme = {
+  name: '雾霾蓝',
+  type: 'journal',
+  colors: {
+    bgPrimary: '#d0dbe2',
+    bgSecondary: '#eef5f8',
+    bgSidebar: '#ced8df',
+    bgContent: '#f4f8fa',
+    bgCard: '#ffffff',
+    textPrimary: '#334155',
+    textSecondary: '#64748b',
+    accent: '#475569',
+    accentLight: '#e2e8f0',
+    border: '#cbd5e1',
+    sidebarText: '#475569',
+    sidebarHover: '#c0ccd4',
+    sidebarActive: '#b6c5ce',
+    sidebarActiveText: '#1e293b',
+    success: '#7EC699',
+    warning: '#F0C78A',
+    danger: '#E88A8A',
+    priorityHigh: '#dc2626',
+    priorityMedium: '#f59e0b',
+    priorityLow: '#64748b',
+  },
+  borderRadius: {
+    small: '8px',
+    medium: '16px',
+    large: '24px',
+  },
+  shadow: {
+    small: '0 2px 8px rgba(51, 65, 85, 0.06)',
+    medium: '0 4px 16px rgba(51, 65, 85, 0.08)',
+    large: '0 8px 32px rgba(51, 65, 85, 0.1)',
+  },
+  font: {
+    primary: '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif',
+    secondary: '"Noto Serif SC", "STSong", serif',
+    heading: '"ZCOOL XiaoWei", "Ma Shan Zheng", cursive',
+  },
+  showTexture: true,
+  showTape: true,
+}

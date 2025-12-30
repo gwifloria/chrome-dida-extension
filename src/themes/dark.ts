@@ -1,0 +1,45 @@
+import type { Theme } from './index'
+
+export const darkTheme: Theme = {
+  name: '暗黑',
+  type: 'modern',
+  colors: {
+    bgPrimary: '#09090b',
+    bgSecondary: '#18181b',
+    bgSidebar: '#000000',
+    bgContent: '#121214',
+    bgCard: '#18181b',
+    textPrimary: '#e4e4e7',
+    textSecondary: '#71717a',
+    accent: '#34d399',
+    accentLight: '#18181b',
+    border: '#27272a',
+    sidebarText: '#71717a',
+    sidebarHover: '#27272a',
+    sidebarActive: '#27272a',
+    sidebarActiveText: '#fafafa',
+    success: '#34d399',
+    warning: '#fbbf24',
+    danger: '#f87171',
+    priorityHigh: '#f87171',
+    priorityMedium: '#fbbf24',
+    priorityLow: '#71717a',
+  },
+  borderRadius: {
+    small: '8px',
+    medium: '12px',
+    large: '16px',
+  },
+  shadow: {
+    small: '0 2px 8px rgba(0, 0, 0, 0.5)',
+    medium: '0 4px 16px rgba(0, 0, 0, 0.6)',
+    large: '0 8px 32px rgba(0, 0, 0, 0.7)',
+  },
+  font: {
+    primary: '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif',
+    secondary: '"Noto Sans SC", sans-serif',
+    heading: '"Noto Sans SC", sans-serif',
+  },
+  showTexture: false,
+  showTape: false,
+}

@@ -2,8 +2,9 @@ import type { ThemeType } from '@/themes'
 
 export const THEME_OPTIONS: { type: ThemeType; color: string; name: string }[] =
   [
-    { type: 'journal', color: '#E8E4DF', name: '手帐' },
-    { type: 'rose', color: '#F5F0ED', name: '玫瑰' },
-    { type: 'ocean', color: '#D8E3E8', name: '海洋' },
-    { type: 'tech', color: '#1C1C1E', name: '暗黑' },
+    { type: 'milk', color: '#ffffff', name: '椰奶' },
+    { type: 'beige', color: '#dce3dd', name: '米灰' },
+    { type: 'pink', color: '#ebdcd9', name: '玫瑰' },
+    { type: 'blue', color: '#ced8df', name: '海洋' },
+    { type: 'dark', color: '#18181b', name: '暗黑' },
   ]

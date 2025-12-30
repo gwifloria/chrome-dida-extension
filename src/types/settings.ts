@@ -16,5 +16,5 @@ export interface AppSettings {
  */
 export const defaultSettings: AppSettings = {
   defaultProjectId: null,
-  theme: 'journal',
+  theme: 'pink',
 }
