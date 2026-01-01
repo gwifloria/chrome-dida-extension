@@ -2,7 +2,7 @@
 // 处理 OAuth 回调和 token 刷新
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('滴答新标签扩展已安装')
+  console.log('First Glance extension installed')
 })
 
 // 定时刷新 token（每 30 分钟检查一次）

@@ -1,6 +1,6 @@
 # 隐私政策 | Privacy Policy
 
-**最后更新 / Last Updated: 2025-12-29**
+**最后更新 / Last Updated: 2026-01-01**
 
 ---
 
@@ -8,7 +8,7 @@
 
 ### 概述
 
-「滴答新标签」是一款 Chrome 浏览器扩展，用于在新标签页展示滴答清单任务。本隐私政策说明我们如何收集、使用和保护您的信息。
+「First Glance」是一款 Chrome 浏览器扩展，用于在新标签页展示滴答清单（Dida365/TickTick）任务。本隐私政策说明我们如何收集、使用和保护您的信息。
 
 ### 数据收集
 
@@ -71,7 +71,7 @@
 
 ### Overview
 
-"Dida365 NewTab" is a Chrome browser extension that displays TickTick/Dida365 tasks on new tab page. This privacy policy explains how we collect, use, and protect your information.
+"First Glance" is a Chrome browser extension that displays Dida365 (TickTick) tasks on your new tab page. This privacy policy explains how we collect, use, and protect your information.
 
 ### Data Collection
 

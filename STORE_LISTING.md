@@ -1,85 +1,96 @@
-# Chrome Web Store 上架材料
+# Chrome Web Store Listing Materials
 
-## 基本信息
+## Basic Information
 
-**扩展名称（45字符内）：**
+**Extension Name (45 characters max):**
 ```
-滴答新标签
-```
-
-**简短描述（132字符内）：**
-```
-将新标签页变成专注任务面板。优雅展示滴答清单任务，支持专注模式、多主题切换，帮助你保持高效。
+First Glance - Focus Tab
 ```
 
-## 详细描述
+**Short Description (132 characters max):**
+```
+Turn new tabs into your focus dashboard. High-priority tasks at a glance. Stay productive, avoid distractions. Supports Dida365.
+```
+
+## Detailed Description
 
 ```
-🎯 将新标签页变成你的专注任务面板
+🎯 One glance at what matters most
 
-每次打开新标签页，不再是空白或广告，而是你今天最重要的任务。
+Every time you open a new tab, instead of blank pages or ads, you see your most important tasks for the day.
 
-✨ 核心功能：
+✨ Core Features:
 
-• 专注模式 - 大时钟 + 今日重点任务，帮助你保持专注
-• 智能清单 - 今天、明天、本周、已过期，一目了然
-• 任务管理 - 查看、完成、编辑、删除、新建，全功能支持
-• 多主题切换 - 手帐、玫瑰、海洋、暗黑四种风格
-• 跨设备同步 - 主题偏好自动同步
+• Focus Mode - Clean clock with today's top tasks to keep you on track
+• Smart Lists - Today, Tomorrow, This Week, Overdue - all organized
+• Full Task Management - View, complete, edit, delete, create - everything you need
+• Multiple Themes - Journal, Rose, Ocean, Dark - match your mood
+• Cross-device Sync - Your theme preferences follow you everywhere
 
-📋 使用说明：
+📋 How to use:
 
-1. 安装扩展后，打开新标签页
-2. 使用滴答清单账号授权登录
-3. 开始专注你的任务！
+1. Install the extension
+2. Authorize with your Dida365 (TickTick) account
+3. Start focusing on what matters!
 
-🔒 隐私保护：
+🔒 Privacy First:
 
-• 所有数据存储在本地浏览器
-• 不收集任何用户数据
-• 不包含广告或追踪
+• All data stored locally in your browser
+• No tracking or analytics
+• No ads or distractions
+• Open source on GitHub
 
-💡 适合人群：
+💡 Perfect for:
 
-• 滴答清单用户
-• 希望减少新标签页干扰的人
-• 追求高效工作的效率爱好者
+• Dida365/TickTick users
+• Anyone who wants to reduce new tab distractions
+• Productivity enthusiasts
 
-📮 反馈建议：
+🔮 Coming Soon:
+- Notion integration
+- Todoist support
+- More task platforms
+
+📮 Feedback & Support:
 GitHub: https://github.com/gwifloria/chrome-dida-extension/issues
 
 ---
 
-需要滴答清单账号才能使用本扩展。
+First Glance helps you stay focused on what truly matters, one tab at a time.
 ```
 
-## 分类
+## Category
 
-- 主分类：效率工具 (Productivity)
-- 语言：中文（简体）、English
+- Primary Category: Productivity
+- Language: English, 中文（简体）
 
-## 截图说明（需要准备）
+## Screenshots (To Prepare)
 
-建议准备 3-5 张截图（1280x800 或 640x400）：
+Recommended: 3-5 screenshots (1280x800 or 640x400):
 
-1. **专注模式** - 大时钟 + 今日任务
-2. **任务列表** - 完整的任务管理界面
-3. **多主题** - 展示不同主题风格
-4. **智能清单** - 侧边栏筛选功能
-5. **登录页面** - 简洁的授权入口
+1. **Focus Mode** - Clean clock + today's tasks with annotation "Clean focus view"
+2. **Task List** - Full task management interface with annotation "Full task management"
+3. **Multiple Themes** - Show 4 different themes with annotation "Match your mood"
+4. **Smart Lists** - Sidebar filtering feature with annotation "Stay organized"
+5. **Login Page** - Clean onboarding screen
 
-## 宣传图（可选）
+## Promotional Images (Optional)
 
-- 小宣传图：440x280
-- 大宣传图：1400x560
-- Marquee：1400x560
+- Small tile: 440x280
+- Large tile: 1400x560
+- Marquee: 1400x560
 
-## 注意事项
+## Important Notes
 
-1. 隐私政策需要托管到可公开访问的 URL
-   - 可用 GitHub Pages: `https://gwifloria.github.io/chrome-dida-extension/PRIVACY`
-   - 或放在 GitHub 仓库直接链接
+1. Privacy Policy URL needs to be publicly accessible
+   - Use GitHub Pages: `https://gwifloria.github.io/chrome-dida-extension/privacy.html`
+   - Or link directly to GitHub repository
 
-2. 首次提交需要支付 $5 开发者注册费
+2. First submission requires $5 developer registration fee
 
-3. 审核时间通常 1-3 个工作日
+3. Review typically takes 1-3 business days
+
+## SEO Keywords (For Reference)
+
+Primary: new tab, focus, productivity, tasks, todo, dida365, ticktick
+Secondary: dashboard, reminder, anti-distraction, time management

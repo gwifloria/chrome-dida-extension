@@ -14,12 +14,12 @@ export function LoginButton({ loading, onLogin }: LoginButtonProps) {
 
         {/* 标题 */}
         <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-3">
-          滴答新标签
+          First Glance
         </h1>
 
         {/* 副标题 */}
         <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-8">
-          每天从这里开始
+          One glance at what matters most
         </p>
 
         {/* 登录按钮 */}
