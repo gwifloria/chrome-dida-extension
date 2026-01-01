@@ -14,14 +14,12 @@ export function LoginButton({ loading, onLogin }: LoginButtonProps) {
 
         {/* 标题 */}
         <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-3">
-          Wonderland Tasks
+          滴答新标签
         </h1>
 
         {/* 副标题 */}
         <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-8">
-          在这个宁静的角落，
-          <br />
-          专注记录与完成你的每一件小事。
+          每天从这里开始
         </p>
 
         {/* 登录按钮 */}
