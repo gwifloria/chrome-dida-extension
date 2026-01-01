@@ -11,7 +11,9 @@
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "zip": "cd dist && zip -r ../first-glance.zip .",
+    "release": "npm run build && npm run zip"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
