@@ -1,17 +1,15 @@
-import { Modal, Form, Input, Select, DatePicker } from 'antd'
+import { Modal, Form, Input, Select } from 'antd'
 import { FlagOutlined } from '@ant-design/icons'
 import { PRIORITY_OPTIONS } from '@/constants/task'
 import {
   FORM_INPUT_STYLE,
   FORM_SELECT_STYLE,
-  FORM_DATEPICKER_STYLE,
   MODAL_STYLE,
   MODAL_OK_BUTTON_STYLE,
   MODAL_CANCEL_BUTTON_STYLE,
   FORM_LAYOUT_STYLE,
 } from '@/constants/styles'
 import type { Task, Project } from '@/types'
-import dayjs from 'dayjs'
 
 interface TaskEditorProps {
   task: Task | null
@@ -38,7 +36,7 @@ export function TaskEditor({
       content: values.content,
       priority: values.priority,
       projectId: values.projectId,
-      dueDate: values.dueDate ? values.dueDate.toISOString() : undefined,
+      dueDate: task?.dueDate, // 保留原有日期，不提供编辑
     }
     onSave(task?.id || null, formattedValues)
     form.resetFields()
@@ -76,7 +74,6 @@ export function TaskEditor({
           content: task?.content || '',
           priority: task?.priority || 0,
           projectId: task?.projectId || projects[0]?.id,
-          dueDate: task?.dueDate ? dayjs(task.dueDate) : null,
         }}
       >
         <Form.Item
@@ -95,38 +92,24 @@ export function TaskEditor({
           />
         </Form.Item>
 
-        {/* 所属项目和截止日期并排 */}
-        <div className="flex gap-3">
-          <Form.Item
-            name="projectId"
-            label="所属项目"
-            className="!flex-1 !mb-4"
-          >
-            <Select className={FORM_SELECT_STYLE}>
-              {projects
-                .filter((p) => !p.closed)
-                .map((project) => (
-                  <Select.Option key={project.id} value={project.id}>
-                    <span className="flex items-center gap-2">
-                      <span
-                        className="w-2 h-2 rounded-full"
-                        style={{ background: project.color || 'var(--accent)' }}
-                      />
-                      {project.name}
-                    </span>
-                  </Select.Option>
-                ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="dueDate" label="截止日期" className="!flex-1 !mb-4">
-            <DatePicker
-              className={FORM_DATEPICKER_STYLE}
-              style={{ width: '100%' }}
-              placeholder="选择日期"
-            />
-          </Form.Item>
-        </div>
+        {/* 所属项目 */}
+        <Form.Item name="projectId" label="所属项目" className="!mb-4">
+          <Select className={FORM_SELECT_STYLE}>
+            {projects
+              .filter((p) => !p.closed)
+              .map((project) => (
+                <Select.Option key={project.id} value={project.id}>
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="w-2 h-2 rounded-full"
+                      style={{ background: project.color || 'var(--accent)' }}
+                    />
+                    {project.name}
+                  </span>
+                </Select.Option>
+              ))}
+          </Select>
+        </Form.Item>
 
         <Form.Item name="priority" label="优先级" className="!mb-0">
           <Select

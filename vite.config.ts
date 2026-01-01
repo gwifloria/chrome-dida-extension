@@ -24,6 +24,14 @@ export default defineConfig(({ command, mode }) => {
     build: {
       outDir: isRelease ? 'build' : 'dist',
       emptyOutDir: true,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom'],
+            'vendor-antd': ['antd'],
+          },
+        },
+      },
     },
   }
 })
