@@ -1,8 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "滴答清单 New Tab",
-  "description": "在新标签页展示滴答清单任务",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoCgWDP59X32DDKwXYpa9yKZ1qUg/u4UMaHBLh3zr5VUb9OYlDlOYNDsrNAvAz2gaZtKklRa++cSSDDq6slSl4QEP9GdSBJQ7KbQn9YKRcWPobl09VkBDbQxoq6i1hpKJNwd9I93ISDLqpEO1KJL7H9aaAL0me5HhYKQ9kXmdSVSlEZY4oEieRoXlPihrYZiD/d2YXTuw5lS3c2GMF8EvrPfxfqK9WP4idS9RPNLHPuXyDOIyLzNlQp/v8VIQalrmREMfeBBCm6xHSgdYfrTDziSno60XekoBRAbD3Kyndte09L3SykGFJxJ4jrMzxtTn1Uv3EnEpwBDP8NzTPT8dUQIDAQAB",
+  "name": "First Glance - Focus Tab",
+  "description": "Turn your new tab into a focus dashboard. View high-priority tasks at a glance. Stay productive, avoid distractions.",
   "version": "1.0.0",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
   "chrome_url_overrides": {
     "newtab": "src/newtab/index.html"
   },

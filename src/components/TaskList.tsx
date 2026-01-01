@@ -1,14 +1,15 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Spin, Empty, Alert, Input } from 'antd'
+import { Empty, Alert, Input } from 'antd'
 import { TaskItem } from './TaskItem'
 import { TaskEditor } from './TaskEditor'
 import { CollapseArrow } from './CollapseArrow'
+import { FocusButton } from './FocusButton'
+import { TaskSkeleton } from './TaskSkeleton'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
 import { useRelativeDates } from '@/hooks/useRelativeDates'
-import { useFilteredTasks } from '@/hooks/useFilteredTasks'
+import { filterTasks, sortTasks, type TaskGroup } from '@/utils/taskFilters'
 import { extractDateStr, formatDisplayDate, formatTime } from '@/utils/date'
-import { findInboxProject } from '@/utils/project'
 import type { Task, Project } from '@/types'
 
 interface TaskListProps {
@@ -22,12 +23,7 @@ interface TaskListProps {
   onDelete: (task: Task) => void
   onUpdate: (taskId: string, updates: Partial<Task>) => void
   onCreate: (task: Partial<Task>) => Promise<Task>
-}
-
-interface TaskGroup {
-  id: string
-  title: string
-  tasks: Task[]
+  onFocus?: () => void
 }
 
 export function TaskList({
@@ -41,6 +37,7 @@ export function TaskList({
   onDelete,
   onUpdate,
   onCreate,
+  onFocus,
 }: TaskListProps) {
   const { settings } = useSettings()
   const [editingTask, setEditingTask] = useState<Task | null>(null)
@@ -62,8 +59,11 @@ export function TaskList({
   // 使用统一的日期 Hook
   const { todayStr, tomorrowStr, dayAfterStr } = useRelativeDates()
 
-  // 使用统一的过滤 Hook
-  const filteredTasks = useFilteredTasks(tasks, filter, searchQuery)
+  // 使用统一的过滤函数
+  const filteredTasks = useMemo(
+    () => sortTasks(filterTasks(tasks, filter, searchQuery), 'priority'),
+    [tasks, filter, searchQuery]
+  )
 
   // 按日期分组
   const groupedTasks = useMemo<TaskGroup[]>(() => {
@@ -160,18 +160,29 @@ export function TaskList({
     if (!quickAddValue.trim()) return
 
     let projectId: string | undefined
+    let dueDate: string | undefined
+
+    // 根据 filter 设置 projectId
     if (filter.startsWith('project:')) {
       projectId = filter.replace('project:', '')
     } else if (settings.defaultProjectId) {
       projectId = settings.defaultProjectId
     } else {
-      const inbox = findInboxProject(projects)
-      projectId = inbox?.id || projects[0]?.id
+      projectId = projects[0]?.id
     }
+
+    // 根据 filter 设置 dueDate
+    if (filter === 'today') {
+      dueDate = todayStr + 'T00:00:00.000+0000'
+    } else if (filter === 'tomorrow') {
+      dueDate = tomorrowStr + 'T00:00:00.000+0000'
+    }
+    // week/overdue/nodate 不设置默认日期
 
     await onCreate({
       title: quickAddValue.trim(),
       projectId,
+      dueDate,
     })
     setQuickAddValue('')
   }
@@ -221,15 +232,19 @@ export function TaskList({
             </span>
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-xs text-[var(--text-secondary)] mb-1">
-            Today is a gift
-          </div>
-          <div className="text-4xl max-md:text-2xl font-extralight text-[var(--text-secondary)] leading-none">
-            {formatTime(currentTime)}
-          </div>
-          <div className="text-xs text-[var(--text-secondary)] mt-1">
-            {formatDisplayDate(currentTime)}
+        <div className="flex items-start gap-6">
+          {/* Focus 按钮 */}
+          {onFocus && <FocusButton onClick={onFocus} size="large" />}
+          <div className="text-right">
+            <div className="text-xs text-[var(--text-secondary)] mb-1">
+              Today is a gift
+            </div>
+            <div className="text-4xl max-md:text-2xl font-extralight text-[var(--text-secondary)] leading-none">
+              {formatTime(currentTime)}
+            </div>
+            <div className="text-xs text-[var(--text-secondary)] mt-1">
+              {formatDisplayDate(currentTime)}
+            </div>
           </div>
         </div>
       </div>
@@ -241,7 +256,7 @@ export function TaskList({
           value={quickAddValue}
           onChange={(e) => setQuickAddValue(e.target.value)}
           onPressEnter={handleQuickAdd}
-          className="!bg-[var(--bg-secondary)] !rounded-xl !py-3.5 !px-5 !text-sm [&_.ant-input]:!bg-transparent [&_.ant-input]:!text-[var(--text-primary)] [&_.ant-input::placeholder]:!text-[var(--text-secondary)]"
+          className="!bg-[var(--bg-secondary)] !rounded-xl !py-3.5 !px-5 !text-sm [&_.ant-input]:!bg-transparent [&_.ant-input]:!text-[var(--text-primary)] [&_.ant-input::placeholder]:!text-[var(--text-secondary)] !border !border-transparent hover:!border-[var(--border)] hover:!shadow-sm !transition-all !duration-200 focus-within:!border-[var(--accent)] focus-within:!shadow-md"
           variant="borderless"
           suffix={
             <span
@@ -265,12 +280,7 @@ export function TaskList({
 
       <div className="flex-1 overflow-y-auto -mx-5 px-5">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 px-5 gap-4">
-            <Spin size="large" />
-            <span className="text-[var(--text-secondary)] text-sm">
-              正在加载...
-            </span>
-          </div>
+          <TaskSkeleton count={6} />
         ) : sortedGroups.length === 0 ? (
           <Empty
             description={

@@ -9,20 +9,19 @@ const REDIRECT_URI = chrome.identity.getRedirectURL()
 const AUTH_URL = 'https://dida365.com/oauth/authorize'
 const TOKEN_URL = 'https://dida365.com/oauth/token'
 
-export const auth = {
+// Debug: 检查配置
+console.log('[Auth Debug] CLIENT_ID:', CLIENT_ID ? '已配置' : '未配置')
+console.log('[Auth Debug] REDIRECT_URI:', REDIRECT_URI)
+
+class AuthService {
+  private refreshPromise: Promise<AuthToken | null> | null = null
+
   async login(): Promise<AuthToken> {
     const authUrl = new URL(AUTH_URL)
     authUrl.searchParams.set('client_id', CLIENT_ID)
     authUrl.searchParams.set('redirect_uri', REDIRECT_URI)
     authUrl.searchParams.set('response_type', 'code')
     authUrl.searchParams.set('scope', 'tasks:read tasks:write')
-
-    // 调试信息
-    console.log('OAuth Config:', {
-      client_id: CLIENT_ID,
-      redirect_uri: REDIRECT_URI,
-      auth_url: authUrl.toString(),
-    })
 
     return new Promise((resolve, reject) => {
       chrome.identity.launchWebAuthFlow(
@@ -59,7 +58,7 @@ export const auth = {
         }
       )
     })
-  },
+  }
 
   async exchangeCodeForToken(code: string): Promise<AuthToken> {
     const response = await fetch(TOKEN_URL, {
@@ -77,48 +76,71 @@ export const auth = {
     })
 
     if (!response.ok) {
-      throw new Error('Token 获取失败')
+      const errorData = await response.json().catch(() => ({}))
+      const errorMessage =
+        errorData.error_description || errorData.error || 'Token 获取失败'
+      throw new Error(`认证失败 (${response.status}): ${errorMessage}`)
     }
 
     return response.json()
-  },
+  }
 
   async refreshToken(): Promise<AuthToken | null> {
+    // 如果已有刷新操作正在进行，等待其完成
+    if (this.refreshPromise) {
+      return this.refreshPromise
+    }
+
     const currentToken = await storage.getToken()
     if (!currentToken?.refresh_token) {
       return null
     }
 
-    try {
-      const response = await fetch(TOKEN_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${btoa(`${CLIENT_ID}:${CLIENT_SECRET}`)}`,
-        },
-        body: new URLSearchParams({
-          grant_type: 'refresh_token',
-          refresh_token: currentToken.refresh_token,
-        }),
-      })
+    const refreshToken = currentToken.refresh_token
 
-      if (!response.ok) {
+    // 创建刷新 Promise，并在完成后清理
+    this.refreshPromise = (async () => {
+      try {
+        const response = await fetch(TOKEN_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${btoa(`${CLIENT_ID}:${CLIENT_SECRET}`)}`,
+          },
+          body: new URLSearchParams({
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken,
+          }),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          const errorMessage =
+            errorData.error_description || errorData.error || 'Token 刷新失败'
+          console.error(`Token 刷新失败 (${response.status}):`, errorMessage)
+          await storage.clearToken()
+          return null
+        }
+
+        const token: AuthToken = await response.json()
+        await storage.setToken(token)
+        return token
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : '未知错误'
+        console.error('Token 刷新异常:', errorMsg)
         await storage.clearToken()
         return null
+      } finally {
+        this.refreshPromise = null
       }
+    })()
 
-      const token: AuthToken = await response.json()
-      await storage.setToken(token)
-      return token
-    } catch {
-      await storage.clearToken()
-      return null
-    }
-  },
+    return this.refreshPromise
+  }
 
   async logout(): Promise<void> {
     await storage.clearToken()
-  },
+  }
 
   async getValidToken(): Promise<string | null> {
     const isValid = await storage.isTokenValid()
@@ -129,5 +151,7 @@ export const auth = {
 
     const refreshed = await this.refreshToken()
     return refreshed?.access_token || null
-  },
+  }
 }
+
+export const auth = new AuthService()

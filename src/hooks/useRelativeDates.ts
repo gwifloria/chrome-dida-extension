@@ -1,5 +1,10 @@
-import { useMemo } from 'react'
-import { formatDateStr } from '@/utils/date'
+import { useState, useEffect } from 'react'
+import {
+  getTodayStr,
+  getTomorrowStr,
+  getDayAfterStr,
+  getNextWeekStr,
+} from '@/utils/date'
 
 interface RelativeDates {
   todayStr: string
@@ -11,24 +16,45 @@ interface RelativeDates {
 /**
  * 获取相对日期字符串的 Hook
  * 用于任务过滤和分组中的日期比较
+ * 会在每天午夜自动更新日期
  */
 export function useRelativeDates(): RelativeDates {
-  return useMemo(() => {
+  const [dates, setDates] = useState(() => ({
+    todayStr: getTodayStr(),
+    tomorrowStr: getTomorrowStr(),
+    dayAfterStr: getDayAfterStr(),
+    nextWeekStr: getNextWeekStr(),
+  }))
+
+  useEffect(() => {
+    const updateDates = () => {
+      setDates({
+        todayStr: getTodayStr(),
+        tomorrowStr: getTomorrowStr(),
+        dayAfterStr: getDayAfterStr(),
+        nextWeekStr: getNextWeekStr(),
+      })
+    }
+
+    // 计算到下一个午夜的毫秒数
     const now = new Date()
-    const todayStr = formatDateStr(now)
+    const tomorrow = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1
+    )
+    const msUntilMidnight = tomorrow.getTime() - now.getTime()
 
-    const tomorrow = new Date(now)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    const tomorrowStr = formatDateStr(tomorrow)
+    // 在午夜时更新日期
+    const timeout = setTimeout(() => {
+      updateDates()
+      // 之后每24小时更新一次
+      const interval = setInterval(updateDates, 24 * 60 * 60 * 1000)
+      return () => clearInterval(interval)
+    }, msUntilMidnight)
 
-    const dayAfter = new Date(now)
-    dayAfter.setDate(dayAfter.getDate() + 2)
-    const dayAfterStr = formatDateStr(dayAfter)
-
-    const nextWeek = new Date(now)
-    nextWeek.setDate(nextWeek.getDate() + 7)
-    const nextWeekStr = formatDateStr(nextWeek)
-
-    return { todayStr, tomorrowStr, dayAfterStr, nextWeekStr }
+    return () => clearTimeout(timeout)
   }, [])
+
+  return dates
 }

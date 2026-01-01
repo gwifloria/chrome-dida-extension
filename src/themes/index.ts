@@ -1,5 +1,6 @@
 export interface Theme {
   name: string
+  type: 'journal' | 'modern'
   colors: {
     bgPrimary: string
     bgSecondary: string
@@ -11,6 +12,12 @@ export interface Theme {
     accent: string
     accentLight: string
     border: string
+    // 侧边栏颜色
+    sidebarText: string
+    sidebarHover: string
+    sidebarActive: string
+    sidebarActiveText: string
+    // 状态颜色
     success: string
     warning: string
     danger: string
@@ -31,11 +38,17 @@ export interface Theme {
   font: {
     primary: string
     secondary: string
+    heading: string
   }
+  // 装饰属性
+  showTexture: boolean
+  showTape: boolean
 }
 
-export type ThemeType = 'journal' | 'ocean' | 'tech'
+export type ThemeType = 'milk' | 'beige' | 'pink' | 'blue' | 'dark'
 
-export { journalTheme } from './journal'
-export { oceanTheme } from './ocean'
-export { techTheme } from './tech'
+export { milkTheme } from './milk'
+export { beigeTheme } from './beige'
+export { pinkTheme } from './pink'
+export { blueTheme } from './blue'
+export { darkTheme } from './dark'

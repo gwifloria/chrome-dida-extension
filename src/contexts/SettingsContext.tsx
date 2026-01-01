@@ -6,49 +6,61 @@ import {
   useCallback,
   type ReactNode,
 } from 'react'
-
-export interface Settings {
-  defaultProjectId: string | null // null 表示使用收集箱
-}
-
-const defaultSettings: Settings = {
-  defaultProjectId: null,
-}
+import {
+  getSettings,
+  setSettings,
+  subscribeSettings,
+} from '@/services/settingsStorage'
+import { defaultSettings, type AppSettings } from '@/types/settings'
 
 interface SettingsContextValue {
-  settings: Settings
-  updateSettings: (updates: Partial<Settings>) => void
+  settings: AppSettings
+  updateSettings: (updates: Partial<AppSettings>) => Promise<void>
   isLoading: boolean
+  error: string | null
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null)
 
-const STORAGE_KEY = 'user_settings'
-
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<Settings>(defaultSettings)
+  const [settings, setSettingsState] = useState<AppSettings>(defaultSettings)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
+  // 初始加载
   useEffect(() => {
-    // 从 storage 读取设置
-    chrome.storage.local.get(STORAGE_KEY).then((result) => {
-      if (result[STORAGE_KEY]) {
-        setSettings({ ...defaultSettings, ...result[STORAGE_KEY] })
-      }
-      setIsLoading(false)
-    })
+    getSettings()
+      .then(setSettingsState)
+      .catch((e) => setError((e as Error).message))
+      .finally(() => setIsLoading(false))
   }, [])
 
-  const updateSettings = useCallback((updates: Partial<Settings>) => {
-    setSettings((prev) => {
-      const next = { ...prev, ...updates }
-      chrome.storage.local.set({ [STORAGE_KEY]: next })
-      return next
-    })
+  // 监听跨 context 变化（其他 tab/popup 修改设置时同步）
+  useEffect(() => {
+    return subscribeSettings(setSettingsState)
   }, [])
+
+  // 更新设置
+  const updateSettings = useCallback(
+    async (updates: Partial<AppSettings>): Promise<void> => {
+      try {
+        setError(null)
+        await setSettings(updates)
+        // 注意：不需要手动 setSettingsState
+        // subscribeSettings 会在 storage 变化时自动触发更新
+      } catch (e) {
+        const message = (e as Error).message
+        setError(message)
+        throw e
+      }
+    },
+    []
+  )
 
   return (
-    <SettingsContext.Provider value={{ settings, updateSettings, isLoading }}>
+    <SettingsContext.Provider
+      value={{ settings, updateSettings, isLoading, error }}
+    >
       {children}
     </SettingsContext.Provider>
   )
@@ -61,3 +73,6 @@ export function useSettings() {
   }
   return context
 }
+
+// 导出类型供外部使用
+export type { AppSettings } from '@/types/settings'

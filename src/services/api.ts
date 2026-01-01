@@ -27,12 +27,16 @@ async function request<T>(
     throw new Error(error.errorMessage || `请求失败: ${response.status}`)
   }
 
-  // 204 No Content
+  // 204 No Content 或空响应体
   if (response.status === 204) {
     return undefined as T
   }
 
-  return response.json()
+  const text = await response.text()
+  if (!text) {
+    return undefined as T
+  }
+  return JSON.parse(text)
 }
 
 export const api = {
@@ -48,22 +52,41 @@ export const api = {
     return request(`/project/${projectId}/data`)
   },
 
-  // 获取所有任务（遍历所有项目）
+  // 获取收集箱任务
+  async getInboxTasks(): Promise<Task[]> {
+    const data = await this.getProjectData('inbox')
+    return (data.tasks || []).filter((task) => task.status === 0)
+  },
+
+  // 获取所有任务
   async getAllTasks(): Promise<{ tasks: Task[]; projects: Project[] }> {
     const projects = await this.getProjects()
-    const allTasks: Task[] = []
 
-    for (const project of projects) {
-      if (project.closed) continue
-      try {
-        const data = await this.getProjectData(project.id)
-        if (data.tasks) {
-          allTasks.push(...data.tasks)
-        }
-      } catch {
-        console.error(`获取项目 ${project.name} 的任务失败`)
-      }
-    }
+    // 并行获取所有项目的任务
+    const projectDataPromises = projects
+      .filter((p) => !p.closed)
+      .map((p) =>
+        this.getProjectData(p.id)
+          .then((data) => data.tasks || [])
+          .catch((err) => {
+            const errorMsg = err instanceof Error ? err.message : '未知错误'
+            console.error(`获取项目 ${p.name} 的任务失败:`, errorMsg)
+            return [] as Task[]
+          })
+      )
+
+    // 并行获取收集箱任务
+    const inboxPromise = this.getProjectData('inbox')
+      .then((data) => data.tasks || [])
+      .catch((err) => {
+        const errorMsg = err instanceof Error ? err.message : '未知错误'
+        console.error('获取收集箱任务失败:', errorMsg)
+        return [] as Task[]
+      })
+
+    // 等待所有请求完成
+    const taskArrays = await Promise.all([...projectDataPromises, inboxPromise])
+    const allTasks = taskArrays.flat()
 
     // 只返回未完成的任务
     const incompleteTasks = allTasks.filter((task) => task.status === 0)

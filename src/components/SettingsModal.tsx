@@ -1,6 +1,6 @@
 import { Modal, Select, Form } from 'antd'
 import { useSettings } from '@/contexts/SettingsContext'
-import { findInboxProject, filterActiveProjects } from '@/utils/project'
+import { filterActiveProjects } from '@/utils/project'
 import type { Project } from '@/types'
 
 interface SettingsModalProps {
@@ -15,15 +15,11 @@ export function SettingsModal({ open, onClose, projects }: SettingsModalProps) {
   // 过滤出未关闭的项目
   const availableProjects = filterActiveProjects(projects)
 
-  // 找到收集箱
-  const inboxProject = findInboxProject(availableProjects)
-
   const handleChange = (value: string) => {
-    updateSettings({
-      defaultProjectId: value === 'inbox' ? null : value,
-    })
+    updateSettings({ defaultProjectId: value })
   }
 
+  // 当前值：使用设置的值，默认为收集箱
   const currentValue = settings.defaultProjectId || 'inbox'
 
   return (
@@ -47,25 +43,27 @@ export function SettingsModal({ open, onClose, projects }: SettingsModalProps) {
             className="w-full"
             popupClassName="[&_.ant-select-item]:!text-[var(--text-primary)]"
           >
-            <Select.Option value="inbox">
+            {/* 收集箱选项 */}
+            <Select.Option key="inbox" value="inbox">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[var(--accent)]" />
-                <span>{inboxProject?.name || '收集箱'}（默认）</span>
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: '#888' }}
+                />
+                <span>收集箱</span>
               </div>
             </Select.Option>
-            {availableProjects
-              .filter((p) => p.kind !== 'INBOX' && p.name !== '收集箱')
-              .map((project) => (
-                <Select.Option key={project.id} value={project.id}>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="w-2 h-2 rounded-full"
-                      style={{ background: project.color || 'var(--accent)' }}
-                    />
-                    <span>{project.name}</span>
-                  </div>
-                </Select.Option>
-              ))}
+            {availableProjects.map((project) => (
+              <Select.Option key={project.id} value={project.id}>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{ background: project.color || 'var(--accent)' }}
+                  />
+                  <span>{project.name}</span>
+                </div>
+              </Select.Option>
+            ))}
           </Select>
           <p className="text-xs text-[var(--text-secondary)] mt-2">
             在智能清单中快速添加任务时，将使用此清单

@@ -1,0 +1,45 @@
+import type { Theme } from './index'
+
+export const beigeTheme: Theme = {
+  name: '经典米',
+  type: 'journal',
+  colors: {
+    bgPrimary: '#e3e0d6',
+    bgSecondary: '#F5EDE4',
+    bgSidebar: '#dce3dd',
+    bgContent: '#fdfbf7',
+    bgCard: '#ffffff',
+    textPrimary: '#44403c',
+    textSecondary: '#78716c',
+    accent: '#57534e',
+    accentLight: '#f5f5f4',
+    border: '#d6d3d1',
+    sidebarText: '#57534e',
+    sidebarHover: '#d1d9d2',
+    sidebarActive: '#c6cfc8',
+    sidebarActiveText: '#292524',
+    success: '#A8D5A2',
+    warning: '#F5D6A8',
+    danger: '#E8A0A0',
+    priorityHigh: '#dc2626',
+    priorityMedium: '#f59e0b',
+    priorityLow: '#a8a29e',
+  },
+  borderRadius: {
+    small: '8px',
+    medium: '16px',
+    large: '24px',
+  },
+  shadow: {
+    small: '0 2px 8px rgba(93, 78, 78, 0.08)',
+    medium: '0 4px 16px rgba(93, 78, 78, 0.1)',
+    large: '0 8px 32px rgba(93, 78, 78, 0.12)',
+  },
+  font: {
+    primary: '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif',
+    secondary: '"Noto Serif SC", "STSong", serif',
+    heading: '"ZCOOL XiaoWei", "Ma Shan Zheng", cursive',
+  },
+  showTexture: true,
+  showTape: true,
+}
