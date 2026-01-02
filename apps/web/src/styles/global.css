@@ -1,1 +1,76 @@
 @import 'tailwindcss';
+
+/* Custom colors matching the app's beige theme */
+@theme {
+  --color-cream: #e3e0d6;
+  --color-cream-light: #f5ede4;
+  --color-cream-dark: #d6d3c9;
+  --color-stone: #44403c;
+  --color-stone-light: #78716c;
+  --color-stone-dark: #292524;
+  --color-sage: #dce3dd;
+  --color-sage-dark: #c6cfc8;
+  --color-accent: #57534e;
+  --color-card: #fdfbf7;
+}
+
+/* Font families */
+.font-sans {
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.font-serif {
+  font-family: 'Noto Serif SC', 'STSong', serif;
+}
+
+.font-hand {
+  font-family: 'ZCOOL XiaoWei', 'Ma Shan Zheng', cursive;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Paper texture */
+.paper-texture {
+  background-image: radial-gradient(
+    rgba(68, 64, 60, 0.04) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+}
+
+/* Animations */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.5deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.5deg);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes border-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: border-spin 12s linear infinite;
+}
+
+/* Focus ring */
+.focus-ring:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
