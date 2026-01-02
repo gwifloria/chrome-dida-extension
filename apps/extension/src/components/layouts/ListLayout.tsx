@@ -1,7 +1,7 @@
 import { Button } from 'antd'
 import { LogoutOutlined } from '@ant-design/icons'
 import { Sidebar } from '@/components/sidebar'
-import { TaskList } from '@/components/task-list'
+import { TaskList } from '@/components/taskList'
 import { useTheme } from '@/hooks/useTheme'
 import type { Task, Project } from '@/types'
 import type { TaskCounts } from '@/utils/taskFilters'
