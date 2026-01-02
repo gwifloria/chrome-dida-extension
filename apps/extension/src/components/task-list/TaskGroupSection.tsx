@@ -1,5 +1,5 @@
 import { CollapseArrow } from '../CollapseArrow'
-import { TaskItem } from '../TaskItem'
+import { TaskItem } from '../task/TaskItem'
 import type { Task, Project } from '@/types'
 import type { TaskGroup } from '@/utils/taskFilters'
 

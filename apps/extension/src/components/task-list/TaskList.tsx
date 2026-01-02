@@ -1,13 +1,11 @@
 import { useState, useMemo } from 'react'
 import { Empty, Alert } from 'antd'
 import { useTranslation } from 'react-i18next'
-import { TaskEditor } from './TaskEditor'
-import { TaskSkeleton } from './TaskSkeleton'
-import {
-  TaskListHeader,
-  QuickAddInput,
-  TaskGroupSection,
-} from './TaskListParts'
+import { TaskEditor } from '../task/TaskEditor'
+import { TaskSkeleton } from '../task/TaskSkeleton'
+import { TaskListHeader } from './TaskListHeader'
+import { QuickAddInput } from './QuickAddInput'
+import { TaskGroupSection } from './TaskGroupSection'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
 import { useRelativeDates } from '@/hooks/useRelativeDates'
 import { filterTasks, sortTasks, type TaskGroup } from '@/utils/taskFilters'
