@@ -2,7 +2,8 @@ import { memo } from 'react'
 import { Button, Popconfirm } from 'antd'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { formatDateStr, extractDateStr, formatShortDate } from '@/utils/date'
+import { formatShortDate } from '@/utils/date'
+import { isOverdue } from '@/utils/taskFilters'
 import { getPriorityColor } from '@/constants/task'
 import { ProjectColorDot } from './ProjectColorDot'
 import { TaskCheckbox } from './common/TaskCheckbox'
@@ -26,14 +27,6 @@ export const TaskItem = memo(function TaskItem({
 }: TaskItemProps) {
   const { t } = useTranslation()
   const { completing, handleComplete } = useTaskCompletion(onComplete)
-
-  const isOverdue = () => {
-    if (!task.dueDate) return false
-    const taskDate = extractDateStr(task.dueDate)
-    const todayStr = formatDateStr(new Date())
-    return taskDate < todayStr
-  }
-
   const priorityColor = getPriorityColor(task.priority)
 
   return (
@@ -72,7 +65,7 @@ export const TaskItem = memo(function TaskItem({
             )}
             {task.dueDate && (
               <span
-                className={`text-xs ${isOverdue() ? 'text-[var(--danger)]/70' : 'text-[var(--accent)]'}`}
+                className={`text-xs ${isOverdue(task.dueDate) ? 'text-[var(--danger)]/70' : 'text-[var(--accent)]'}`}
               >
                 {formatShortDate(task.dueDate)}
               </span>

@@ -1,14 +1,7 @@
 import { useState, useCallback } from 'react'
 import { message } from 'antd'
-import { LogoutOutlined } from '@ant-design/icons'
-import { Button } from 'antd'
 import { useTranslation } from 'react-i18next'
-import { FocusView } from '@/components/FocusView'
-import { Onboarding } from '@/components/Onboarding'
-import { Sidebar } from '@/components/Sidebar'
-import { TaskList } from '@/components/TaskList'
-import { ConnectPrompt } from '@/components/ConnectPrompt'
-import { useTheme } from '@/hooks/useTheme'
+import { FocusLayout, ListLayout } from '@/components/layouts'
 import { useAppMode } from '@/hooks/useAppMode'
 import { useLocalTasks } from '@/hooks/useLocalTasks'
 import { useTasks } from '@/hooks/useTasks'
@@ -29,7 +22,6 @@ function AppContent() {
     disconnect,
     loading: modeLoading,
   } = useAppMode()
-  const { theme } = useTheme()
 
   // Local tasks for guest mode
   const localTasks = useLocalTasks()
@@ -140,91 +132,45 @@ function AppContent() {
   // Connected mode: Show Focus or List based on viewMode
   if (isGuest || viewMode === 'focus') {
     return (
-      <>
-        <Onboarding onComplete={() => {}} />
-        <FocusView
-          focusTasks={focusTasks}
-          loading={modeLoading || loading}
-          onComplete={handleComplete}
-          onCreate={handleCreate}
-          onSwitchView={isGuest ? undefined : () => setViewMode('list')}
-          todayTaskCount={todayCount}
-          isGuestMode={isGuest}
-          canAddMore={isGuest ? localTasks.canAddMore : true}
-          onConnect={handleConnectClick}
-        />
-        <ConnectPrompt
-          open={showConnectPrompt}
-          localTaskCount={localTasks.count}
-          loading={connectLoading}
-          onConnectAndMigrate={handleConnectAndMigrate}
-          onConnectWithoutMigrate={handleConnectWithoutMigrate}
-          onCancel={handleCancelConnect}
-        />
-      </>
+      <FocusLayout
+        focusTasks={focusTasks}
+        loading={modeLoading || loading}
+        todayTaskCount={todayCount}
+        isGuestMode={isGuest}
+        canAddMore={isGuest ? localTasks.canAddMore : true}
+        onComplete={handleComplete}
+        onCreate={handleCreate}
+        onSwitchView={isGuest ? undefined : () => setViewMode('list')}
+        onConnect={handleConnectClick}
+        showConnectPrompt={showConnectPrompt}
+        localTaskCount={localTasks.count}
+        connectLoading={connectLoading}
+        onConnectAndMigrate={handleConnectAndMigrate}
+        onConnectWithoutMigrate={handleConnectWithoutMigrate}
+        onCancelConnect={handleCancelConnect}
+      />
     )
   }
 
   // Connected mode: List view
   return (
-    <div className="h-screen bg-[var(--bg-primary)] flex overflow-hidden relative animate-fadeIn">
-      {/* 背景纹理层 */}
-      {theme.showTexture && (
-        <div className="absolute inset-0 pointer-events-none opacity-40 paper-texture z-0" />
-      )}
-
-      {/* 侧边栏 */}
-      <Sidebar
-        tasks={tasks}
-        projects={projects}
-        counts={counts}
-        selectedFilter={selectedFilter}
-        onFilterChange={setSelectedFilter}
-        onSearch={setSearchQuery}
-      />
-
-      {/* 右侧内容区域 - 纸张容器 */}
-      <div className="flex-1 p-6 min-h-0 relative z-10">
-        <div
-          className={`
-            h-full bg-[var(--bg-content)] rounded-2xl overflow-hidden relative
-            ${theme.showTexture ? 'notebook-shadow' : 'shadow-[var(--shadow-small)]'}
-          `}
-        >
-          {/* 点阵背景 */}
-          {theme.showTexture && (
-            <div className="absolute inset-0 pointer-events-none dot-grid z-0" />
-          )}
-
-          {/* 登出按钮 */}
-          <div className="absolute top-3 right-3 z-50">
-            <Button
-              type="text"
-              size="small"
-              icon={<LogoutOutlined />}
-              onClick={disconnect}
-              className="text-[var(--text-secondary)] text-xs hover:text-[var(--text-primary)]"
-            />
-          </div>
-
-          <main className="h-full overflow-y-auto relative z-10">
-            <TaskList
-              tasks={tasks}
-              projects={projects}
-              loading={tasksLoading}
-              error={error}
-              filter={selectedFilter}
-              searchQuery={searchQuery}
-              onComplete={completeTask}
-              onDelete={deleteTask}
-              onUpdate={updateTask}
-              onCreate={createTask}
-              onFocus={() => setViewMode('focus')}
-            />
-          </main>
-        </div>
-      </div>
-    </div>
+    <ListLayout
+      tasks={tasks}
+      projects={projects}
+      counts={counts}
+      loading={tasksLoading}
+      error={error}
+      selectedFilter={selectedFilter}
+      searchQuery={searchQuery}
+      onFilterChange={setSelectedFilter}
+      onSearch={setSearchQuery}
+      onComplete={completeTask}
+      onDelete={deleteTask}
+      onUpdate={updateTask}
+      onCreate={createTask}
+      onFocus={() => setViewMode('focus')}
+      onDisconnect={disconnect}
+    />
   )
 }
 

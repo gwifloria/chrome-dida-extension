@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react'
-import { Empty, Alert, Input } from 'antd'
+import { Empty, Alert } from 'antd'
 import { useTranslation } from 'react-i18next'
-import { TaskItem } from './TaskItem'
 import { TaskEditor } from './TaskEditor'
-import { CollapseArrow } from './CollapseArrow'
-import { FocusButton } from './FocusButton'
 import { TaskSkeleton } from './TaskSkeleton'
-import { Clock } from './common/Clock'
-import { useSettings } from '@/hooks/useSettings'
+import {
+  TaskListHeader,
+  QuickAddInput,
+  TaskGroupSection,
+} from './TaskListParts'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
 import { useRelativeDates } from '@/hooks/useRelativeDates'
 import { filterTasks, sortTasks, type TaskGroup } from '@/utils/taskFilters'
@@ -42,15 +42,9 @@ export function TaskList({
   onFocus,
 }: TaskListProps) {
   const { t } = useTranslation('task')
-  const { settings } = useSettings()
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [isEditorOpen, setIsEditorOpen] = useState(false)
-  const [quickAddValue, setQuickAddValue] = useState('')
-
-  // 分组折叠状态
   const [collapsedGroups, toggleGroup] = usePersistedSet('taskGroupCollapsed')
-
-  // 使用统一的日期 Hook
   const { todayStr, tomorrowStr, dayAfterStr } = useRelativeDates()
 
   // 使用统一的过滤函数
@@ -154,114 +148,21 @@ export function TaskList({
     setEditingTask(null)
   }
 
-  const handleQuickAdd = async () => {
-    if (!quickAddValue.trim()) return
-
-    let projectId: string | undefined
-    let dueDate: string | undefined
-
-    // 根据 filter 设置 projectId
-    if (filter.startsWith('project:')) {
-      projectId = filter.replace('project:', '')
-    } else if (settings.defaultProjectId) {
-      projectId = settings.defaultProjectId
-    } else {
-      projectId = projects[0]?.id
-    }
-
-    // 根据 filter 设置 dueDate
-    if (filter === 'today') {
-      dueDate = todayStr + 'T00:00:00.000+0000'
-    } else if (filter === 'tomorrow') {
-      dueDate = tomorrowStr + 'T00:00:00.000+0000'
-    }
-    // week/overdue/nodate 不设置默认日期
-
-    await onCreate({
-      title: quickAddValue.trim(),
-      projectId,
-      dueDate,
-    })
-    setQuickAddValue('')
-  }
-
-  const getProjectById = (projectId: string) =>
-    projects.find((p) => p.id === projectId)
-
-  const getFilterTitle = () => {
-    if (filter.startsWith('project:')) {
-      const projectId = filter.replace('project:', '')
-      const project = projects.find((p) => p.id === projectId)
-      return project?.name || t('common:label.list')
-    }
-    const filterKeys: Record<string, string> = {
-      all: 'filter.all',
-      today: 'filter.today',
-      tomorrow: 'filter.tomorrow',
-      week: 'filter.week',
-      overdue: 'filter.overdue',
-      nodate: 'filter.noDate',
-    }
-    const key = filterKeys[filter]
-    return key ? t(key) : t('filter.default')
-  }
-
-  const getFilterLabel = () => {
-    if (filter.startsWith('project:')) {
-      return t('common:label.list')
-    }
-    return t('common:label.smartList')
-  }
-
   return (
     <div className="flex flex-col h-full bg-transparent relative py-10 px-[60px] overflow-hidden max-md:p-5">
-      {/* 头部 */}
-      <div className="flex justify-between items-start mb-8">
-        <div className="flex flex-col gap-1">
-          <span className="text-[11px] font-medium text-[var(--text-secondary)] tracking-[1px]">
-            {getFilterLabel()}
-          </span>
-          <div className="flex items-baseline gap-2">
-            <h1 className="text-[32px] max-md:text-2xl font-light text-[var(--text-primary)] m-0 font-[var(--font-secondary)]">
-              {getFilterTitle()}
-            </h1>
-            <span className="text-base text-[var(--warning)]">✦</span>
-            <span className="text-2xl font-light text-[var(--text-secondary)]">
-              {filteredTasks.length}
-            </span>
-          </div>
-        </div>
-        <div className="flex items-start gap-6">
-          {/* Focus 按钮 */}
-          {onFocus && <FocusButton onClick={onFocus} size="large" />}
-          <div className="text-right">
-            <div className="text-xs text-[var(--text-secondary)] mb-1">
-              {t('common:message.todayIsGift')}
-            </div>
-            <Clock variant="small" showDate />
-          </div>
-        </div>
-      </div>
+      <TaskListHeader
+        filter={filter}
+        projects={projects}
+        taskCount={filteredTasks.length}
+        onFocus={onFocus}
+      />
 
-      {/* 快速添加 */}
-      <div className="mb-6">
-        <Input
-          placeholder={t('placeholder.quickAdd')}
-          value={quickAddValue}
-          onChange={(e) => setQuickAddValue(e.target.value)}
-          onPressEnter={handleQuickAdd}
-          className="quick-add-input"
-          variant="borderless"
-          suffix={
-            <span
-              className="text-[11px] text-[var(--text-secondary)] bg-[var(--bg-card)] py-0.5 px-1.5 rounded cursor-pointer hover:bg-[var(--border)]"
-              onClick={handleNew}
-            >
-              ⌘ K
-            </span>
-          }
-        />
-      </div>
+      <QuickAddInput
+        filter={filter}
+        projects={projects}
+        onCreate={onCreate}
+        onOpenEditor={handleNew}
+      />
 
       {error && (
         <Alert
@@ -282,42 +183,19 @@ export function TaskList({
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         ) : (
-          sortedGroups.map((group) => {
-            const isCollapsed = collapsedGroups.has(group.id)
-            return (
-              <div key={group.id} className="mb-4">
-                {/* 只有多个分组时才显示分组标题 */}
-                {sortedGroups.length > 1 && (
-                  <div
-                    className="flex items-center gap-2 py-3 cursor-pointer select-none border-b border-[var(--border)] mb-2 hover:opacity-80"
-                    onClick={() => toggleGroup(group.id)}
-                  >
-                    <CollapseArrow isCollapsed={isCollapsed} />
-                    <span className="text-[11px] font-medium text-[var(--text-secondary)] tracking-[1px]">
-                      {group.title.toUpperCase()}
-                    </span>
-                    <span className="ml-auto text-xs text-[var(--text-secondary)]">
-                      {group.tasks.length}
-                    </span>
-                  </div>
-                )}
-                {!isCollapsed && (
-                  <div className="flex flex-col gap-1">
-                    {group.tasks.map((task) => (
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        project={getProjectById(task.projectId)}
-                        onComplete={onComplete}
-                        onDelete={onDelete}
-                        onEdit={handleEdit}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })
+          sortedGroups.map((group) => (
+            <TaskGroupSection
+              key={group.id}
+              group={group}
+              projects={projects}
+              isCollapsed={collapsedGroups.has(group.id)}
+              showGroupTitle={sortedGroups.length > 1}
+              onToggle={() => toggleGroup(group.id)}
+              onComplete={onComplete}
+              onDelete={onDelete}
+              onEdit={handleEdit}
+            />
+          ))
         )}
       </div>
 

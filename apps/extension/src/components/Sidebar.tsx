@@ -1,24 +1,13 @@
+import { useState } from 'react'
+import { Button } from 'antd'
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
 import { usePersistedBoolean } from '@/hooks/usePersistedBoolean'
-import { usePersistedSet } from '@/hooks/usePersistedSet'
+import { ThemeToggle } from './common/ThemeToggle'
+import { SearchInput } from './SearchInput'
+import { SmartFilterList, ProjectList, SidebarFooter } from './SidebarParts'
 import type { Project, Task } from '@/types'
 import type { TaskCounts } from '@/utils/taskFilters'
-import {
-  CalendarOutlined,
-  ClockCircleOutlined,
-  FieldTimeOutlined,
-  InboxOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  SettingOutlined,
-} from '@ant-design/icons'
-import { Button } from 'antd'
-import { memo, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { CollapseArrow } from './CollapseArrow'
-import { ProjectColorDot } from './ProjectColorDot'
-import { SearchInput } from './SearchInput'
-import { SettingsModal } from './SettingsModal'
-import { ThemeToggle } from './common/ThemeToggle'
 
 interface SidebarProps {
   tasks: Task[]
@@ -29,24 +18,6 @@ interface SidebarProps {
   onSearch?: (query: string) => void
 }
 
-interface SmartFilter {
-  id: string
-  name: string
-  icon: React.ReactNode
-  count: number
-}
-
-interface ProjectWithCount extends Project {
-  count: number
-}
-
-interface FolderGroup {
-  id: string
-  name: string
-  projects: ProjectWithCount[]
-}
-
-// 侧边栏头部组件
 function SidebarHeader({
   collapsed,
   onToggleCollapse,
@@ -75,139 +46,6 @@ function SidebarHeader({
   )
 }
 
-// 分组标题组件
-function SectionTitle({ title }: { title: string }) {
-  return (
-    <div className="px-3 py-2 text-[11px] font-medium text-[var(--text-secondary)] tracking-wide flex items-center gap-1">
-      <span className="text-xs">›</span>
-      {title}
-    </div>
-  )
-}
-
-// 筛选项组件（使用 memo 避免不必要的重渲染）
-const FilterItem = memo(function FilterItem({
-  active,
-  onClick,
-  icon,
-  name,
-  count,
-  nested = false,
-  color,
-  collapsed = false,
-}: {
-  active: boolean
-  onClick: () => void
-  icon?: React.ReactNode
-  name: string
-  count: number
-  nested?: boolean
-  color?: string
-  collapsed?: boolean
-}) {
-  return (
-    <div
-      onClick={onClick}
-      title={collapsed ? name : undefined}
-      className={`
-        flex items-center gap-2.5 py-2 cursor-pointer rounded-lg my-0.5
-        transition-all duration-200 ease-out
-        ${collapsed ? 'justify-center px-2' : 'px-3'}
-        ${nested && !collapsed ? 'pl-7' : ''}
-        ${active ? 'bg-[var(--accent-light)]' : 'hover:bg-black/[0.04] hover:translate-x-0.5'}
-      `}
-    >
-      {icon ? (
-        <span
-          className={`text-base w-5 flex items-center justify-center shrink-0 ${active ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}
-        >
-          {icon}
-        </span>
-      ) : (
-        <ProjectColorDot color={color} />
-      )}
-      {!collapsed && (
-        <>
-          <span className="flex-1 text-[13px] text-[var(--text-primary)] truncate">
-            {name}
-          </span>
-          {count > 0 && (
-            <span
-              className={`
-                text-xs font-normal
-                ${
-                  active
-                    ? 'bg-[var(--accent)] text-white min-w-[18px] h-[18px] leading-[18px] rounded-[9px] px-1.5 text-center'
-                    : 'text-[var(--text-secondary)]'
-                }
-              `}
-            >
-              {count > 99 ? '99+' : count}
-            </span>
-          )}
-        </>
-      )}
-    </div>
-  )
-})
-
-// 文件夹组件（使用 memo 避免不必要的重渲染）
-const FolderItem = memo(function FolderItem({
-  folder,
-  collapsed,
-  isFolderCollapsed,
-  selectedFilter,
-  onToggleFolder,
-  onFilterChange,
-}: {
-  folder: FolderGroup
-  collapsed: boolean
-  isFolderCollapsed: boolean
-  selectedFilter: string
-  onToggleFolder: () => void
-  onFilterChange: (filter: string) => void
-}) {
-  return (
-    <div className="my-1">
-      {collapsed ? (
-        <div
-          onClick={onToggleFolder}
-          title={folder.name}
-          className={`flex items-center justify-center py-2 px-2 cursor-pointer rounded-lg transition-all duration-200 ease-out hover:bg-black/[0.04] select-none ${isFolderCollapsed ? 'opacity-80' : ''}`}
-        >
-          <CollapseArrow isCollapsed={isFolderCollapsed} />
-        </div>
-      ) : (
-        <div
-          onClick={onToggleFolder}
-          className={`flex items-center gap-1 py-2 px-3 cursor-pointer rounded-lg transition-all duration-200 ease-out hover:bg-black/[0.04] hover:translate-x-0.5 select-none ${isFolderCollapsed ? 'opacity-80' : ''}`}
-        >
-          <CollapseArrow isCollapsed={isFolderCollapsed} />
-          <span className="text-[11px] font-medium text-[var(--text-secondary)] tracking-wide">
-            {folder.name.toUpperCase()}
-          </span>
-        </div>
-      )}
-      {!isFolderCollapsed && (
-        <div className={collapsed ? '' : 'ml-1'}>
-          {folder.projects.map((project) => (
-            <FilterItem
-              key={project.id}
-              active={selectedFilter === `project:${project.id}`}
-              onClick={() => onFilterChange(`project:${project.id}`)}
-              name={project.name}
-              count={project.count}
-              color={project.color}
-              nested={!collapsed}
-              collapsed={collapsed}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  )
-})
-
 export function Sidebar({
   tasks,
   projects,
@@ -217,85 +55,8 @@ export function Sidebar({
   onSearch,
 }: SidebarProps) {
   const { t } = useTranslation('sidebar')
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [collapsedFolders, toggleFolder] = usePersistedSet(
-    'sidebarFoldersCollapsed'
-  )
   const [collapsed, toggleCollapsed] = usePersistedBoolean('sidebarCollapsed')
-
-  // 使用预计算的 counts
-  const smartFilters: SmartFilter[] = [
-    {
-      id: 'inbox',
-      name: t('smartList.inbox'),
-      icon: <InboxOutlined />,
-      count: counts.inbox,
-    },
-    {
-      id: 'today',
-      name: t('smartList.today'),
-      icon: <FieldTimeOutlined />,
-      count: counts.today,
-    },
-    {
-      id: 'tomorrow',
-      name: t('smartList.tomorrow'),
-      icon: <CalendarOutlined />,
-      count: counts.tomorrow,
-    },
-    {
-      id: 'week',
-      name: t('smartList.week'),
-      icon: <CalendarOutlined />,
-      count: counts.week,
-    },
-    {
-      id: 'overdue',
-      name: t('smartList.overdue'),
-      icon: <ClockCircleOutlined />,
-      count: counts.overdue,
-    },
-  ]
-
-  const { folders, ungroupedProjects } = useMemo(() => {
-    const projectsWithCount: ProjectWithCount[] = projects
-      .filter((p) => !p.closed)
-      .map((p) => ({
-        ...p,
-        count: tasks.filter((t) => t.projectId === p.id).length,
-      }))
-
-    const folderMap = new Map<string, ProjectWithCount[]>()
-    const ungrouped: ProjectWithCount[] = []
-
-    projectsWithCount.forEach((p) => {
-      if (p.groupId) {
-        if (!folderMap.has(p.groupId)) folderMap.set(p.groupId, [])
-        folderMap.get(p.groupId)!.push(p)
-      } else {
-        ungrouped.push(p)
-      }
-    })
-
-    // Open API 不返回文件夹项目，只返回子项目及其 groupId
-    // 因此无法获取文件夹名称，只能显示默认名称
-    const folderList: FolderGroup[] = []
-    let folderIndex = 0
-    folderMap.forEach((projectList, groupId) => {
-      folderIndex++
-      folderList.push({
-        id: groupId,
-        name: t('folder.defaultName', { index: folderIndex }),
-        projects: projectList.sort((a, b) => a.sortOrder - b.sortOrder),
-      })
-    })
-
-    return {
-      folders: folderList.sort((a, b) => a.id.localeCompare(b.id)),
-      ungroupedProjects: ungrouped.sort((a, b) => a.sortOrder - b.sortOrder),
-    }
-  }, [projects, t, tasks])
 
   const handleSearch = (value: string) => {
     setSearchQuery(value)
@@ -322,71 +83,23 @@ export function Sidebar({
 
       {/* 可滚动内容区 */}
       <div className="flex-1 overflow-y-auto px-2 scrollbar-thin scrollbar-thumb-[var(--border)] scrollbar-track-transparent">
-        {/* 智能清单 */}
-        <div className="mb-2">
-          {!collapsed && <SectionTitle title={t('smartList.title')} />}
-          {smartFilters.map((filter) => (
-            <FilterItem
-              key={filter.id}
-              active={selectedFilter === filter.id}
-              onClick={() => onFilterChange(filter.id)}
-              icon={filter.icon}
-              name={filter.name}
-              count={filter.count}
-              collapsed={collapsed}
-            />
-          ))}
-        </div>
+        <SmartFilterList
+          counts={counts}
+          selectedFilter={selectedFilter}
+          collapsed={collapsed}
+          onFilterChange={onFilterChange}
+        />
 
-        {/* 清单 */}
-        <div className="mb-4">
-          {!collapsed && <SectionTitle title={t('section.lists')} />}
-
-          {ungroupedProjects.map((project) => (
-            <FilterItem
-              key={project.id}
-              active={selectedFilter === `project:${project.id}`}
-              onClick={() => onFilterChange(`project:${project.id}`)}
-              name={project.name}
-              count={project.count}
-              color={project.color}
-              collapsed={collapsed}
-            />
-          ))}
-
-          {folders.map((folder) => (
-            <FolderItem
-              key={folder.id}
-              folder={folder}
-              collapsed={collapsed}
-              isFolderCollapsed={collapsedFolders.has(folder.id)}
-              selectedFilter={selectedFilter}
-              onToggleFolder={() => toggleFolder(folder.id)}
-              onFilterChange={onFilterChange}
-            />
-          ))}
-        </div>
+        <ProjectList
+          projects={projects}
+          tasks={tasks}
+          selectedFilter={selectedFilter}
+          collapsed={collapsed}
+          onFilterChange={onFilterChange}
+        />
       </div>
 
-      {/* 底部设置按钮 */}
-      <div className="p-3 border-t border-[var(--border)]">
-        <Button
-          type="text"
-          block
-          onClick={() => setSettingsOpen(true)}
-          title={collapsed ? t('action.settings') : undefined}
-          icon={<SettingOutlined />}
-          className={`sidebar-settings-btn ${collapsed ? 'collapsed' : ''}`}
-        >
-          {!collapsed && t('action.settings')}
-        </Button>
-      </div>
-
-      <SettingsModal
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        projects={projects}
-      />
+      <SidebarFooter collapsed={collapsed} projects={projects} />
     </aside>
   )
 }

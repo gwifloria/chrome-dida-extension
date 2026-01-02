@@ -1,26 +1,23 @@
 import { useState, memo } from 'react'
 import { Button } from 'antd'
-import { LinkOutlined, PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@/hooks/useTheme'
 import { getGreeting } from '@/utils/greeting'
-import { formatDateStr } from '@/utils/date'
 import { getRandomQuote, type Quote } from '@/data/quotes'
-import { ThemeToggle } from './common/ThemeToggle'
 import { TaskCheckbox } from './common/TaskCheckbox'
 import { Clock } from './common/Clock'
+import { FocusTopBar, FocusTaskInput, FocusQuote } from './FocusViewParts'
 import { useTaskCompletion } from '@/hooks/useTaskCompletion'
 import { FocusSkeleton } from './TaskSkeleton'
 import type { Task, LocalTask } from '@/types'
 
 interface FocusViewProps {
-  focusTasks: (Task | LocalTask)[] // 今日高优先级任务（已筛选）
+  focusTasks: (Task | LocalTask)[]
   loading: boolean
   onComplete: (task: Task | LocalTask) => void
   onCreate: (task: Partial<Task>) => Promise<Task | LocalTask | null>
   onSwitchView?: () => void
   todayTaskCount: number
-  // Guest mode props
   isGuestMode?: boolean
   canAddMore?: boolean
   onConnect?: () => void
@@ -40,25 +37,14 @@ export function FocusView({
   const { t } = useTranslation('focus')
   const { theme } = useTheme()
   const [quote] = useState<Quote>(() => getRandomQuote())
-  const [newTaskTitle, setNewTaskTitle] = useState('')
   const [creating, setCreating] = useState(false)
 
   const greeting = getGreeting()
 
-  const handleCreateTask = async () => {
-    if (!newTaskTitle.trim() || creating) return
-
+  const handleCreate = async (task: Partial<Task>) => {
     setCreating(true)
     try {
-      // 使用本地日期格式（避免 UTC 时区问题）
-      const dueDate = formatDateStr(new Date()) + 'T00:00:00.000+0800'
-
-      await onCreate({
-        title: newTaskTitle.trim(),
-        dueDate,
-        priority: 5, // 最高优先级
-      })
-      setNewTaskTitle('')
+      return await onCreate(task)
     } finally {
       setCreating(false)
     }
@@ -71,26 +57,7 @@ export function FocusView({
         <div className="absolute inset-0 pointer-events-none opacity-40 paper-texture" />
       )}
 
-      {/* 顶部栏 */}
-      <div className="flex justify-between items-center p-6 relative z-10">
-        <div /> {/* 保持布局平衡 */}
-        {/* 右上角 */}
-        <div className="flex items-center gap-3">
-          {/* 访客模式显示连接按钮 */}
-          {isGuestMode && onConnect && (
-            <Button
-              type="primary"
-              shape="round"
-              size="small"
-              onClick={onConnect}
-              icon={<LinkOutlined />}
-            >
-              {t('common:button.connect')}
-            </Button>
-          )}
-          <ThemeToggle variant="minimal" size="sm" />
-        </div>
-      </div>
+      <FocusTopBar isGuestMode={isGuestMode} onConnect={onConnect} />
 
       {/* 主内容区 */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
@@ -126,59 +93,17 @@ export function FocusView({
             </div>
           )}
 
-          {/* Add another focus - 输入框 */}
-          <div className="mt-8">
-            <input
-              type="text"
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleCreateTask()}
-              placeholder={
-                isGuestMode && !canAddMore
-                  ? t('placeholder.connectToAdd')
-                  : t('placeholder.addFocus')
-              }
-              disabled={creating || (isGuestMode && !canAddMore)}
-              className="w-full text-center text-[var(--text-secondary)] placeholder:text-[var(--text-secondary)] bg-transparent border-0 border-b border-[var(--border)] py-2 text-sm outline-none focus:border-[var(--accent)] transition-colors disabled:opacity-50"
-            />
-            <Button
-              type="text"
-              shape="circle"
-              size="small"
-              onClick={handleCreateTask}
-              disabled={creating || (isGuestMode && !canAddMore)}
-              icon={<PlusOutlined />}
-              className="!mx-auto !mt-2 !flex"
-            />
-            {/* 访客模式限制提示 */}
-            {isGuestMode && (
-              <div className="text-xs text-[var(--text-secondary)] text-center mt-2 opacity-60">
-                {canAddMore
-                  ? t('guestLimit.available', {
-                      remaining: 3 - focusTasks.length,
-                    })
-                  : t('guestLimit.unlock')}
-              </div>
-            )}
-          </div>
+          <FocusTaskInput
+            isGuestMode={isGuestMode}
+            canAddMore={canAddMore}
+            taskCount={focusTasks.length}
+            creating={creating}
+            onCreate={handleCreate}
+          />
         </div>
       </div>
 
-      {/* 底部语录 */}
-      <div className="text-center pb-8 px-6 relative z-10">
-        <p
-          className="text-lg text-[var(--text-primary)] italic opacity-70 max-w-3xl mx-auto"
-          style={{
-            fontFamily:
-              theme.type === 'journal' ? 'var(--font-heading)' : 'inherit',
-          }}
-        >
-          "{quote.text}"
-        </p>
-        <p className="text-xs text-[var(--text-secondary)] mt-2 tracking-widest uppercase font-bold opacity-40">
-          {quote.author}
-        </p>
-      </div>
+      <FocusQuote quote={quote} />
 
       {/* 右下角 Todo 按钮 - 访客模式隐藏 */}
       {!isGuestMode && onSwitchView && (
