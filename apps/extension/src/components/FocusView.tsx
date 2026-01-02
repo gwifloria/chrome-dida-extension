@@ -210,7 +210,13 @@ function FocusTaskItem({
   })
 
   return (
-    <div className="flex items-center gap-4 py-3 px-4 bg-[var(--bg-card)] rounded-xl shadow-sm">
+    <div
+      className={`
+        flex items-center gap-4 py-3 px-4 bg-[var(--bg-card)] rounded-xl shadow-sm
+        transition-all duration-300 ease-out
+        ${completing ? 'animate-[taskComplete_0.4s_ease-out_forwards]' : ''}
+      `}
+    >
       <TaskCheckbox
         completing={completing}
         onComplete={() => handleComplete(task)}
@@ -218,7 +224,7 @@ function FocusTaskItem({
         disabled={completing}
       />
       <span
-        className={`flex-1 text-lg text-[var(--text-primary)] ${completing ? 'line-through opacity-40' : ''}`}
+        className={`flex-1 text-lg text-[var(--text-primary)] transition-all duration-200 ${completing ? 'line-through text-[var(--text-secondary)]' : ''}`}
         style={{
           fontFamily:
             theme.type === 'journal' ? 'var(--font-heading)' : 'inherit',
