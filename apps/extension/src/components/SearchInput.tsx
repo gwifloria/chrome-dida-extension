@@ -30,7 +30,7 @@ export function SearchInput({
             />
           )
         }
-        className="!bg-black/[0.04] !rounded-lg !py-1.5 !text-sm [&_.ant-input]:!bg-transparent [&_.ant-input]:!text-[var(--text-primary)] [&_.ant-input::placeholder]:!text-[var(--text-secondary)]"
+        className="!bg-black/[0.04] !rounded-lg !py-1.5 !text-sm [&_.ant-input]:!bg-transparent"
         variant="borderless"
       />
     </div>

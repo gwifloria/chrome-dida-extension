@@ -68,7 +68,7 @@ function SidebarHeader({
           onClick={onToggleCollapse}
           title={toggleTitle}
           icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          className="!w-5 !h-5 !min-w-0 !p-0 !text-[var(--text-secondary)] hover:!text-[var(--text-primary)] hover:!bg-transparent"
+          className="!w-5 !h-5 !min-w-0 !p-0"
         />
       </div>
     </div>
@@ -376,7 +376,7 @@ export function Sidebar({
           onClick={() => setSettingsOpen(true)}
           title={collapsed ? t('action.settings') : undefined}
           icon={<SettingOutlined />}
-          className={`!flex !items-center !gap-2 !py-2 !h-auto !text-[13px] !text-[var(--text-secondary)] !rounded-lg hover:!bg-black/[0.04] ${collapsed ? '!justify-center !px-2' : '!px-3 !justify-start'}`}
+          className={`!flex !items-center !gap-2 !py-2 !h-auto !text-[13px] !rounded-lg ${collapsed ? '!justify-center !px-2' : '!px-3 !justify-start'}`}
         >
           {!collapsed && t('action.settings')}
         </Button>

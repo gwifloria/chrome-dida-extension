@@ -250,7 +250,7 @@ export function TaskList({
           value={quickAddValue}
           onChange={(e) => setQuickAddValue(e.target.value)}
           onPressEnter={handleQuickAdd}
-          className="!bg-[var(--bg-secondary)] !rounded-xl !py-3.5 !px-5 !text-sm [&_.ant-input]:!bg-transparent [&_.ant-input]:!text-[var(--text-primary)] [&_.ant-input::placeholder]:!text-[var(--text-secondary)] !border !border-transparent hover:!border-[var(--border)] hover:!shadow-sm !transition-all !duration-200 focus-within:!border-[var(--accent)] focus-within:!shadow-md"
+          className="!bg-[var(--bg-secondary)] !rounded-xl !py-3.5 !px-5 !text-sm [&_.ant-input]:!bg-transparent !border !border-transparent hover:!border-[var(--border)] hover:!shadow-sm !transition-all !duration-200 focus-within:!border-[var(--accent)] focus-within:!shadow-md"
           variant="borderless"
           suffix={
             <span
@@ -277,11 +277,7 @@ export function TaskList({
           <TaskSkeleton count={6} />
         ) : sortedGroups.length === 0 ? (
           <Empty
-            description={
-              <span className="text-[var(--text-secondary)] text-sm">
-                {t('empty.noTasks')}
-              </span>
-            }
+            description={t('empty.noTasks')}
             className="!py-[100px] !px-5 !bg-transparent"
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           />

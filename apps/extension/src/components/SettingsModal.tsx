@@ -31,21 +31,13 @@ export function SettingsModal({ open, onClose, projects }: SettingsModalProps) {
       onCancel={onClose}
       footer={null}
       width={400}
-      className="[&_.ant-modal-content]:!bg-[var(--bg-card)] [&_.ant-modal-header]:!bg-transparent [&_.ant-modal-title]:!text-[var(--text-primary)]"
     >
       <Form layout="vertical" className="mt-4">
-        <Form.Item
-          label={
-            <span className="text-[var(--text-primary)]">
-              {t('defaultProject.label')}
-            </span>
-          }
-        >
+        <Form.Item label={t('defaultProject.label')}>
           <Select
             value={currentValue}
             onChange={handleChange}
             className="w-full"
-            popupClassName="[&_.ant-select-item]:!text-[var(--text-primary)]"
           >
             {/* 收集箱选项 */}
             <Select.Option key="inbox" value="inbox">

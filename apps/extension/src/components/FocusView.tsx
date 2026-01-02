@@ -84,7 +84,6 @@ export function FocusView({
               size="small"
               onClick={onConnect}
               icon={<LinkOutlined />}
-              className="!bg-[var(--accent)] hover:!bg-[var(--accent)] hover:!opacity-90"
             >
               {t('common:button.connect')}
             </Button>
@@ -149,7 +148,7 @@ export function FocusView({
               onClick={handleCreateTask}
               disabled={creating || (isGuestMode && !canAddMore)}
               icon={<PlusOutlined />}
-              className="!mx-auto !mt-2 !flex !text-[var(--text-secondary)] hover:!text-[var(--accent)]"
+              className="!mx-auto !mt-2 !flex"
             />
             {/* 访客模式限制提示 */}
             {isGuestMode && (
@@ -187,7 +186,7 @@ export function FocusView({
           type="default"
           shape="round"
           onClick={onSwitchView}
-          className="!absolute !bottom-6 !right-6 !z-50 !bg-[var(--bg-card)] !text-[var(--text-primary)] !border-[var(--border)] !shadow-sm hover:!shadow-md !flex !items-center !gap-2"
+          className="!absolute !bottom-6 !right-6 !z-50 !shadow-sm hover:!shadow-md !flex !items-center !gap-2"
         >
           Todo
           <span className="bg-[var(--accent)] text-white text-xs px-2 py-0.5 rounded-full">

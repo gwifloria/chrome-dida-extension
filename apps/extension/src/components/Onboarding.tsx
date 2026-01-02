@@ -7,8 +7,7 @@ import {
   BgColorsOutlined,
 } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-
-const ONBOARDING_KEY = 'onboarding_completed'
+import { shouldShowOnboarding, completeOnboarding } from '@/utils/onboarding'
 
 interface OnboardingProps {
   onComplete: () => void
@@ -35,8 +34,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
   useEffect(() => {
     // 检查是否已完成引导
-    chrome.storage.local.get(ONBOARDING_KEY, (result) => {
-      if (!result[ONBOARDING_KEY]) {
+    shouldShowOnboarding().then((shouldShow) => {
+      if (shouldShow) {
         setVisible(true)
       }
     })
@@ -55,7 +54,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   }
 
   const handleComplete = () => {
-    chrome.storage.local.set({ [ONBOARDING_KEY]: true })
+    completeOnboarding()
     setVisible(false)
     onComplete()
   }
@@ -70,7 +69,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       closable={false}
       centered
       width={400}
-      className="[&_.ant-modal-content]:!bg-[var(--bg-card)] [&_.ant-modal-content]:!rounded-2xl [&_.ant-modal-content]:!p-0"
+      className="[&_.ant-modal-content]:!rounded-2xl [&_.ant-modal-content]:!p-0"
     >
       <div className="p-8 text-center">
         {/* 步骤指示器 */}
@@ -124,22 +123,4 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       </div>
     </Modal>
   )
-}
-
-/**
- * 检查是否需要显示引导
- */
-export async function shouldShowOnboarding(): Promise<boolean> {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(ONBOARDING_KEY, (result) => {
-      resolve(!result[ONBOARDING_KEY])
-    })
-  })
-}
-
-/**
- * 重置引导状态（用于测试）
- */
-export function resetOnboarding(): void {
-  chrome.storage.local.remove(ONBOARDING_KEY)
 }

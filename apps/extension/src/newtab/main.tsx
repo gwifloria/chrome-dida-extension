@@ -6,6 +6,7 @@ import enUS from 'antd/locale/en_US'
 import { useTranslation } from 'react-i18next'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { SettingsProvider } from '@/contexts/SettingsContext'
+import { antdTheme } from '@/themes/antdTheme'
 import '@/i18n'
 import App from './App'
 import './index.css'
@@ -28,7 +29,7 @@ function Root() {
   }, [i18n])
 
   return (
-    <ConfigProvider locale={antdLocale}>
+    <ConfigProvider locale={antdLocale} theme={antdTheme}>
       <SettingsProvider>
         <ThemeProvider>
           <App />

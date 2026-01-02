@@ -87,7 +87,7 @@ export const TaskItem = memo(function TaskItem({
           size="small"
           icon={<EditOutlined />}
           onClick={() => onEdit(task)}
-          className="!w-7 !h-7 !text-[var(--text-secondary)] hover:!text-[var(--accent)] hover:!bg-[var(--accent-light)]"
+          className="!w-7 !h-7"
         />
         <Popconfirm
           title={t('task:confirm.delete')}
@@ -100,7 +100,7 @@ export const TaskItem = memo(function TaskItem({
             size="small"
             danger
             icon={<DeleteOutlined />}
-            className="!w-7 !h-7 !text-[var(--text-secondary)] hover:!text-[var(--danger)]/70 hover:!bg-[var(--danger)]/5"
+            className="!w-7 !h-7"
           />
         </Popconfirm>
       </div>

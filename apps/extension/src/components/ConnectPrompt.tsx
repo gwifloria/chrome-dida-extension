@@ -70,7 +70,7 @@ export function ConnectPrompt({
               onClick={onConnectAndMigrate}
               disabled={loading}
               icon={<SyncOutlined spin={loading} />}
-              className="!h-12 !rounded-lg !bg-[var(--accent)] hover:!bg-[var(--accent)] hover:!opacity-90"
+              className="!h-12 !rounded-lg"
             >
               {t('connectPrompt.connectAndSync')}
             </Button>
@@ -83,11 +83,7 @@ export function ConnectPrompt({
             onClick={onConnectWithoutMigrate}
             disabled={loading}
             icon={<LinkOutlined />}
-            className={
-              hasLocalTasks
-                ? '!h-12 !rounded-lg !bg-[var(--bg-card)] !text-[var(--text-primary)] !border-[var(--border)] hover:!bg-[var(--bg-secondary)]'
-                : '!h-12 !rounded-lg !bg-[var(--accent)] hover:!bg-[var(--accent)] hover:!opacity-90'
-            }
+            className="!h-12 !rounded-lg"
           >
             {hasLocalTasks
               ? t('connectPrompt.connectWithoutSync')
@@ -101,7 +97,7 @@ export function ConnectPrompt({
             onClick={onCancel}
             disabled={loading}
             icon={<CloseOutlined />}
-            className="!h-12 !text-[var(--text-secondary)] hover:!text-[var(--text-primary)] hover:!bg-transparent"
+            className="!h-12 !text-[var(--text-secondary)] hover:!text-[var(--text-primary)]"
           >
             {t('button.maybeLater')}
           </Button>
