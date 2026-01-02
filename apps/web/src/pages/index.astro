@@ -3,40 +3,402 @@ import Layout from '../layouts/Layout.astro'
 ---
 
 <Layout title="First Glance - 专注新标签页">
-  <main class="max-w-4xl mx-auto px-6 py-20">
-    <!-- Hero -->
-    <section class="text-center mb-20">
-      <h1 class="text-5xl font-bold mb-6">First Glance</h1>
-      <p class="text-xl text-[#6b4f4f] mb-8 max-w-2xl mx-auto">
-        将新标签页变成专注仪表盘，一眼看到今日最重要的任务。与滴答清单无缝同步。
+  <!-- Background Texture -->
+  <div class="fixed inset-0 paper-texture pointer-events-none z-0"></div>
+
+  <!-- Navigation -->
+  <nav
+    class="fixed top-0 w-full z-50 bg-cream/80 backdrop-blur-md border-b border-cream-dark"
+  >
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Logo Icon -->
+        <div class="w-8 h-8 relative flex items-center justify-center">
+          <div
+            class="absolute inset-0 border-2 border-stone rounded-full border-dashed animate-spin-slow opacity-60"
+          >
+          </div>
+          <div class="w-2.5 h-2.5 bg-sage-dark rounded-full"></div>
+        </div>
+        <span class="font-hand font-bold text-lg tracking-tight"
+          >First Glance</span
+        >
+      </div>
+
+      <div class="flex items-center gap-6">
+        <a
+          href="#features"
+          class="hidden md:block text-sm font-medium opacity-60 hover:opacity-100 transition-opacity"
+          >功能特色</a
+        >
+        <a
+          href="#themes"
+          class="hidden md:block text-sm font-medium opacity-60 hover:opacity-100 transition-opacity"
+          >主题风格</a
+        >
+        <a
+          href="https://chrome.google.com/webstore"
+          class="bg-stone text-cream px-5 py-2 rounded-full text-sm font-bold hover:scale-105 transition-transform shadow-lg"
+        >
+          添加到 Chrome
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="relative pt-32 pb-20 px-6 z-10">
+    <div class="max-w-4xl mx-auto text-center mb-16">
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-stone/10 bg-white/40 mb-6 backdrop-blur-sm"
+      >
+        <span class="w-2 h-2 rounded-full bg-sage-dark"></span>
+        <span class="text-xs font-bold uppercase tracking-widest opacity-60"
+          >Chrome 新标签页扩展</span
+        >
+      </div>
+      <h1
+        class="text-5xl md:text-7xl font-hand font-medium mb-6 leading-tight text-stone"
+      >
+        一眼捕获专注，<br />
+        <span class="opacity-70">开启高效一天。</span>
+      </h1>
+      <p
+        class="text-lg md:text-xl opacity-70 max-w-2xl mx-auto mb-10 leading-relaxed"
+      >
+        将新标签页变成专注仪表盘，与滴答清单无缝同步。<br
+          class="hidden md:block"
+        />
+        结合手帐的简约美学与任务管理的强大功能。
+      </p>
+
+      <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+        <a
+          href="https://chrome.google.com/webstore"
+          class="w-full md:w-auto px-8 py-3.5 bg-stone text-cream-light rounded-lg font-bold shadow-xl hover:-translate-y-1 transition-transform flex items-center justify-center gap-3"
+        >
+          <!-- Chrome Icon -->
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"
+            ><path
+              d="M12 0C5.373 0 0 5.373 0 12c0 6.627 5.373 12 12 12s12-5.373 12-12C24 5.373 18.627 0 12 0zm0 19.5c-4.142 0-7.5-3.358-7.5-7.5S7.858 4.5 12 4.5s7.5 3.358 7.5 7.5-3.358 7.5-7.5 7.5z"
+            ></path></svg
+          >
+          添加到 Chrome
+        </a>
+        <button
+          class="w-full md:w-auto px-8 py-3.5 bg-white border border-cream-dark text-stone rounded-lg font-bold hover:bg-card transition-colors"
+        >
+          查看演示
+        </button>
+      </div>
+    </div>
+
+    <!-- CSS Product Mockup -->
+    <div class="relative max-w-5xl mx-auto mt-12 animate-float">
+      <!-- Browser Window Frame -->
+      <div class="bg-stone/5 rounded-xl p-2 md:p-3 backdrop-blur-sm">
+        <div
+          class="bg-card rounded-lg shadow-2xl overflow-hidden border border-cream-dark aspect-[16/10] relative flex"
+        >
+          <!-- MOCKUP: Sidebar -->
+          <div
+            class="hidden md:flex w-56 border-r border-cream-dark bg-sage flex-col p-4 gap-4"
+          >
+            <div class="flex items-center gap-3 opacity-80 mb-2">
+              <div class="w-7 h-7 bg-white/40 rounded-full"></div>
+              <div class="h-2 w-16 bg-stone/20 rounded"></div>
+            </div>
+            <!-- Mock List Items -->
+            <div class="space-y-2">
+              <div
+                class="h-8 w-full bg-sage-dark rounded-lg shadow-sm flex items-center px-3"
+              >
+                <div class="text-xs font-bold text-stone/80">今天</div>
+              </div>
+              <div class="h-8 w-full flex items-center px-3">
+                <div class="h-2 w-20 bg-stone/10 rounded"></div>
+              </div>
+              <div class="h-8 w-full flex items-center px-3">
+                <div class="h-2 w-14 bg-stone/10 rounded"></div>
+              </div>
+            </div>
+            <div class="mt-auto pt-4 border-t border-stone/10">
+              <div class="h-2 w-12 bg-stone/10 rounded"></div>
+            </div>
+          </div>
+
+          <!-- MOCKUP: Main Content (Focus Mode) -->
+          <div
+            class="flex-1 bg-cream relative flex flex-col items-center justify-center p-8 overflow-hidden"
+          >
+            <!-- Background Texture -->
+            <div
+              class="absolute inset-0 opacity-30"
+              style="background-image: radial-gradient(rgba(68,64,60,0.05) 1px, transparent 1px); background-size: 16px 16px;"
+            >
+            </div>
+
+            <!-- Time -->
+            <div class="mb-6 text-center">
+              <div
+                class="text-[72px] md:text-[96px] font-extralight text-stone leading-none tracking-tight"
+              >
+                10:42
+              </div>
+              <div class="text-lg text-stone-light mt-2">下午好</div>
+            </div>
+
+            <!-- Today's Focus Label -->
+            <div
+              class="text-xs font-medium tracking-[3px] text-stone-light mb-4"
+            >
+              TODAY'S FOCUS
+            </div>
+
+            <!-- The Task -->
+            <div
+              class="flex items-center gap-4 bg-white rounded-xl px-5 py-4 shadow-sm max-w-md"
+            >
+              <div class="w-6 h-6 border-2 border-stone/40 rounded-lg"></div>
+              <div class="text-xl font-hand text-stone">设计新的介绍页面</div>
+            </div>
+
+            <!-- Bottom Quote -->
+            <div
+              class="absolute bottom-6 text-sm text-stone-light italic opacity-60 font-serif"
+            >
+              "简约是终极的复杂。"
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decorative Elements -->
+      <div
+        class="absolute -top-8 -right-8 w-20 h-20 bg-sage rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse"
+      >
+      </div>
+      <div
+        class="absolute -bottom-4 -left-4 w-28 h-28 bg-cream-light rounded-full mix-blend-multiply filter blur-xl opacity-50"
+      >
+      </div>
+    </div>
+  </header>
+
+  <!-- Features Grid -->
+  <section id="features" class="py-20 px-6 max-w-6xl mx-auto">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-hand font-medium text-stone mb-4">功能特色</h2>
+      <p class="text-stone-light max-w-xl mx-auto">
+        专为专注设计，帮你保持高效
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- Feature 1 -->
+      <div
+        class="bg-white p-8 rounded-2xl shadow-sm border border-cream-dark hover:shadow-md transition-shadow group"
+      >
+        <div
+          class="w-12 h-12 bg-cream rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+        >
+          <svg
+            class="w-6 h-6 text-stone"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold font-hand mb-3 text-stone">聚焦视图</h3>
+        <p class="text-sm opacity-70 leading-relaxed">
+          自动展示今日最高优先级任务，大时钟配合简洁界面，让你专注于最重要的事。
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div
+        class="bg-white p-8 rounded-2xl shadow-sm border border-cream-dark hover:shadow-md transition-shadow group"
+      >
+        <div
+          class="w-12 h-12 bg-cream rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+        >
+          <svg
+            class="w-6 h-6 text-stone"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold font-hand mb-3 text-stone">智能清单</h3>
+        <p class="text-sm opacity-70 leading-relaxed">
+          今天、明天、已逾期任务自动分组。支持在聚焦模式和完整列表之间快速切换。
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div
+        class="bg-white p-8 rounded-2xl shadow-sm border border-cream-dark hover:shadow-md transition-shadow group"
+      >
+        <div
+          class="w-12 h-12 bg-cream rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+        >
+          <svg
+            class="w-6 h-6 text-stone"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold font-hand mb-3 text-stone">多彩主题</h3>
+        <p class="text-sm opacity-70 leading-relaxed">
+          提供椰奶白、经典米、樱花粉、天空蓝、深邃黑五种精心设计的配色主题。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Theme Showcase -->
+  <section id="themes" class="py-20 px-6 relative overflow-hidden">
+    <div class="absolute inset-0 bg-sage/30 -skew-y-2 transform scale-110 z-0">
+    </div>
+    <div class="relative z-10 max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-hand font-medium text-stone mb-4">主题风格</h2>
+        <p class="text-stone-light max-w-xl mx-auto">适配你的审美偏好</p>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-4">
+        <!-- Theme Pills -->
+        <div
+          class="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-cream-dark"
+        >
+          <div class="w-4 h-4 rounded-full bg-[#fdfbf7] border border-gray-200">
+          </div>
+          <span class="text-sm font-medium">椰奶白</span>
+        </div>
+        <div
+          class="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-cream-dark"
+        >
+          <div class="w-4 h-4 rounded-full bg-[#e3e0d6]"></div>
+          <span class="text-sm font-medium">经典米</span>
+        </div>
+        <div
+          class="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-cream-dark"
+        >
+          <div class="w-4 h-4 rounded-full bg-[#fce7f3]"></div>
+          <span class="text-sm font-medium">樱花粉</span>
+        </div>
+        <div
+          class="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-cream-dark"
+        >
+          <div class="w-4 h-4 rounded-full bg-[#dbeafe]"></div>
+          <span class="text-sm font-medium">天空蓝</span>
+        </div>
+        <div
+          class="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-cream-dark"
+        >
+          <div class="w-4 h-4 rounded-full bg-[#1f2937]"></div>
+          <span class="text-sm font-medium">深邃黑</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quote / Philosophy -->
+  <section class="py-24 px-6 text-center relative">
+    <div class="relative z-10 max-w-2xl mx-auto">
+      <svg
+        class="w-8 h-8 text-stone/20 mx-auto mb-6"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"
+          fill-rule="evenodd"
+          clip-rule="evenodd"></path>
+      </svg>
+      <h2
+        class="text-2xl md:text-3xl font-serif italic text-stone leading-relaxed mb-6"
+      >
+        "做好工作的唯一方法就是热爱你所做的事。而开始的方式，就是一次专注于一件事。"
+      </h2>
+      <div class="w-12 h-0.5 bg-stone/20 mx-auto rounded-full"></div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 px-6">
+    <div
+      class="max-w-3xl mx-auto text-center bg-white rounded-3xl p-12 shadow-lg border border-cream-dark"
+    >
+      <h2 class="text-3xl font-hand font-medium text-stone mb-4">
+        开始专注之旅
+      </h2>
+      <p class="text-stone-light mb-8 max-w-md mx-auto">
+        免费安装，与滴答清单账号连接即可使用。
       </p>
       <a
         href="https://chrome.google.com/webstore"
-        class="inline-block bg-[#4f2b2b] text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-[#3a1f1f] transition-colors"
+        class="inline-flex items-center gap-3 px-8 py-4 bg-stone text-cream-light rounded-full font-bold shadow-xl hover:-translate-y-1 transition-transform"
       >
-        安装 Chrome 扩展
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"
+          ><path
+            d="M12 0C5.373 0 0 5.373 0 12c0 6.627 5.373 12 12 12s12-5.373 12-12C24 5.373 18.627 0 12 0zm0 19.5c-4.142 0-7.5-3.358-7.5-7.5S7.858 4.5 12 4.5s7.5 3.358 7.5 7.5-3.358 7.5-7.5 7.5z"
+          ></path></svg
+        >
+        添加到 Chrome
       </a>
-    </section>
+    </div>
+  </section>
 
-    <!-- Features -->
-    <section class="grid md:grid-cols-3 gap-8 mb-20">
-      <div class="bg-white/50 rounded-2xl p-6">
-        <h3 class="text-lg font-semibold mb-2">聚焦视图</h3>
-        <p class="text-[#6b4f4f]">自动展示今日最高优先级任务，保持专注。</p>
+  <!-- Footer -->
+  <footer class="bg-white border-t border-cream-dark py-12 px-6">
+    <div
+      class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6"
+    >
+      <div class="flex items-center gap-2 opacity-50">
+        <div
+          class="w-5 h-5 rounded-full border border-current flex items-center justify-center"
+        >
+          <div class="w-1.5 h-1.5 bg-current rounded-full"></div>
+        </div>
+        <span class="font-hand font-bold text-sm">First Glance</span>
       </div>
-      <div class="bg-white/50 rounded-2xl p-6">
-        <h3 class="text-lg font-semibold mb-2">快速操作</h3>
-        <p class="text-[#6b4f4f]">直接在新标签页完成、编辑或创建任务。</p>
-      </div>
-      <div class="bg-white/50 rounded-2xl p-6">
-        <h3 class="text-lg font-semibold mb-2">多种主题</h3>
-        <p class="text-[#6b4f4f]">支持多种配色风格，适配你的审美。</p>
-      </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="text-center text-[#8b7355]">
-      <p>&copy; 2026 First Glance</p>
-    </footer>
-  </main>
+      <div class="text-xs font-medium uppercase tracking-widest opacity-40">
+        &copy; 2026 First Glance
+      </div>
+
+      <div class="flex gap-6 text-sm font-medium opacity-60">
+        <a href="#" class="hover:opacity-100 transition-opacity">GitHub</a>
+        <a href="#" class="hover:opacity-100 transition-opacity">隐私政策</a>
+      </div>
+    </div>
+  </footer>
 </Layout>

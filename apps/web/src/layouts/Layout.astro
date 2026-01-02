@@ -16,9 +16,19 @@ const { title } = Astro.props
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
-    <meta name="description" content="将新标签页变成专注仪表盘，一眼看到今日重要任务。" />
+    <meta
+      name="description"
+      content="将新标签页变成专注仪表盘，一眼看到今日重要任务。与滴答清单无缝同步。"
+    />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;500;600&family=ZCOOL+XiaoWei&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body class="min-h-screen bg-[#f7f1e4] text-[#4f2b2b]">
+  <body class="min-h-screen bg-cream text-stone overflow-x-hidden">
     <slot />
   </body>
 </html>
