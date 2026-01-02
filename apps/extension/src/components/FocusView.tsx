@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { MenuOutlined, LinkOutlined } from '@ant-design/icons'
+import { LinkOutlined } from '@ant-design/icons'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getGreeting } from '@/utils/greeting'
 import { formatTime, formatDateStr } from '@/utils/date'
@@ -78,19 +78,7 @@ export function FocusView({
 
       {/* 顶部栏 */}
       <div className="flex justify-between items-center p-6 relative z-10">
-        {/* 左上角 Links 按钮 - 访客模式隐藏 */}
-        {!isGuestMode && onSwitchView ? (
-          <button
-            onClick={onSwitchView}
-            className="flex items-center gap-2 text-sm font-bold opacity-60 hover:opacity-100 transition-opacity text-[var(--text-primary)] bg-transparent border-0 cursor-pointer"
-          >
-            <MenuOutlined className="text-base" />
-            <span>Links</span>
-          </button>
-        ) : (
-          <div /> // 占位保持布局
-        )}
-
+        <div /> {/* 保持布局平衡 */}
         {/* 右上角 */}
         <div className="flex items-center gap-3">
           {/* 访客模式显示连接按钮 */}
