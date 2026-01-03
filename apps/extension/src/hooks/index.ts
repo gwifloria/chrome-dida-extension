@@ -20,8 +20,15 @@ export { usePersistedSet } from './usePersistedSet'
 
 // 类型导出
 export type {
+  // useTasks 结构化类型
+  UseTasksReturn,
+  TaskData,
+  TaskActions,
+  TaskViews,
+  TaskFilters,
+  // 通用类型
   SortOption,
   GroupOption,
   TaskGroup,
   TaskCounts,
-} from './useTaskViews'
+} from './useTasks'

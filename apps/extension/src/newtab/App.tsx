@@ -27,20 +27,17 @@ function AppContent() {
   const localTasks = useLocalTasks()
 
   // Remote tasks for connected mode
+  const { data, actions, views } = useTasks(isConnected)
+  const { tasks, projects, loading: tasksLoading, error } = data
   const {
-    tasks,
-    projects,
-    loading: tasksLoading,
-    error,
-    todayFocusTasks,
-    counts,
     completeTask,
     deleteTask,
     updateTask,
     createTask,
     createInboxTask,
     refresh: refreshRemoteTasks,
-  } = useTasks(isConnected)
+  } = actions
+  const { todayFocusTasks, counts } = views
 
   const [viewMode, setViewMode] = useState<ViewMode>('focus')
   const [selectedFilter, setSelectedFilter] = useState('today')

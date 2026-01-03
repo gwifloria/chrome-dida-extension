@@ -3,6 +3,23 @@ import { api } from '@/services/api'
 import { storage } from '@/services/storage'
 import type { Task, Project } from '@/types'
 
+export interface TaskData {
+  tasks: Task[]
+  projects: Project[]
+  loading: boolean
+  error: string | null
+}
+
+export interface TaskActions {
+  refresh: () => Promise<void>
+  refreshInbox: () => Promise<void>
+  completeTask: (task: Task) => Promise<void>
+  deleteTask: (task: Task) => Promise<void>
+  updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>
+  createTask: (task: Partial<Task>) => Promise<Task>
+  createInboxTask: (task: Partial<Task>) => Promise<Task>
+}
+
 /**
  * 任务数据管理 Hook
  * 负责：原始数据获取、缓存、CRUD 操作
@@ -128,14 +145,10 @@ export function useTaskData(isLoggedIn: boolean) {
     }
   }, [])
 
-  return {
-    // 原始数据
-    tasks,
-    projects,
-    loading,
-    error,
+  // 结构化返回
+  const data: TaskData = { tasks, projects, loading, error }
 
-    // 数据操作
+  const actions: TaskActions = {
     refresh,
     refreshInbox,
     completeTask,
@@ -144,4 +157,6 @@ export function useTaskData(isLoggedIn: boolean) {
     createTask,
     createInboxTask,
   }
+
+  return { data, actions }
 }

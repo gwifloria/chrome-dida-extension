@@ -19,6 +19,25 @@ import type { Task, Project } from '@/types'
 
 export type { SortOption, GroupOption, TaskGroup, TaskCounts }
 
+export interface TaskViews {
+  todayTasks: Task[]
+  todayFocusTasks: Task[]
+  inboxTasks: Task[]
+  overdueTasks: Task[]
+  tomorrowTasks: Task[]
+  weekTasks: Task[]
+  counts: TaskCounts
+}
+
+export interface TaskFilters {
+  sortBy: SortOption
+  setSortBy: (sort: SortOption) => void
+  groupBy: GroupOption
+  setGroupBy: (group: GroupOption) => void
+  getFilteredTasks: (filter: string, searchQuery?: string) => Task[]
+  getGroupedTasks: (filter: string, searchQuery?: string) => TaskGroup[]
+}
+
 /**
  * 任务视图计算 Hook
  * 负责：计算派生视图、筛选、分组、排序
@@ -56,8 +75,8 @@ export function useTaskViews(tasks: Task[], projects: Project[]) {
     [tasks, sortBy, groupBy, projects]
   )
 
-  return {
-    // 计算视图
+  // 结构化返回
+  const views: TaskViews = {
     todayTasks,
     todayFocusTasks,
     inboxTasks,
@@ -65,13 +84,16 @@ export function useTaskViews(tasks: Task[], projects: Project[]) {
     tomorrowTasks,
     weekTasks,
     counts,
+  }
 
-    // 筛选和分组
-    getFilteredTasks,
-    getGroupedTasks,
+  const filters: TaskFilters = {
     sortBy,
     setSortBy,
     groupBy,
     setGroupBy,
+    getFilteredTasks,
+    getGroupedTasks,
   }
+
+  return { views, filters }
 }
