@@ -6,6 +6,9 @@ export { request } from './client'
 export { tasksApi } from './tasks'
 export { projectsApi } from './projects'
 
+// Adapters
+export * from './adapters'
+
 // 兼容旧 API 接口
 import { tasksApi } from './tasks'
 import { projectsApi } from './projects'
