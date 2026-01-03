@@ -8,12 +8,6 @@ export function useLocalTasks() {
   const [tasks, setTasks] = useState<LocalTask[]>([])
   const [loading, setLoading] = useState(true)
 
-  const refresh = useCallback(async () => {
-    const pendingTasks = await localTaskStorage.getPendingTasks()
-    setTasks(pendingTasks)
-    setLoading(false)
-  }, [])
-
   // Load tasks on mount
   useEffect(() => {
     localTaskStorage.getPendingTasks().then((pendingTasks) => {
@@ -55,7 +49,6 @@ export function useLocalTasks() {
     completeTask,
     deleteTask,
     clearAll,
-    refresh,
     canAddMore: tasks.length < MAX_LOCAL_TASKS,
     count: tasks.length,
     maxTasks: MAX_LOCAL_TASKS,

@@ -2,18 +2,10 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
 import type { Project, Task } from '@/types'
+import { SectionTitle } from '../common/SectionTitle'
 import { FilterItem } from './FilterItem'
 import { FolderItem } from './FolderItem'
-
-interface ProjectWithCount extends Project {
-  count: number
-}
-
-interface FolderGroup {
-  id: string
-  name: string
-  projects: ProjectWithCount[]
-}
+import type { ProjectWithCount, FolderGroup } from './types'
 
 interface ProjectListProps {
   projects: Project[]
@@ -21,15 +13,6 @@ interface ProjectListProps {
   selectedFilter: string
   collapsed: boolean
   onFilterChange: (filter: string) => void
-}
-
-function SectionTitle({ title }: { title: string }) {
-  return (
-    <div className="px-3 py-2 text-[11px] font-medium text-[var(--text-secondary)] tracking-wide flex items-center gap-1">
-      <span className="text-xs">›</span>
-      {title}
-    </div>
-  )
 }
 
 export function ProjectList({

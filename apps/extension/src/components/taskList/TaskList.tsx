@@ -8,7 +8,7 @@ import { QuickAddInput } from './QuickAddInput'
 import { TaskGroupSection } from './TaskGroupSection'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
 import { useRelativeDates } from '@/hooks/useRelativeDates'
-import { filterTasks, sortTasks, type TaskGroup } from '@/utils/taskFilters'
+import { filterTasks, type TaskGroup } from '@/utils/taskFilters'
 import { extractDateStr } from '@/utils/date'
 import type { Task, Project } from '@/types'
 
@@ -45,9 +45,9 @@ export function TaskList({
   const [collapsedGroups, toggleGroup] = usePersistedSet('taskGroupCollapsed')
   const { todayStr, tomorrowStr, dayAfterStr } = useRelativeDates()
 
-  // 使用统一的过滤函数
+  // 使用统一的过滤函数（排序在分组后进行）
   const filteredTasks = useMemo(
-    () => sortTasks(filterTasks(tasks, filter, searchQuery), 'priority'),
+    () => filterTasks(tasks, filter, searchQuery),
     [tasks, filter, searchQuery]
   )
 

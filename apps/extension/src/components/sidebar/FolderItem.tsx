@@ -1,20 +1,7 @@
 import { memo } from 'react'
 import { CollapseArrow } from '../CollapseArrow'
 import { FilterItem } from './FilterItem'
-
-interface ProjectWithCount {
-  id: string
-  name: string
-  color?: string
-  sortOrder: number
-  count: number
-}
-
-interface FolderGroup {
-  id: string
-  name: string
-  projects: ProjectWithCount[]
-}
+import type { FolderGroup } from './types'
 
 interface FolderItemProps {
   folder: FolderGroup
@@ -25,6 +12,9 @@ interface FolderItemProps {
   onFilterChange: (filter: string) => void
 }
 
+const baseButtonClass =
+  'flex items-center cursor-pointer rounded-lg transition-all duration-200 ease-out hover:bg-black/[0.04] select-none'
+
 export const FolderItem = memo(function FolderItem({
   folder,
   collapsed,
@@ -33,20 +23,22 @@ export const FolderItem = memo(function FolderItem({
   onToggleFolder,
   onFilterChange,
 }: FolderItemProps) {
+  const opacityClass = isFolderCollapsed ? 'opacity-80' : ''
+
   return (
     <div className="my-1">
       {collapsed ? (
         <div
           onClick={onToggleFolder}
           title={folder.name}
-          className={`flex items-center justify-center py-2 px-2 cursor-pointer rounded-lg transition-all duration-200 ease-out hover:bg-black/[0.04] select-none ${isFolderCollapsed ? 'opacity-80' : ''}`}
+          className={`${baseButtonClass} justify-center py-2 px-2 ${opacityClass}`}
         >
           <CollapseArrow isCollapsed={isFolderCollapsed} />
         </div>
       ) : (
         <div
           onClick={onToggleFolder}
-          className={`flex items-center gap-1 py-2 px-3 cursor-pointer rounded-lg transition-all duration-200 ease-out hover:bg-black/[0.04] hover:translate-x-0.5 select-none ${isFolderCollapsed ? 'opacity-80' : ''}`}
+          className={`${baseButtonClass} gap-1 py-2 px-3 hover:translate-x-0.5 ${opacityClass}`}
         >
           <CollapseArrow isCollapsed={isFolderCollapsed} />
           <span className="text-[11px] font-medium text-[var(--text-secondary)] tracking-wide">

@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import type { TaskCounts } from '@/utils/taskFilters'
+import { SectionTitle } from '../common/SectionTitle'
 import { FilterItem } from './FilterItem'
 
 interface SmartFilter {
@@ -20,15 +21,6 @@ interface SmartFilterListProps {
   selectedFilter: string
   collapsed: boolean
   onFilterChange: (filter: string) => void
-}
-
-function SectionTitle({ title }: { title: string }) {
-  return (
-    <div className="px-3 py-2 text-[11px] font-medium text-[var(--text-secondary)] tracking-wide flex items-center gap-1">
-      <span className="text-xs">›</span>
-      {title}
-    </div>
-  )
 }
 
 export function SmartFilterList({
