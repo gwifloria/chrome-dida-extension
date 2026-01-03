@@ -6,6 +6,10 @@ export { useTaskGroups } from './useTaskGroups'
 export { useTaskCompletion } from './useTaskCompletion'
 export { useLocalTasks } from './useLocalTasks'
 
+// 番茄时钟
+export { usePomodoro, formatPomodoroTime } from './usePomodoro'
+export type { PomodoroMode, PomodoroConfig, PomodoroState } from './usePomodoro'
+
 // 应用状态
 export { useAppMode } from './useAppMode'
 export { useSettings } from './useSettings'
