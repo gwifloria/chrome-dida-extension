@@ -21,7 +21,7 @@ export const FocusTaskItem = memo(function FocusTaskItem({
   return (
     <div
       className={`
-        flex items-center gap-4 py-3 px-4 bg-[var(--bg-card)] rounded-xl shadow-sm
+        flex items-center gap-5 py-4 px-5 bg-[var(--bg-card)] rounded-xl shadow-sm
         transition-all duration-300 ease-out
         ${completing ? 'animate-[taskComplete_0.4s_ease-out_forwards]' : ''}
       `}
@@ -33,7 +33,7 @@ export const FocusTaskItem = memo(function FocusTaskItem({
         disabled={completing}
       />
       <span
-        className={`flex-1 text-lg text-[var(--text-primary)] transition-all duration-200 ${completing ? 'line-through text-[var(--text-secondary)]' : ''}`}
+        className={`flex-1 text-xl text-[var(--text-primary)] transition-all duration-200 ${completing ? 'line-through text-[var(--text-secondary)]' : ''}`}
         style={{
           fontFamily:
             theme.type === 'journal' ? 'var(--font-heading)' : 'inherit',
