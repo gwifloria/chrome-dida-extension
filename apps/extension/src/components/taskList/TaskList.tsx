@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { Empty, Alert } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { TaskEditor } from '../Task/TaskEditor'
@@ -7,9 +7,7 @@ import { TaskListHeader } from './TaskListHeader'
 import { QuickAddInput } from './QuickAddInput'
 import { TaskGroupSection } from './TaskGroupSection'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
-import { useRelativeDates } from '@/hooks/useRelativeDates'
-import { filterTasks, type TaskGroup } from '@/utils/taskFilters'
-import { extractDateStr } from '@/utils/date'
+import { useTaskGroups } from '@/hooks/useTaskGroups'
 import type { Task, Project } from '@/types'
 
 interface TaskListProps {
@@ -43,88 +41,10 @@ export function TaskList({
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [isEditorOpen, setIsEditorOpen] = useState(false)
   const [collapsedGroups, toggleGroup] = usePersistedSet('taskGroupCollapsed')
-  const { todayStr, tomorrowStr, dayAfterStr } = useRelativeDates()
 
-  // 使用统一的过滤函数（排序在分组后进行）
-  const filteredTasks = useMemo(
-    () => filterTasks(tasks, filter, searchQuery),
-    [tasks, filter, searchQuery]
-  )
-
-  // 按日期分组
-  const groupedTasks = useMemo<TaskGroup[]>(() => {
-    const groups: TaskGroup[] = []
-
-    // 置顶任务 (sortOrder 较大的表示置顶)
-    const pinned = filteredTasks.filter((t) => t.sortOrder > 0)
-    if (pinned.length > 0) {
-      groups.push({
-        id: 'pinned',
-        title: t('group.pinned'),
-        tasks: pinned.sort((a, b) => b.sortOrder - a.sortOrder),
-      })
-    }
-
-    // 非置顶任务
-    const unpinned = filteredTasks.filter((t) => t.sortOrder <= 0)
-
-    // 已过期
-    const overdue = unpinned.filter((task) => {
-      if (!task.dueDate) return false
-      const taskDateStr = extractDateStr(task.dueDate)
-      return taskDateStr < todayStr
-    })
-    if (overdue.length > 0) {
-      groups.push({ id: 'overdue', title: t('group.overdue'), tasks: overdue })
-    }
-
-    // 今天
-    const todayTasks = unpinned.filter((task) => {
-      if (!task.dueDate) return false
-      return extractDateStr(task.dueDate) === todayStr
-    })
-    if (todayTasks.length > 0) {
-      groups.push({ id: 'today', title: t('group.today'), tasks: todayTasks })
-    }
-
-    // 明天
-    const tomorrowTasks = unpinned.filter((task) => {
-      if (!task.dueDate) return false
-      return extractDateStr(task.dueDate) === tomorrowStr
-    })
-    if (tomorrowTasks.length > 0) {
-      groups.push({
-        id: 'tomorrow',
-        title: t('group.tomorrow'),
-        tasks: tomorrowTasks,
-      })
-    }
-
-    // 之后
-    const later = unpinned.filter((task) => {
-      if (!task.dueDate) return false
-      return extractDateStr(task.dueDate) >= dayAfterStr
-    })
-    if (later.length > 0) {
-      groups.push({ id: 'later', title: t('group.later'), tasks: later })
-    }
-
-    // 无日期
-    const noDate = unpinned.filter((task) => !task.dueDate)
-    if (noDate.length > 0) {
-      groups.push({ id: 'nodate', title: t('group.noDate'), tasks: noDate })
-    }
-
-    return groups
-  }, [filteredTasks, todayStr, tomorrowStr, dayAfterStr, t])
-
-  // 对每组内的任务排序（按优先级）
-  const sortedGroups = useMemo(() => {
-    return groupedTasks.map((group) => ({
-      ...group,
-      tasks: [...group.tasks].sort((a, b) => b.priority - a.priority),
-    }))
-  }, [groupedTasks])
+  // 使用抽取的分组 hook
+  const groups = useTaskGroups({ tasks, filter, searchQuery })
+  const taskCount = groups.reduce((sum, g) => sum + g.tasks.length, 0)
 
   const handleEdit = (task: Task) => {
     setEditingTask(task)
@@ -151,7 +71,7 @@ export function TaskList({
       <TaskListHeader
         filter={filter}
         projects={projects}
-        taskCount={filteredTasks.length}
+        taskCount={taskCount}
         onFocus={onFocus}
       />
 
@@ -174,20 +94,20 @@ export function TaskList({
       <div className="flex-1 overflow-y-auto -mx-5 px-5">
         {loading ? (
           <TaskSkeleton count={6} />
-        ) : sortedGroups.length === 0 ? (
+        ) : groups.length === 0 ? (
           <Empty
             description={t('empty.noTasks')}
             className="!py-[100px] !px-5 !bg-transparent"
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         ) : (
-          sortedGroups.map((group) => (
+          groups.map((group) => (
             <TaskGroupSection
               key={group.id}
               group={group}
               projects={projects}
               isCollapsed={collapsedGroups.has(group.id)}
-              showGroupTitle={sortedGroups.length > 1}
+              showGroupTitle={groups.length > 1}
               onToggle={() => toggleGroup(group.id)}
               onComplete={onComplete}
               onDelete={onDelete}

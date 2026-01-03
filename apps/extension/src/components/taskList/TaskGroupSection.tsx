@@ -1,3 +1,4 @@
+import { memo, useCallback } from 'react'
 import { CollapseArrow } from '../CollapseArrow'
 import { TaskItem } from '../Task/TaskItem'
 import type { Task, Project } from '@/types'
@@ -14,7 +15,7 @@ interface TaskGroupSectionProps {
   onEdit: (task: Task) => void
 }
 
-export function TaskGroupSection({
+export const TaskGroupSection = memo(function TaskGroupSection({
   group,
   projects,
   isCollapsed,
@@ -24,8 +25,10 @@ export function TaskGroupSection({
   onDelete,
   onEdit,
 }: TaskGroupSectionProps) {
-  const getProjectById = (projectId: string) =>
-    projects.find((p) => p.id === projectId)
+  const getProjectById = useCallback(
+    (projectId: string) => projects.find((p) => p.id === projectId),
+    [projects]
+  )
 
   return (
     <div className="mb-4">
@@ -59,4 +62,4 @@ export function TaskGroupSection({
       )}
     </div>
   )
-}
+})

@@ -2,6 +2,7 @@
 export { useTasks } from './useTasks'
 export { useTaskData } from './useTaskData'
 export { useTaskViews } from './useTaskViews'
+export { useTaskGroups } from './useTaskGroups'
 export { useTaskCompletion } from './useTaskCompletion'
 export { useLocalTasks } from './useLocalTasks'
 
