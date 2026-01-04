@@ -4,8 +4,16 @@
     "overdue": "已过期",
     "today": "今天",
     "tomorrow": "明天",
-    "later": "之后",
-    "noDate": "无日期"
+    "week": "最近7天",
+    "later": "更晚",
+    "noDate": "无日期",
+    "nodate": "无日期",
+    "all": "所有任务",
+    "inbox": "收集箱",
+    "high": "高优先级",
+    "medium": "中优先级",
+    "low": "低优先级",
+    "none": "无优先级"
   },
   "filter": {
     "all": "所有任务",

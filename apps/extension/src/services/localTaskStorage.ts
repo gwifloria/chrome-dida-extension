@@ -1,5 +1,5 @@
 import type { LocalTask } from '@/types'
-import { formatDateStr } from '@/utils/date'
+import { formatDateTimeWithTimezone } from '@/utils/date'
 
 const STORAGE_KEY = 'local_tasks'
 const MAX_LOCAL_TASKS = 3
@@ -74,7 +74,7 @@ export const localTaskStorage = {
 
   // Create a task with default values for guest mode
   async createQuickTask(title: string): Promise<LocalTask | null> {
-    const dueDate = formatDateStr(new Date()) + 'T00:00:00.000+0800'
+    const dueDate = formatDateTimeWithTimezone(new Date())
     return this.addTask({
       title,
       priority: 5, // High priority for focus

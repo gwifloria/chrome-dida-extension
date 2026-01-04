@@ -8,5 +8,14 @@
   "guestLimit": {
     "available": "{{remaining}}/3 available",
     "unlock": "Connect to unlock more tasks"
+  },
+  "pomodoro": {
+    "start": "Start Pomodoro",
+    "pause": "Pause",
+    "resume": "Resume",
+    "skip": "Skip",
+    "reset": "Reset",
+    "working": "Focusing",
+    "resting": "Resting"
   }
 }

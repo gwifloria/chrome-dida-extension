@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useCurrentTime } from '@/hooks/useCurrentTime'
 import { formatPomodoroTime, type PomodoroMode } from '@/hooks/usePomodoro'
 
@@ -23,6 +24,7 @@ export const Clock = memo(function Clock({
   pomodoroTimeLeft = 0,
   onClick,
 }: ClockProps) {
+  const { t } = useTranslation('focus')
   const { formattedTime, formattedDate } = useCurrentTime()
 
   // 番茄模式下显示倒计时
@@ -48,7 +50,9 @@ export const Clock = memo(function Clock({
         {displayTime}
         {isPomodoroActive && (
           <div className="text-sm font-normal tracking-widest text-center mt-2 uppercase opacity-60">
-            {pomodoroMode === 'work' ? '专注中' : '休息中'}
+            {pomodoroMode === 'work'
+              ? t('pomodoro.working')
+              : t('pomodoro.resting')}
           </div>
         )}
       </div>

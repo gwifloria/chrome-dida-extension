@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { formatDateStr } from '@/utils/date'
+import { formatDateTimeWithTimezone } from '@/utils/date'
 import type { Task, LocalTask } from '@/types'
 
 interface FocusTaskInputProps {
@@ -27,8 +27,8 @@ export function FocusTaskInput({
 
     setCreating(true)
     try {
-      // 使用本地日期格式（避免 UTC 时区问题）
-      const dueDate = formatDateStr(new Date()) + 'T00:00:00.000+0800'
+      // 使用本地日期格式（自动处理时区）
+      const dueDate = formatDateTimeWithTimezone(new Date())
 
       const result = await onCreate({
         title: newTaskTitle.trim(),

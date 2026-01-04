@@ -8,5 +8,14 @@
   "guestLimit": {
     "available": "{{remaining}}/3 available",
     "unlock": "Connect to unlock more tasks"
+  },
+  "pomodoro": {
+    "start": "开始番茄",
+    "pause": "暂停",
+    "resume": "继续",
+    "skip": "跳过",
+    "reset": "重置",
+    "working": "专注中",
+    "resting": "休息中"
   }
 }

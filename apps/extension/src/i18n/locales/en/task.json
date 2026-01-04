@@ -4,8 +4,16 @@
     "overdue": "Overdue",
     "today": "Today",
     "tomorrow": "Tomorrow",
+    "week": "Next 7 Days",
     "later": "Later",
-    "noDate": "No Date"
+    "noDate": "No Date",
+    "nodate": "No Date",
+    "all": "All Tasks",
+    "inbox": "Inbox",
+    "high": "High Priority",
+    "medium": "Medium Priority",
+    "low": "Low Priority",
+    "none": "No Priority"
   },
   "filter": {
     "all": "All Tasks",
