@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Input } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { useSettings } from '@/hooks/useSettings'
-import { useRelativeDates } from '@/hooks/useRelativeDates'
+import { formatDateTimeWithTimezone } from '@/utils/date'
 import type { Task, Project } from '@/types'
 
 interface QuickAddInputProps {
@@ -20,7 +20,6 @@ export function QuickAddInput({
 }: QuickAddInputProps) {
   const { t } = useTranslation('task')
   const { settings } = useSettings()
-  const { todayStr, tomorrowStr } = useRelativeDates()
   const [quickAddValue, setQuickAddValue] = useState('')
 
   const handleQuickAdd = async () => {
@@ -40,9 +39,11 @@ export function QuickAddInput({
 
     // 根据 filter 设置 dueDate
     if (filter === 'today') {
-      dueDate = todayStr + 'T00:00:00.000+0000'
+      dueDate = formatDateTimeWithTimezone(new Date())
     } else if (filter === 'tomorrow') {
-      dueDate = tomorrowStr + 'T00:00:00.000+0000'
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      dueDate = formatDateTimeWithTimezone(tomorrow)
     }
     // week/overdue/nodate 不设置默认日期
 

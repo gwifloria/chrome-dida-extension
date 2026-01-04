@@ -1,6 +1,8 @@
 import { memo } from 'react'
 import { ProjectColorDot } from '../ProjectColorDot'
 
+const MAX_VISIBLE_COUNT = 99
+
 interface FilterItemProps {
   active: boolean
   onClick: () => void
@@ -59,7 +61,7 @@ export const FilterItem = memo(function FilterItem({
                 }
               `}
             >
-              {count > 99 ? '99+' : count}
+              {count > MAX_VISIBLE_COUNT ? `${MAX_VISIBLE_COUNT}+` : count}
             </span>
           )}
         </>

@@ -1,26 +1,28 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
 /**
  * 持久化布尔值状态的 Hook
- * 用于管理侧边栏折叠等需要本地存储的布尔状态
+ * 使用 chrome.storage.local 存储，支持跨 tab 同步
  */
 export function usePersistedBoolean(
   storageKey: string,
   defaultValue = false
 ): [boolean, () => void] {
-  const [value, setValue] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem(storageKey)
-      return saved !== null ? JSON.parse(saved) : defaultValue
-    } catch {
-      return defaultValue
-    }
-  })
+  const [value, setValue] = useState<boolean>(defaultValue)
+
+  // 初始化时从 storage 读取
+  useEffect(() => {
+    chrome.storage.local.get(storageKey).then((result) => {
+      if (result[storageKey] !== undefined) {
+        setValue(result[storageKey])
+      }
+    })
+  }, [storageKey])
 
   const toggle = useCallback(() => {
     setValue((prev) => {
       const next = !prev
-      localStorage.setItem(storageKey, JSON.stringify(next))
+      chrome.storage.local.set({ [storageKey]: next })
       return next
     })
   }, [storageKey])

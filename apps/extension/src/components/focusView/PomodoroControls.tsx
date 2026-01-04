@@ -9,6 +9,7 @@ import {
   RedoOutlined,
   ForwardOutlined,
 } from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
 import type { PomodoroMode } from '@/hooks/usePomodoro'
 
 interface PomodoroControlsProps {
@@ -32,6 +33,8 @@ export const PomodoroControls = memo(function PomodoroControls({
   onReset,
   onSkip,
 }: PomodoroControlsProps) {
+  const { t } = useTranslation('focus')
+
   // 空闲模式：显示开始按钮
   if (mode === 'idle') {
     return (
@@ -43,7 +46,7 @@ export const PomodoroControls = memo(function PomodoroControls({
           onClick={onStart}
           className="!text-[var(--text-secondary)] hover:!text-[var(--accent)] !text-base"
         >
-          开始番茄
+          {t('pomodoro.start')}
         </Button>
       </div>
     )
@@ -61,7 +64,7 @@ export const PomodoroControls = memo(function PomodoroControls({
           onClick={onPause}
           className="!text-[var(--text-secondary)] hover:!text-[var(--accent)]"
         >
-          暂停
+          {t('pomodoro.pause')}
         </Button>
       ) : (
         <Button
@@ -71,7 +74,7 @@ export const PomodoroControls = memo(function PomodoroControls({
           onClick={onResume}
           className="!text-[var(--text-secondary)] hover:!text-[var(--accent)]"
         >
-          继续
+          {t('pomodoro.resume')}
         </Button>
       )}
 
@@ -83,7 +86,7 @@ export const PomodoroControls = memo(function PomodoroControls({
         onClick={onSkip}
         className="!text-[var(--text-secondary)] hover:!text-[var(--text-primary)]"
       >
-        跳过
+        {t('pomodoro.skip')}
       </Button>
 
       {/* 重置 */}
@@ -94,7 +97,7 @@ export const PomodoroControls = memo(function PomodoroControls({
         onClick={onReset}
         className="!text-[var(--text-secondary)] hover:!text-[var(--text-primary)]"
       >
-        重置
+        {t('pomodoro.reset')}
       </Button>
 
       {/* 完成计数 */}

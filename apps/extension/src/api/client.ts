@@ -24,8 +24,13 @@ export async function request<T = void>(
   })
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}))
-    throw new Error(error.errorMessage || `请求失败: ${response.status}`)
+    const errorData = await response.json().catch(() => ({}))
+    const errorMsg =
+      errorData?.errorMessage ||
+      errorData?.error ||
+      errorData?.message ||
+      `请求失败: ${response.status}`
+    throw new Error(errorMsg)
   }
 
   // 204 No Content 或空响应体 - 适用于 DELETE/POST 无返回的情况

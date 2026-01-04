@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Modal, Form, Input, Select, message } from 'antd'
 import { FlagOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
@@ -29,15 +30,18 @@ export function TaskEditor({
 }: TaskEditorProps) {
   const { t } = useTranslation('task')
   const [form] = Form.useForm()
+  const [saving, setSaving] = useState(false)
   const isNew = !task
   const priorityOptions = getPriorityOptions(t)
 
   const handleOk = async () => {
+    if (saving) return
+    setSaving(true)
     try {
       const values = await form.validateFields()
       const formattedValues: Partial<Task> = {
-        title: values.title,
-        content: values.content,
+        title: values.title?.trim(),
+        content: values.content?.trim(),
         priority: values.priority,
         projectId: values.projectId,
         dueDate: task?.dueDate, // 保留原有日期，不提供编辑
@@ -50,6 +54,8 @@ export function TaskEditor({
         return
       }
       message.error(t('common:message.saveFailed'))
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -73,7 +79,7 @@ export function TaskEditor({
       destroyOnClose
       width={480}
       className={MODAL_STYLE}
-      okButtonProps={{ className: MODAL_OK_BUTTON_STYLE }}
+      okButtonProps={{ className: MODAL_OK_BUTTON_STYLE, loading: saving }}
       cancelButtonProps={{ className: MODAL_CANCEL_BUTTON_STYLE }}
     >
       <Form
@@ -90,7 +96,10 @@ export function TaskEditor({
         <Form.Item
           name="title"
           label={t('editor.labelTitle')}
-          rules={[{ required: true, message: t('validation.titleRequired') }]}
+          rules={[
+            { required: true, message: t('validation.titleRequired') },
+            { whitespace: true, message: t('validation.titleRequired') },
+          ]}
         >
           <Input
             placeholder={t('editor.placeholderTitle')}

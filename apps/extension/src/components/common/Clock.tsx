@@ -44,6 +44,8 @@ export const Clock = memo(function Clock({
   if (variant === 'large') {
     return (
       <div
+        role="timer"
+        aria-label={displayTime}
         onClick={onClick}
         className={`text-[120px] font-extralight leading-none tracking-tight transition-all duration-700 cursor-pointer hover:scale-105 ${isPomodoroActive ? pomodoroColor : 'text-[var(--text-primary)]'} ${className}`}
       >

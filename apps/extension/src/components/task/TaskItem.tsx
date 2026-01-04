@@ -81,6 +81,7 @@ export const TaskItem = memo(function TaskItem({
           icon={<EditOutlined />}
           onClick={() => onEdit(task)}
           className="!w-7 !h-7"
+          aria-label={t('common:button.edit')}
         />
         <Popconfirm
           title={t('task:confirm.delete')}
@@ -94,6 +95,7 @@ export const TaskItem = memo(function TaskItem({
             danger
             icon={<DeleteOutlined />}
             className="!w-7 !h-7"
+            aria-label={t('common:button.delete')}
           />
         </Popconfirm>
       </div>
