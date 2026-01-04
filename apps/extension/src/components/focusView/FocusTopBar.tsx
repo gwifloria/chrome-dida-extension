@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Button } from 'antd'
 import { LinkOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
@@ -8,7 +9,10 @@ interface FocusTopBarProps {
   onConnect?: () => void
 }
 
-export function FocusTopBar({ isGuestMode, onConnect }: FocusTopBarProps) {
+export const FocusTopBar = memo(function FocusTopBar({
+  isGuestMode,
+  onConnect,
+}: FocusTopBarProps) {
   const { t } = useTranslation('common')
 
   return (
@@ -32,4 +36,4 @@ export function FocusTopBar({ isGuestMode, onConnect }: FocusTopBarProps) {
       </div>
     </div>
   )
-}
+})

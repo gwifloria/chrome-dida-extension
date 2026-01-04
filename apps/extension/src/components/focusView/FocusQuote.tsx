@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import type { Quote } from '@/data/quotes'
 
@@ -5,7 +6,7 @@ interface FocusQuoteProps {
   quote: Quote
 }
 
-export function FocusQuote({ quote }: FocusQuoteProps) {
+export const FocusQuote = memo(function FocusQuote({ quote }: FocusQuoteProps) {
   const { theme } = useTheme()
 
   return (
@@ -24,4 +25,4 @@ export function FocusQuote({ quote }: FocusQuoteProps) {
       </p>
     </div>
   )
-}
+})
