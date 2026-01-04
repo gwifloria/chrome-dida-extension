@@ -1,7 +1,8 @@
 /**
- * 番茄时钟 Hook
+ * 番茄时钟 Hook - 支持多 Tab 同步
  */
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { storage, type PomodoroStorage } from '@/services/storage'
 
 export type PomodoroMode = 'idle' | 'work' | 'break'
 
@@ -12,7 +13,7 @@ export interface PomodoroConfig {
 
 export interface PomodoroState {
   mode: PomodoroMode
-  timeLeft: number // 剩余秒数
+  timeLeft: number // 剩余秒数（计算得出）
   isRunning: boolean
   completedCount: number // 完成的番茄数
 }
@@ -45,11 +46,31 @@ function getAudioContext(): AudioContext | null {
   return sharedAudioContext
 }
 
+// 计算剩余时间
+function calculateTimeLeft(stored: PomodoroStorage): number {
+  if (stored.mode === 'idle') {
+    return stored.config.workDuration * 60
+  }
+
+  if (!stored.isRunning) {
+    return stored.pausedTimeLeft ?? stored.config.workDuration * 60
+  }
+
+  const duration =
+    stored.mode === 'work'
+      ? stored.config.workDuration * 60
+      : stored.config.breakDuration * 60
+
+  const elapsed = Math.floor((Date.now() - stored.startTime!) / 1000)
+  return Math.max(0, duration - elapsed)
+}
+
 export function usePomodoro(
   config: Partial<PomodoroConfig> = {}
 ): PomodoroState & PomodoroActions {
   const mergedConfig = { ...DEFAULT_CONFIG, ...config }
   const intervalRef = useRef<number | null>(null)
+  const storageRef = useRef<PomodoroStorage | null>(null)
 
   const [state, setState] = useState<PomodoroState>({
     mode: 'idle',
@@ -58,21 +79,37 @@ export function usePomodoro(
     completedCount: 0,
   })
 
-  // 清理定时器
-  const clearTimer = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
-    }
-  }, [])
+  // 从存储状态更新本地状态
+  const updateFromStorage = useCallback(
+    (stored: PomodoroStorage | null) => {
+      if (!stored) {
+        setState({
+          mode: 'idle',
+          timeLeft: mergedConfig.workDuration * 60,
+          isRunning: false,
+          completedCount: 0,
+        })
+        storageRef.current = null
+        return
+      }
 
-  // 播放提示音（复用共享 AudioContext）
+      storageRef.current = stored
+      setState({
+        mode: stored.mode,
+        timeLeft: calculateTimeLeft(stored),
+        isRunning: stored.isRunning,
+        completedCount: stored.completedCount,
+      })
+    },
+    [mergedConfig.workDuration]
+  )
+
+  // 播放提示音
   const playNotification = useCallback(() => {
     try {
       const audioContext = getAudioContext()
       if (!audioContext) return
 
-      // 确保 AudioContext 处于运行状态
       if (audioContext.state === 'suspended') {
         audioContext.resume()
       }
@@ -90,7 +127,6 @@ export function usePomodoro(
       oscillator.start()
       oscillator.stop(audioContext.currentTime + 0.2)
 
-      // 第二声
       setTimeout(() => {
         const ctx = getAudioContext()
         if (!ctx) return
@@ -109,101 +145,153 @@ export function usePomodoro(
     }
   }, [])
 
+  // 切换到下一阶段
+  const switchToNextPhase = useCallback(async () => {
+    const stored = storageRef.current
+    if (!stored) return
+
+    const now = Date.now()
+
+    // 检查是否需要播放提示音（防止多 tab 重复播放，1秒内不重复）
+    const shouldPlaySound =
+      !stored.lastNotificationTime || now - stored.lastNotificationTime > 1000
+
+    if (shouldPlaySound) {
+      playNotification()
+    }
+
+    const newStored: PomodoroStorage = {
+      ...stored,
+      mode: stored.mode === 'work' ? 'break' : 'work',
+      startTime: now,
+      pausedTimeLeft: null,
+      completedCount:
+        stored.mode === 'work'
+          ? stored.completedCount + 1
+          : stored.completedCount,
+      lastNotificationTime: now,
+    }
+
+    await storage.setPomodoro(newStored)
+  }, [playNotification])
+
+  // 初始化和监听 storage 变化
+  useEffect(() => {
+    // 加载初始状态
+    storage.getPomodoro().then(updateFromStorage)
+
+    // 监听 storage 变化
+    const unsubscribe = storage.onPomodoroChange(updateFromStorage)
+
+    return unsubscribe
+  }, [updateFromStorage])
+
+  // 定时器：每秒更新 timeLeft 并检查是否需要切换阶段
+  useEffect(() => {
+    if (!state.isRunning) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+      return
+    }
+
+    intervalRef.current = window.setInterval(() => {
+      const stored = storageRef.current
+      if (!stored || !stored.isRunning) return
+
+      const timeLeft = calculateTimeLeft(stored)
+
+      if (timeLeft <= 0) {
+        switchToNextPhase()
+      } else {
+        setState((prev) => ({ ...prev, timeLeft }))
+      }
+    }, 1000)
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+    }
+  }, [state.isRunning, switchToNextPhase])
+
   // 开始工作
-  const start = useCallback(() => {
-    clearTimer()
-    setState((prev) => ({
-      ...prev,
+  const start = useCallback(async () => {
+    const newStored: PomodoroStorage = {
       mode: 'work',
-      timeLeft: mergedConfig.workDuration * 60,
       isRunning: true,
-    }))
-  }, [clearTimer, mergedConfig.workDuration])
+      completedCount: storageRef.current?.completedCount ?? 0,
+      startTime: Date.now(),
+      pausedTimeLeft: null,
+      lastNotificationTime: null,
+      config: mergedConfig,
+    }
+    await storage.setPomodoro(newStored)
+  }, [mergedConfig])
 
   // 暂停
-  const pause = useCallback(() => {
-    clearTimer()
-    setState((prev) => ({ ...prev, isRunning: false }))
-  }, [clearTimer])
+  const pause = useCallback(async () => {
+    const stored = storageRef.current
+    if (!stored || !stored.isRunning) return
+
+    const timeLeft = calculateTimeLeft(stored)
+    const newStored: PomodoroStorage = {
+      ...stored,
+      isRunning: false,
+      pausedTimeLeft: timeLeft,
+      startTime: null,
+    }
+    await storage.setPomodoro(newStored)
+  }, [])
 
   // 继续
-  const resume = useCallback(() => {
-    setState((prev) => ({ ...prev, isRunning: true }))
+  const resume = useCallback(async () => {
+    const stored = storageRef.current
+    if (!stored || stored.isRunning || stored.mode === 'idle') return
+
+    const newStored: PomodoroStorage = {
+      ...stored,
+      isRunning: true,
+      startTime: Date.now(),
+      // startTime 基于 pausedTimeLeft 反推
+    }
+
+    // 计算新的 startTime，使得 timeLeft = pausedTimeLeft
+    const duration =
+      stored.mode === 'work'
+        ? stored.config.workDuration * 60
+        : stored.config.breakDuration * 60
+    const elapsed = duration - (stored.pausedTimeLeft ?? duration)
+    newStored.startTime = Date.now() - elapsed * 1000
+
+    await storage.setPomodoro(newStored)
   }, [])
 
   // 重置
-  const reset = useCallback(() => {
-    clearTimer()
-    setState({
-      mode: 'idle',
-      timeLeft: mergedConfig.workDuration * 60,
-      isRunning: false,
-      completedCount: 0,
-    })
-  }, [clearTimer, mergedConfig.workDuration])
+  const reset = useCallback(async () => {
+    await storage.clearPomodoro()
+  }, [])
 
   // 跳过当前阶段
-  const skip = useCallback(() => {
-    clearTimer()
-    setState((prev) => {
-      if (prev.mode === 'work') {
-        return {
-          ...prev,
-          mode: 'break',
-          timeLeft: mergedConfig.breakDuration * 60,
-          isRunning: true,
-          completedCount: prev.completedCount + 1,
-        }
-      } else if (prev.mode === 'break') {
-        return {
-          ...prev,
-          mode: 'work',
-          timeLeft: mergedConfig.workDuration * 60,
-          isRunning: true,
-        }
-      }
-      return prev
-    })
-  }, [clearTimer, mergedConfig.breakDuration, mergedConfig.workDuration])
+  const skip = useCallback(async () => {
+    const stored = storageRef.current
+    if (!stored || stored.mode === 'idle') return
 
-  // 倒计时逻辑
-  useEffect(() => {
-    if (!state.isRunning) return
-
-    intervalRef.current = window.setInterval(() => {
-      setState((prev) => {
-        if (prev.timeLeft <= 1) {
-          playNotification()
-
-          // 切换模式
-          if (prev.mode === 'work') {
-            return {
-              ...prev,
-              mode: 'break',
-              timeLeft: mergedConfig.breakDuration * 60,
-              completedCount: prev.completedCount + 1,
-            }
-          } else if (prev.mode === 'break') {
-            return {
-              ...prev,
-              mode: 'work',
-              timeLeft: mergedConfig.workDuration * 60,
-            }
-          }
-        }
-
-        return { ...prev, timeLeft: prev.timeLeft - 1 }
-      })
-    }, 1000)
-
-    return clearTimer
-  }, [
-    state.isRunning,
-    clearTimer,
-    playNotification,
-    mergedConfig.breakDuration,
-    mergedConfig.workDuration,
-  ])
+    const newStored: PomodoroStorage = {
+      ...stored,
+      mode: stored.mode === 'work' ? 'break' : 'work',
+      isRunning: true,
+      startTime: Date.now(),
+      pausedTimeLeft: null,
+      completedCount:
+        stored.mode === 'work'
+          ? stored.completedCount + 1
+          : stored.completedCount,
+    }
+    await storage.setPomodoro(newStored)
+  }, [])
 
   return {
     ...state,

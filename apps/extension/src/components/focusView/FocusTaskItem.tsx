@@ -33,7 +33,7 @@ export const FocusTaskItem = memo(function FocusTaskItem({
         disabled={completing}
       />
       <span
-        className={`flex-1 text-xl text-[var(--text-primary)] transition-all duration-200 ${completing ? 'line-through text-[var(--text-secondary)]' : ''}`}
+        className={`flex-1 text-2xl text-[var(--text-primary)] transition-all duration-200 ${completing ? 'line-through text-[var(--text-secondary)]' : ''}`}
         style={{
           fontFamily:
             theme.type === 'journal' ? 'var(--font-heading)' : 'inherit',

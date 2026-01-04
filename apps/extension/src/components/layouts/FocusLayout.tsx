@@ -1,6 +1,6 @@
+import { memo } from 'react'
 import { FocusView } from '@/components/FocusView'
 import { Onboarding } from '@/components/Onboarding'
-import { ConnectPrompt } from '@/components/ConnectPrompt'
 import type { Task, LocalTask } from '@/types'
 
 interface FocusLayoutProps {
@@ -13,16 +13,10 @@ interface FocusLayoutProps {
   onCreate: (task: Partial<Task>) => Promise<Task | LocalTask | null>
   onSwitchView?: () => void
   onConnect?: () => void
-  // Connect prompt props
-  showConnectPrompt: boolean
-  localTaskCount: number
-  connectLoading: boolean
-  onConnectAndMigrate: () => void
-  onConnectWithoutMigrate: () => void
-  onCancelConnect: () => void
 }
 
-export function FocusLayout({
+// memo 避免 ConnectPrompt 状态变化导致重渲染
+export const FocusLayout = memo(function FocusLayout({
   focusTasks,
   loading,
   todayTaskCount,
@@ -32,12 +26,6 @@ export function FocusLayout({
   onCreate,
   onSwitchView,
   onConnect,
-  showConnectPrompt,
-  localTaskCount,
-  connectLoading,
-  onConnectAndMigrate,
-  onConnectWithoutMigrate,
-  onCancelConnect,
 }: FocusLayoutProps) {
   return (
     <>
@@ -53,14 +41,6 @@ export function FocusLayout({
         canAddMore={canAddMore}
         onConnect={onConnect}
       />
-      <ConnectPrompt
-        open={showConnectPrompt}
-        localTaskCount={localTaskCount}
-        loading={connectLoading}
-        onConnectAndMigrate={onConnectAndMigrate}
-        onConnectWithoutMigrate={onConnectWithoutMigrate}
-        onCancel={onCancelConnect}
-      />
     </>
   )
-}
+})

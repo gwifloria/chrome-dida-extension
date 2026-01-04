@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { message } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { FocusLayout, ListLayout } from '@/components/layouts'
+import { ConnectPrompt } from '@/components/ConnectPrompt'
 import { useAppMode } from '@/hooks/useAppMode'
 import { useLocalTasks } from '@/hooks/useLocalTasks'
 import { useTasks } from '@/hooks/useTasks'
@@ -92,6 +93,11 @@ function AppContent() {
     setShowConnectPrompt(false)
   }, [])
 
+  // Switch to list view
+  const handleSwitchToList = useCallback(() => {
+    setViewMode('list')
+  }, [])
+
   // Handle task completion (works for both local and remote)
   const handleComplete = useCallback(
     async (task: Task | LocalTask) => {
@@ -129,23 +135,28 @@ function AppContent() {
   // Connected mode: Show Focus or List based on viewMode
   if (isGuest || viewMode === 'focus') {
     return (
-      <FocusLayout
-        focusTasks={focusTasks}
-        loading={modeLoading || loading}
-        todayTaskCount={todayCount}
-        isGuestMode={isGuest}
-        canAddMore={isGuest ? localTasks.canAddMore : true}
-        onComplete={handleComplete}
-        onCreate={handleCreate}
-        onSwitchView={isGuest ? undefined : () => setViewMode('list')}
-        onConnect={handleConnectClick}
-        showConnectPrompt={showConnectPrompt}
-        localTaskCount={localTasks.count}
-        connectLoading={connectLoading}
-        onConnectAndMigrate={handleConnectAndMigrate}
-        onConnectWithoutMigrate={handleConnectWithoutMigrate}
-        onCancelConnect={handleCancelConnect}
-      />
+      <>
+        <FocusLayout
+          focusTasks={focusTasks}
+          loading={modeLoading || loading}
+          todayTaskCount={todayCount}
+          isGuestMode={isGuest}
+          canAddMore={isGuest ? localTasks.canAddMore : true}
+          onComplete={handleComplete}
+          onCreate={handleCreate}
+          onSwitchView={isGuest ? undefined : handleSwitchToList}
+          onConnect={handleConnectClick}
+        />
+        {/* ConnectPrompt 独立渲染，避免状态变化导致 FocusLayout 重渲染 */}
+        <ConnectPrompt
+          open={showConnectPrompt}
+          localTaskCount={localTasks.count}
+          loading={connectLoading}
+          onConnectAndMigrate={handleConnectAndMigrate}
+          onConnectWithoutMigrate={handleConnectWithoutMigrate}
+          onCancel={handleCancelConnect}
+        />
+      </>
     )
   }
 

@@ -6,7 +6,22 @@ const STORAGE_KEYS = {
   CACHED_PROJECTS: 'cached_projects',
   LAST_SYNC: 'last_sync',
   LOCAL_TASKS: 'local_tasks', // Guest mode local tasks
+  POMODORO: 'pomodoro', // Pomodoro timer state
 } as const
+
+// 番茄时钟存储结构
+export interface PomodoroStorage {
+  mode: 'idle' | 'work' | 'break'
+  isRunning: boolean
+  completedCount: number
+  startTime: number | null // 当前阶段开始的时间戳
+  pausedTimeLeft: number | null // 暂停时的剩余秒数
+  lastNotificationTime: number | null // 上次播放提示音的时间戳（防止多 tab 重复播放）
+  config: {
+    workDuration: number // 分钟
+    breakDuration: number // 分钟
+  }
+}
 
 export const storage = {
   async getToken(): Promise<AuthToken | null> {
@@ -58,5 +73,35 @@ export const storage = {
   async getLastSync(): Promise<number | null> {
     const result = await chrome.storage.local.get(STORAGE_KEYS.LAST_SYNC)
     return result[STORAGE_KEYS.LAST_SYNC] || null
+  },
+
+  // 番茄时钟相关
+  async getPomodoro(): Promise<PomodoroStorage | null> {
+    const result = await chrome.storage.local.get(STORAGE_KEYS.POMODORO)
+    return result[STORAGE_KEYS.POMODORO] || null
+  },
+
+  async setPomodoro(state: PomodoroStorage): Promise<void> {
+    await chrome.storage.local.set({ [STORAGE_KEYS.POMODORO]: state })
+  },
+
+  async clearPomodoro(): Promise<void> {
+    await chrome.storage.local.remove(STORAGE_KEYS.POMODORO)
+  },
+
+  // 监听 storage 变化
+  onPomodoroChange(
+    callback: (newState: PomodoroStorage | null) => void
+  ): () => void {
+    const listener = (
+      changes: { [key: string]: chrome.storage.StorageChange },
+      areaName: string
+    ) => {
+      if (areaName === 'local' && changes[STORAGE_KEYS.POMODORO]) {
+        callback(changes[STORAGE_KEYS.POMODORO].newValue || null)
+      }
+    }
+    chrome.storage.onChanged.addListener(listener)
+    return () => chrome.storage.onChanged.removeListener(listener)
   },
 }
