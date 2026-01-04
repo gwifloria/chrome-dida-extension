@@ -43,12 +43,17 @@ export function useTaskData(isLoggedIn: boolean) {
       setTasks(data.tasks)
       setProjects(data.projects)
     } catch (err) {
-      setError(err instanceof Error ? err.message : '获取任务失败')
       // 尝试使用缓存
       const cachedTasks = await storage.getCachedTasks<Task[]>()
       const cachedProjects = await storage.getCachedProjects<Project[]>()
-      if (cachedTasks) setTasks(cachedTasks)
-      if (cachedProjects) setProjects(cachedProjects)
+      if (cachedTasks || cachedProjects) {
+        // 有缓存数据时使用缓存，不显示错误
+        if (cachedTasks) setTasks(cachedTasks)
+        if (cachedProjects) setProjects(cachedProjects)
+      } else {
+        // 无缓存时显示错误
+        setError(err instanceof Error ? err.message : '获取任务失败')
+      }
     } finally {
       setLoading(false)
     }

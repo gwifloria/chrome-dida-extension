@@ -22,7 +22,8 @@ export function useAppMode() {
 
   useEffect(() => {
     checkMode()
-  }, [checkMode])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const connect = useCallback(async () => {
     setLoading(true)

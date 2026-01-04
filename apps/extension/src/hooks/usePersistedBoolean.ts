@@ -12,11 +12,16 @@ export function usePersistedBoolean(
 
   // 初始化时从 storage 读取
   useEffect(() => {
-    chrome.storage.local.get(storageKey).then((result) => {
-      if (result[storageKey] !== undefined) {
-        setValue(result[storageKey])
-      }
-    })
+    chrome.storage.local
+      .get(storageKey)
+      .then((result) => {
+        if (result[storageKey] !== undefined) {
+          setValue(result[storageKey])
+        }
+      })
+      .catch(() => {
+        // storage 读取失败时保持默认值
+      })
   }, [storageKey])
 
   const toggle = useCallback(() => {

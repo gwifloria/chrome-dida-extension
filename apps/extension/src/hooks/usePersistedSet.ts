@@ -11,11 +11,16 @@ export function usePersistedSet(
 
   // 初始化时从 storage 读取
   useEffect(() => {
-    chrome.storage.local.get(storageKey).then((result) => {
-      if (result[storageKey]) {
-        setItems(new Set(result[storageKey]))
-      }
-    })
+    chrome.storage.local
+      .get(storageKey)
+      .then((result) => {
+        if (result[storageKey]) {
+          setItems(new Set(result[storageKey]))
+        }
+      })
+      .catch(() => {
+        // storage 读取失败时保持空集合
+      })
   }, [storageKey])
 
   const toggle = useCallback(

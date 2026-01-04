@@ -30,7 +30,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     getSettings()
       .then(setSettingsState)
-      .catch((e) => setError((e as Error).message))
+      .catch((e) => {
+        const message = e instanceof Error ? e.message : '加载设置失败'
+        setError(message)
+      })
       .finally(() => setIsLoading(false))
   }, [])
 
@@ -48,7 +51,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         // 注意：不需要手动 setSettingsState
         // subscribeSettings 会在 storage 变化时自动触发更新
       } catch (e) {
-        const message = (e as Error).message
+        const message = e instanceof Error ? e.message : '更新设置失败'
         setError(message)
         throw e
       }

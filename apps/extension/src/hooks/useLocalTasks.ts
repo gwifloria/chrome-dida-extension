@@ -10,10 +10,17 @@ export function useLocalTasks() {
 
   // Load tasks on mount
   useEffect(() => {
-    localTaskStorage.getPendingTasks().then((pendingTasks) => {
-      setTasks(pendingTasks)
-      setLoading(false)
-    })
+    localTaskStorage
+      .getPendingTasks()
+      .then((pendingTasks) => {
+        setTasks(pendingTasks)
+      })
+      .catch(() => {
+        // storage 读取失败时保持空列表
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [])
 
   const createTask = useCallback(

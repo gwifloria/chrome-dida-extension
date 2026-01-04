@@ -6,6 +6,7 @@ import enUS from 'antd/locale/en_US'
 import { useTranslation } from 'react-i18next'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { SettingsProvider } from '@/contexts/SettingsContext'
+import { ErrorBoundary } from '@/components/common'
 import { antdTheme } from '@/themes/antdTheme'
 import '@/i18n'
 import App from './App'
@@ -30,11 +31,13 @@ export function Root() {
 
   return (
     <ConfigProvider locale={antdLocale} theme={antdTheme}>
-      <SettingsProvider>
-        <ThemeProvider>
-          <App />
-        </ThemeProvider>
-      </SettingsProvider>
+      <ErrorBoundary>
+        <SettingsProvider>
+          <ThemeProvider>
+            <App />
+          </ThemeProvider>
+        </SettingsProvider>
+      </ErrorBoundary>
     </ConfigProvider>
   )
 }

@@ -71,6 +71,7 @@ export function usePomodoro(
   const mergedConfig = { ...DEFAULT_CONFIG, ...config }
   const intervalRef = useRef<number | null>(null)
   const storageRef = useRef<PomodoroStorage | null>(null)
+  const switchToNextPhaseRef = useRef<(() => Promise<void>) | null>(null)
 
   const [state, setState] = useState<PomodoroState>({
     mode: 'idle',
@@ -175,6 +176,9 @@ export function usePomodoro(
     await storage.setPomodoro(newStored)
   }, [playNotification])
 
+  // 保持 ref 与最新函数同步
+  switchToNextPhaseRef.current = switchToNextPhase
+
   // 初始化和监听 storage 变化
   useEffect(() => {
     // 加载初始状态
@@ -203,7 +207,8 @@ export function usePomodoro(
       const timeLeft = calculateTimeLeft(stored)
 
       if (timeLeft <= 0) {
-        switchToNextPhase()
+        // 使用 ref 避免依赖变化导致定时器重注册
+        switchToNextPhaseRef.current?.()
       } else {
         setState((prev) => ({ ...prev, timeLeft }))
       }
@@ -215,7 +220,7 @@ export function usePomodoro(
         intervalRef.current = null
       }
     }
-  }, [state.isRunning, switchToNextPhase])
+  }, [state.isRunning])
 
   // 开始工作
   const start = useCallback(async () => {
