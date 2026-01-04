@@ -28,11 +28,20 @@ export function ProjectList({
   )
 
   const { folders, ungroupedProjects } = useMemo(() => {
+    // 预处理：创建项目ID到任务计数的映射（避免为每个项目遍历整个 tasks 数组）
+    const taskCountMap = new Map<string, number>()
+    for (const task of tasks) {
+      taskCountMap.set(
+        task.projectId,
+        (taskCountMap.get(task.projectId) ?? 0) + 1
+      )
+    }
+
     const projectsWithCount: ProjectWithCount[] = projects
       .filter((p) => !p.closed)
       .map((p) => ({
         ...p,
-        count: tasks.filter((t) => t.projectId === p.id).length,
+        count: taskCountMap.get(p.id) ?? 0,
       }))
 
     const folderMap = new Map<string, ProjectWithCount[]>()

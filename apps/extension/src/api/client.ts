@@ -4,7 +4,8 @@
 import { auth } from '@/services/auth'
 import { API_BASE } from './endpoints'
 
-export async function request<T>(
+// 重载签名：void 返回类型时返回 void，其他类型返回 T
+export async function request<T = void>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
@@ -27,14 +28,14 @@ export async function request<T>(
     throw new Error(error.errorMessage || `请求失败: ${response.status}`)
   }
 
-  // 204 No Content 或空响应体
+  // 204 No Content 或空响应体 - 适用于 DELETE/POST 无返回的情况
   if (response.status === 204) {
-    return undefined as T
+    return undefined as unknown as T
   }
 
   const text = await response.text()
   if (!text) {
-    return undefined as T
+    return undefined as unknown as T
   }
-  return JSON.parse(text)
+  return JSON.parse(text) as T
 }

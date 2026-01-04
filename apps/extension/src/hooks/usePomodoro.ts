@@ -30,6 +30,21 @@ const DEFAULT_CONFIG: PomodoroConfig = {
   breakDuration: 5,
 }
 
+// 共享的 AudioContext 实例（Safari 兼容）
+let sharedAudioContext: AudioContext | null = null
+function getAudioContext(): AudioContext | null {
+  if (!sharedAudioContext) {
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext
+    if (AudioContextClass) {
+      sharedAudioContext = new AudioContextClass()
+    }
+  }
+  return sharedAudioContext
+}
+
 export function usePomodoro(
   config: Partial<PomodoroConfig> = {}
 ): PomodoroState & PomodoroActions {
@@ -51,11 +66,17 @@ export function usePomodoro(
     }
   }, [])
 
-  // 播放提示音
+  // 播放提示音（复用共享 AudioContext）
   const playNotification = useCallback(() => {
-    // 使用 Web Audio API 播放简单提示音
     try {
-      const audioContext = new AudioContext()
+      const audioContext = getAudioContext()
+      if (!audioContext) return
+
+      // 确保 AudioContext 处于运行状态
+      if (audioContext.state === 'suspended') {
+        audioContext.resume()
+      }
+
       const oscillator = audioContext.createOscillator()
       const gainNode = audioContext.createGain()
 
@@ -71,15 +92,17 @@ export function usePomodoro(
 
       // 第二声
       setTimeout(() => {
-        const osc2 = audioContext.createOscillator()
-        const gain2 = audioContext.createGain()
+        const ctx = getAudioContext()
+        if (!ctx) return
+        const osc2 = ctx.createOscillator()
+        const gain2 = ctx.createGain()
         osc2.connect(gain2)
-        gain2.connect(audioContext.destination)
+        gain2.connect(ctx.destination)
         osc2.frequency.value = 1000
         osc2.type = 'sine'
         gain2.gain.value = 0.3
         osc2.start()
-        osc2.stop(audioContext.currentTime + 0.2)
+        osc2.stop(ctx.currentTime + 0.2)
       }, 250)
     } catch {
       // 静默失败

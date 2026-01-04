@@ -1,15 +1,16 @@
-import { useState, memo } from 'react'
+import { useState, useMemo } from 'react'
 import { Button } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@/hooks/useTheme'
+import { usePomodoro } from '@/hooks/usePomodoro'
 import { getGreeting } from '@/utils/greeting'
 import { getRandomQuote, type Quote } from '@/data/quotes'
-import { TaskCheckbox } from '../common/TaskCheckbox'
 import { Clock } from '../common/Clock'
 import { FocusTopBar } from './FocusTopBar'
 import { FocusTaskInput } from './FocusTaskInput'
+import { FocusTaskItem } from './FocusTaskItem'
 import { FocusQuote } from './FocusQuote'
-import { useTaskCompletion } from '@/hooks/useTaskCompletion'
+import { PomodoroControls } from './PomodoroControls'
 import { FocusSkeleton } from '../Task/TaskSkeleton'
 import type { Task, LocalTask } from '@/types'
 
@@ -41,7 +42,11 @@ export function FocusView({
   const [quote] = useState<Quote>(() => getRandomQuote())
   const [creating, setCreating] = useState(false)
 
-  const greeting = getGreeting()
+  // 番茄时钟
+  const pomodoro = usePomodoro()
+
+  // 缓存问候语（避免每次渲染重新计算）
+  const greeting = useMemo(() => getGreeting(), [])
 
   const handleCreate = async (task: Partial<Task>) => {
     setCreating(true)
@@ -63,13 +68,31 @@ export function FocusView({
 
       {/* 主内容区 */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
-        {/* 大时钟 */}
-        <Clock variant="large" />
+        {/* 大时钟 / 番茄倒计时 */}
+        <Clock
+          variant="large"
+          pomodoroMode={pomodoro.mode}
+          pomodoroTimeLeft={pomodoro.timeLeft}
+        />
 
-        {/* 问候语 */}
-        <div className="text-2xl text-[var(--text-primary)] mt-4 font-light">
-          {greeting}
-        </div>
+        {/* 番茄控制按钮 */}
+        <PomodoroControls
+          mode={pomodoro.mode}
+          isRunning={pomodoro.isRunning}
+          completedCount={pomodoro.completedCount}
+          onStart={pomodoro.start}
+          onPause={pomodoro.pause}
+          onResume={pomodoro.resume}
+          onReset={pomodoro.reset}
+          onSkip={pomodoro.skip}
+        />
+
+        {/* 问候语 - 番茄模式时隐藏 */}
+        {pomodoro.mode === 'idle' && (
+          <div className="text-2xl text-[var(--text-primary)] mt-4 font-light">
+            {greeting}
+          </div>
+        )}
 
         {/* TODAY'S FOCUS */}
         <div className="mt-16 w-full max-w-md">
@@ -124,43 +147,3 @@ export function FocusView({
     </div>
   )
 }
-
-// 专注任务项组件（使用 memo 避免不必要的重渲染）
-const FocusTaskItem = memo(function FocusTaskItem({
-  task,
-  onComplete,
-}: {
-  task: Task | LocalTask
-  onComplete: (task: Task | LocalTask) => void
-}) {
-  const { theme } = useTheme()
-  const { completing, handleComplete } = useTaskCompletion(onComplete, {
-    delayBefore: false,
-  })
-
-  return (
-    <div
-      className={`
-        flex items-center gap-4 py-3 px-4 bg-[var(--bg-card)] rounded-xl shadow-sm
-        transition-all duration-300 ease-out
-        ${completing ? 'animate-[taskComplete_0.4s_ease-out_forwards]' : ''}
-      `}
-    >
-      <TaskCheckbox
-        completing={completing}
-        onComplete={() => handleComplete(task)}
-        variant="focus"
-        disabled={completing}
-      />
-      <span
-        className={`flex-1 text-lg text-[var(--text-primary)] transition-all duration-200 ${completing ? 'line-through text-[var(--text-secondary)]' : ''}`}
-        style={{
-          fontFamily:
-            theme.type === 'journal' ? 'var(--font-heading)' : 'inherit',
-        }}
-      >
-        {task.title}
-      </span>
-    </div>
-  )
-})

@@ -133,17 +133,8 @@ export function useTaskData(isLoggedIn: boolean) {
     }
   }, [])
 
-  const createInboxTask = useCallback(async (task: Partial<Task>) => {
-    try {
-      const created = await api.createTask(task)
-      // 乐观更新：直接将新任务添加到列表
-      setTasks((prev) => [...prev, created])
-      return created
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '创建任务失败')
-      throw err
-    }
-  }, [])
+  // createInboxTask 与 createTask 逻辑相同，复用即可
+  const createInboxTask = createTask
 
   // 结构化返回
   const data: TaskData = { tasks, projects, loading, error }

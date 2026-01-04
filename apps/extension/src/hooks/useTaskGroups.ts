@@ -25,77 +25,85 @@ export function useTaskGroups({
     [tasks, filter, searchQuery]
   )
 
-  // 按日期分组并排序
+  // 按日期分组并排序（单次遍历分类）
   const groups = useMemo<TaskGroup[]>(() => {
+    // 预分类容器
+    const categorized = {
+      pinned: [] as Task[],
+      overdue: [] as Task[],
+      today: [] as Task[],
+      tomorrow: [] as Task[],
+      later: [] as Task[],
+      nodate: [] as Task[],
+    }
+
+    // 单次遍历分类
+    for (const task of filteredTasks) {
+      if (task.sortOrder > 0) {
+        categorized.pinned.push(task)
+      } else if (!task.dueDate) {
+        categorized.nodate.push(task)
+      } else {
+        const dateStr = extractDateStr(task.dueDate)
+        if (dateStr < todayStr) {
+          categorized.overdue.push(task)
+        } else if (dateStr === todayStr) {
+          categorized.today.push(task)
+        } else if (dateStr === tomorrowStr) {
+          categorized.tomorrow.push(task)
+        } else {
+          categorized.later.push(task)
+        }
+      }
+    }
+
+    // 构建结果（保持原有顺序）
     const result: TaskGroup[] = []
 
-    // 置顶任务 (sortOrder 较大的表示置顶)
-    const pinned = filteredTasks.filter((t) => t.sortOrder > 0)
-    if (pinned.length > 0) {
+    if (categorized.pinned.length > 0) {
       result.push({
         id: 'pinned',
         title: t('group.pinned'),
-        tasks: pinned.sort((a, b) => b.sortOrder - a.sortOrder),
+        tasks: categorized.pinned.sort((a, b) => b.sortOrder - a.sortOrder),
       })
     }
-
-    // 非置顶任务
-    const unpinned = filteredTasks.filter((t) => t.sortOrder <= 0)
-
-    // 已过期
-    const overdue = unpinned.filter((task) => {
-      if (!task.dueDate) return false
-      return extractDateStr(task.dueDate) < todayStr
-    })
-    if (overdue.length > 0) {
-      result.push({ id: 'overdue', title: t('group.overdue'), tasks: overdue })
+    if (categorized.overdue.length > 0) {
+      result.push({
+        id: 'overdue',
+        title: t('group.overdue'),
+        tasks: categorized.overdue.sort((a, b) => b.priority - a.priority),
+      })
     }
-
-    // 今天
-    const todayTasks = unpinned.filter((task) => {
-      if (!task.dueDate) return false
-      return extractDateStr(task.dueDate) === todayStr
-    })
-    if (todayTasks.length > 0) {
-      result.push({ id: 'today', title: t('group.today'), tasks: todayTasks })
+    if (categorized.today.length > 0) {
+      result.push({
+        id: 'today',
+        title: t('group.today'),
+        tasks: categorized.today.sort((a, b) => b.priority - a.priority),
+      })
     }
-
-    // 明天
-    const tomorrowTasks = unpinned.filter((task) => {
-      if (!task.dueDate) return false
-      return extractDateStr(task.dueDate) === tomorrowStr
-    })
-    if (tomorrowTasks.length > 0) {
+    if (categorized.tomorrow.length > 0) {
       result.push({
         id: 'tomorrow',
         title: t('group.tomorrow'),
-        tasks: tomorrowTasks,
+        tasks: categorized.tomorrow.sort((a, b) => b.priority - a.priority),
+      })
+    }
+    if (categorized.later.length > 0) {
+      result.push({
+        id: 'later',
+        title: t('group.later'),
+        tasks: categorized.later.sort((a, b) => b.priority - a.priority),
+      })
+    }
+    if (categorized.nodate.length > 0) {
+      result.push({
+        id: 'nodate',
+        title: t('group.noDate'),
+        tasks: categorized.nodate.sort((a, b) => b.priority - a.priority),
       })
     }
 
-    // 之后
-    const later = unpinned.filter((task) => {
-      if (!task.dueDate) return false
-      return extractDateStr(task.dueDate) >= dayAfterStr
-    })
-    if (later.length > 0) {
-      result.push({ id: 'later', title: t('group.later'), tasks: later })
-    }
-
-    // 无日期
-    const noDate = unpinned.filter((task) => !task.dueDate)
-    if (noDate.length > 0) {
-      result.push({ id: 'nodate', title: t('group.noDate'), tasks: noDate })
-    }
-
-    // 对每组内的任务按优先级排序
-    return result.map((group) => ({
-      ...group,
-      tasks:
-        group.id === 'pinned'
-          ? group.tasks // 置顶组保持 sortOrder 排序
-          : [...group.tasks].sort((a, b) => b.priority - a.priority),
-    }))
+    return result
   }, [filteredTasks, todayStr, tomorrowStr, dayAfterStr, t])
 
   return groups
