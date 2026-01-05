@@ -57,7 +57,21 @@ async function refreshTokenIfNeeded(): Promise<void> {
       return
     }
 
-    const newToken = await response.json()
+    // 解析响应 JSON
+    let newToken
+    try {
+      newToken = await response.json()
+    } catch {
+      console.error('[Background] Token 响应解析失败')
+      return
+    }
+
+    // 验证响应格式
+    if (!newToken?.access_token || !newToken?.expires_in) {
+      console.error('[Background] Token 响应格式无效:', newToken)
+      return
+    }
+
     // 计算过期时间
     newToken.expires_at = Date.now() + newToken.expires_in * 1000
     await chrome.storage.local.set({ auth_token: newToken })
