@@ -46,7 +46,13 @@ function calculateTimeLeft(stored: PomodoroStorage): number {
       ? stored.config.workDuration * 60
       : stored.config.breakDuration * 60
 
-  const elapsed = Math.floor((Date.now() - stored.startTime!) / 1000)
+  // 防御性检查：startTime 应该在 isRunning 时存在
+  if (!stored.startTime) {
+    console.warn('[Pomodoro] isRunning=true 但 startTime 为空，返回完整时长')
+    return duration
+  }
+
+  const elapsed = Math.floor((Date.now() - stored.startTime) / 1000)
   return Math.max(0, duration - elapsed)
 }
 

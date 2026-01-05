@@ -41,5 +41,11 @@ export async function request<T = void>(
   if (!text) {
     return undefined as unknown as T
   }
-  return JSON.parse(text) as T
+
+  try {
+    return JSON.parse(text) as T
+  } catch (err) {
+    console.error('[API] JSON 解析失败:', err, 'response:', text.slice(0, 200))
+    throw new Error('服务器返回了无效的响应格式')
+  }
 }

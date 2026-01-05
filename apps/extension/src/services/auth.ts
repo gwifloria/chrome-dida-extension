@@ -9,8 +9,22 @@ const REDIRECT_URI = chrome.identity.getRedirectURL()
 const AUTH_URL = 'https://dida365.com/oauth/authorize'
 const TOKEN_URL = 'https://dida365.com/oauth/token'
 
+export type AuthEventType = 'token_invalid' | 'token_refreshed' | 'logged_out'
+type AuthEventListener = (event: AuthEventType) => void
+
 class AuthService {
   private refreshPromise: Promise<AuthToken | null> | null = null
+  private listeners: Set<AuthEventListener> = new Set()
+
+  /** 订阅认证事件 */
+  onAuthEvent(listener: AuthEventListener): () => void {
+    this.listeners.add(listener)
+    return () => this.listeners.delete(listener)
+  }
+
+  private emit(event: AuthEventType): void {
+    this.listeners.forEach((listener) => listener(event))
+  }
 
   async login(): Promise<AuthToken> {
     const authUrl = new URL(AUTH_URL)
@@ -118,16 +132,19 @@ class AuthService {
             errorMessage
           )
           await storage.clearToken()
+          this.emit('token_invalid')
           return null
         }
 
         const token: AuthToken = await response.json()
         await storage.setToken(token)
+        this.emit('token_refreshed')
         return token
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : '未知错误'
         console.error('[Auth] Token 刷新异常:', errorMsg)
         await storage.clearToken()
+        this.emit('token_invalid')
         return null
       } finally {
         this.refreshPromise = null
@@ -139,6 +156,7 @@ class AuthService {
 
   async logout(): Promise<void> {
     await storage.clearToken()
+    this.emit('logged_out')
   }
 
   async getValidToken(): Promise<string | null> {
