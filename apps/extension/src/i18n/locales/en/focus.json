@@ -16,6 +16,8 @@
     "start": "Start Pomodoro",
     "pause": "Pause",
     "resume": "Resume",
+    "startBreak": "Start Break",
+    "startWork": "Start Pomodoro",
     "skip": "Skip",
     "reset": "Reset",
     "working": "Focusing",

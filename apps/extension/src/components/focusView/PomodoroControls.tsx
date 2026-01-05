@@ -74,7 +74,9 @@ export const PomodoroControls = memo(function PomodoroControls({
           onClick={onResume}
           className="!text-[var(--text-secondary)] hover:!text-[var(--accent)]"
         >
-          {t('pomodoro.resume')}
+          {mode === 'break'
+            ? t('pomodoro.startBreak')
+            : t('pomodoro.startWork')}
         </Button>
       )}
 

@@ -31,21 +31,6 @@ const DEFAULT_CONFIG: PomodoroConfig = {
   breakDuration: 5,
 }
 
-// 共享的 AudioContext 实例（Safari 兼容）
-let sharedAudioContext: AudioContext | null = null
-function getAudioContext(): AudioContext | null {
-  if (!sharedAudioContext) {
-    const AudioContextClass =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext })
-        .webkitAudioContext
-    if (AudioContextClass) {
-      sharedAudioContext = new AudioContextClass()
-    }
-  }
-  return sharedAudioContext
-}
-
 // 计算剩余时间
 function calculateTimeLeft(stored: PomodoroStorage): number {
   if (stored.mode === 'idle') {
@@ -105,67 +90,24 @@ export function usePomodoro(
     [mergedConfig.workDuration]
   )
 
-  // 播放提示音
-  const playNotification = useCallback(() => {
-    try {
-      const audioContext = getAudioContext()
-      if (!audioContext) return
-
-      if (audioContext.state === 'suspended') {
-        audioContext.resume()
-      }
-
-      const oscillator = audioContext.createOscillator()
-      const gainNode = audioContext.createGain()
-
-      oscillator.connect(gainNode)
-      gainNode.connect(audioContext.destination)
-
-      oscillator.frequency.value = 800
-      oscillator.type = 'sine'
-      gainNode.gain.value = 0.3
-
-      oscillator.start()
-      oscillator.stop(audioContext.currentTime + 0.2)
-
-      setTimeout(() => {
-        const ctx = getAudioContext()
-        if (!ctx) return
-        const osc2 = ctx.createOscillator()
-        const gain2 = ctx.createGain()
-        osc2.connect(gain2)
-        gain2.connect(ctx.destination)
-        osc2.frequency.value = 1000
-        osc2.type = 'sine'
-        gain2.gain.value = 0.3
-        osc2.start()
-        osc2.stop(ctx.currentTime + 0.2)
-      }, 250)
-    } catch {
-      // 静默失败
-    }
-  }, [])
-
-  // 切换到下一阶段
+  // 切换到下一阶段（不自动开始，等待用户手动触发）
   const switchToNextPhase = useCallback(async () => {
     const stored = storageRef.current
     if (!stored) return
 
     const now = Date.now()
-
-    // 检查是否需要播放提示音（防止多 tab 重复播放，1秒内不重复）
-    const shouldPlaySound =
-      !stored.lastNotificationTime || now - stored.lastNotificationTime > 1000
-
-    if (shouldPlaySound) {
-      playNotification()
-    }
+    const nextMode = stored.mode === 'work' ? 'break' : 'work'
+    const nextDuration =
+      nextMode === 'work'
+        ? stored.config.workDuration * 60
+        : stored.config.breakDuration * 60
 
     const newStored: PomodoroStorage = {
       ...stored,
-      mode: stored.mode === 'work' ? 'break' : 'work',
-      startTime: now,
-      pausedTimeLeft: null,
+      mode: nextMode,
+      isRunning: false, // 不自动开始，等待用户手动触发
+      startTime: null,
+      pausedTimeLeft: nextDuration, // 设置为下一阶段的完整时长
       completedCount:
         stored.mode === 'work'
           ? stored.completedCount + 1
@@ -174,7 +116,7 @@ export function usePomodoro(
     }
 
     await storage.setPomodoro(newStored)
-  }, [playNotification])
+  }, [])
 
   // 保持 ref 与最新函数同步
   switchToNextPhaseRef.current = switchToNextPhase
