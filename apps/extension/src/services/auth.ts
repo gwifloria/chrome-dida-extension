@@ -9,6 +9,13 @@ const REDIRECT_URI = chrome.identity.getRedirectURL()
 const AUTH_URL = 'https://dida365.com/oauth/authorize'
 const TOKEN_URL = 'https://dida365.com/oauth/token'
 
+// 开发环境下校验配置
+if (import.meta.env.DEV && (!CLIENT_ID || !CLIENT_SECRET)) {
+  console.warn(
+    '[Auth] 缺少环境变量 VITE_DIDA_CLIENT_ID 或 VITE_DIDA_CLIENT_SECRET，认证功能将不可用'
+  )
+}
+
 export type AuthEventType = 'token_invalid' | 'token_refreshed' | 'logged_out'
 type AuthEventListener = (event: AuthEventType) => void
 
@@ -27,6 +34,10 @@ class AuthService {
   }
 
   async login(): Promise<AuthToken> {
+    if (!CLIENT_ID || !CLIENT_SECRET) {
+      throw new Error('认证配置缺失，请检查环境变量')
+    }
+
     const authUrl = new URL(AUTH_URL)
     authUrl.searchParams.set('client_id', CLIENT_ID)
     authUrl.searchParams.set('redirect_uri', REDIRECT_URI)

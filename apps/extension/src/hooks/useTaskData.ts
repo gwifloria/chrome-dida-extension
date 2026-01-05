@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createTaskAdapter, type AdapterType } from '@/api/adapters'
 import { storage } from '@/services/storage'
 import type { Task, Project } from '@/types'
@@ -34,9 +34,17 @@ export function useTaskData(adapterType: AdapterType) {
   const [loading, setLoading] = useState(true) // 默认 loading，等待首次加载
   const [error, setError] = useState<string | null>(null)
 
+  // 防止并发刷新导致竞态条件
+  const refreshingRef = useRef(false)
+  const refreshInboxRef = useRef(false)
+
   // ============ 数据获取 ============
 
   const refresh = useCallback(async () => {
+    // 防止并发刷新
+    if (refreshingRef.current) return
+    refreshingRef.current = true
+
     setLoading(true)
     setError(null)
 
@@ -60,11 +68,16 @@ export function useTaskData(adapterType: AdapterType) {
       }
     } finally {
       setLoading(false)
+      refreshingRef.current = false
     }
   }, [adapter, isLocal])
 
   // 只刷新收集箱任务（用于快速更新）
   const refreshInbox = useCallback(async () => {
+    // 防止并发刷新
+    if (refreshInboxRef.current) return
+    refreshInboxRef.current = true
+
     try {
       const inboxTasks = await adapter.getInboxTasks()
       setTasks((prev) => {
@@ -79,6 +92,8 @@ export function useTaskData(adapterType: AdapterType) {
       })
     } catch (err) {
       console.error('[useTaskData] 刷新收集箱失败:', err)
+    } finally {
+      refreshInboxRef.current = false
     }
   }, [adapter, isLocal])
 

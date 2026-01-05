@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { message } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { FocusLayout, ListLayout } from '@/components/layouts'
@@ -42,6 +42,14 @@ function AppContent() {
   const [showConnectPrompt, setShowConnectPrompt] = useState(false)
   const [connectLoading, setConnectLoading] = useState(false)
 
+  // 防止组件卸载后更新状态
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
   // Handle connect button click
   const handleConnectClick = useCallback(() => {
     setShowConnectPrompt(true)
@@ -53,6 +61,7 @@ function AppContent() {
     try {
       await connect()
       const result = await migrateLocalTasksToDidaList()
+      if (!mountedRef.current) return
       if (result.success > 0) {
         message.success(t('message.syncSuccess', { count: result.success }))
       }
@@ -61,9 +70,12 @@ function AppContent() {
       }
       setShowConnectPrompt(false)
     } catch {
+      if (!mountedRef.current) return
       message.error(t('message.failedToConnect'))
     } finally {
-      setConnectLoading(false)
+      if (mountedRef.current) {
+        setConnectLoading(false)
+      }
     }
   }, [connect, t])
 
@@ -73,11 +85,15 @@ function AppContent() {
     try {
       await connect()
       await clearLocalTasks()
+      if (!mountedRef.current) return
       setShowConnectPrompt(false)
     } catch {
+      if (!mountedRef.current) return
       message.error(t('message.failedToConnect'))
     } finally {
-      setConnectLoading(false)
+      if (mountedRef.current) {
+        setConnectLoading(false)
+      }
     }
   }, [connect, t])
 
