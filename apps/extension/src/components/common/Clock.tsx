@@ -33,12 +33,12 @@ export const Clock = memo(function Clock({
     ? formatPomodoroTime(pomodoroTimeLeft)
     : formattedTime
 
-  // 番茄模式颜色
+  // 番茄模式颜色（莫兰迪色系）
   const pomodoroColor =
     pomodoroMode === 'work'
-      ? 'text-[var(--accent)]'
+      ? 'text-[#c9a89a]' // 莫兰迪砖红
       : pomodoroMode === 'break'
-        ? 'text-green-500'
+        ? 'text-[#9eb0a2]' // 莫兰迪灰绿
         : ''
 
   if (variant === 'large') {
