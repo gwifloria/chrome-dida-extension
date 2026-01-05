@@ -40,8 +40,9 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           setVisible(true)
         }
       })
-      .catch(() => {
+      .catch((err) => {
         // 出错时默认不显示引导
+        console.error('[Onboarding] 检查引导状态失败:', err)
       })
   }, [])
 
