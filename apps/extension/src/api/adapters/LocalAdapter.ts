@@ -63,7 +63,12 @@ export class LocalAdapter implements ITaskAdapter {
     return this.toTask(local)
   }
 
-  async updateTask(_taskId: string, _input: UpdateTaskInput): Promise<Task> {
+  async updateTask(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _taskId: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _input: UpdateTaskInput
+  ): Promise<Task> {
     // 访客模式不支持更新任务
     throw new Error('访客模式不支持编辑任务')
   }

@@ -1,7 +1,7 @@
 /**
  * 番茄时钟 Hook - 支持多 Tab 同步
  */
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { storage, type PomodoroStorage } from '@/services/storage'
 
 export type PomodoroMode = 'idle' | 'work' | 'break'
@@ -53,7 +53,10 @@ function calculateTimeLeft(stored: PomodoroStorage): number {
 export function usePomodoro(
   config: Partial<PomodoroConfig> = {}
 ): PomodoroState & PomodoroActions {
-  const mergedConfig = { ...DEFAULT_CONFIG, ...config }
+  const mergedConfig = useMemo(
+    () => ({ ...DEFAULT_CONFIG, ...config }),
+    [config]
+  )
   const intervalRef = useRef<number | null>(null)
   const storageRef = useRef<PomodoroStorage | null>(null)
   const switchToNextPhaseRef = useRef<(() => Promise<void>) | null>(null)
@@ -119,7 +122,9 @@ export function usePomodoro(
   }, [])
 
   // 保持 ref 与最新函数同步
-  switchToNextPhaseRef.current = switchToNextPhase
+  useEffect(() => {
+    switchToNextPhaseRef.current = switchToNextPhase
+  }, [switchToNextPhase])
 
   // 初始化和监听 storage 变化
   useEffect(() => {
