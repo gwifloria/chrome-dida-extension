@@ -136,6 +136,7 @@ function AppContent() {
           onCreate={handleCreate}
           onSwitchView={isGuest ? undefined : handleSwitchToList}
           onConnect={handleConnectClick}
+          onDisconnect={disconnect}
         />
         {/* ConnectPrompt 独立渲染，避免状态变化导致 FocusLayout 重渲染 */}
         <ConnectPrompt

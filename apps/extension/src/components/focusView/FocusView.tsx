@@ -24,6 +24,7 @@ interface FocusViewProps {
   isGuestMode?: boolean
   canAddMore?: boolean
   onConnect?: () => void
+  onDisconnect?: () => void
 }
 
 export function FocusView({
@@ -36,6 +37,7 @@ export function FocusView({
   isGuestMode = false,
   canAddMore = true,
   onConnect,
+  onDisconnect,
 }: FocusViewProps) {
   const { t } = useTranslation('focus')
   const { theme } = useTheme()
@@ -54,7 +56,11 @@ export function FocusView({
         <div className="absolute inset-0 pointer-events-none opacity-40 paper-texture" />
       )}
 
-      <FocusTopBar isGuestMode={isGuestMode} onConnect={onConnect} />
+      <FocusTopBar
+        isGuestMode={isGuestMode}
+        onConnect={onConnect}
+        onDisconnect={onDisconnect}
+      />
 
       {/* 主内容区 */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">

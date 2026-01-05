@@ -13,6 +13,7 @@ interface FocusLayoutProps {
   onCreate: (task: Partial<Task>) => Promise<Task | null>
   onSwitchView?: () => void
   onConnect?: () => void
+  onDisconnect?: () => void
 }
 
 // memo 避免 ConnectPrompt 状态变化导致重渲染
@@ -26,6 +27,7 @@ export const FocusLayout = memo(function FocusLayout({
   onCreate,
   onSwitchView,
   onConnect,
+  onDisconnect,
 }: FocusLayoutProps) {
   return (
     <>
@@ -40,6 +42,7 @@ export const FocusLayout = memo(function FocusLayout({
         isGuestMode={isGuestMode}
         canAddMore={canAddMore}
         onConnect={onConnect}
+        onDisconnect={onDisconnect}
       />
     </>
   )

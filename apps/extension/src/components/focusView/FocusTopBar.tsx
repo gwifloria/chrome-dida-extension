@@ -1,17 +1,19 @@
 import { memo } from 'react'
 import { Button } from 'antd'
-import { LinkOutlined } from '@ant-design/icons'
+import { LinkOutlined, DisconnectOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ThemeToggle } from '../common/ThemeToggle'
 
 interface FocusTopBarProps {
   isGuestMode: boolean
   onConnect?: () => void
+  onDisconnect?: () => void
 }
 
 export const FocusTopBar = memo(function FocusTopBar({
   isGuestMode,
   onConnect,
+  onDisconnect,
 }: FocusTopBarProps) {
   const { t } = useTranslation('common')
 
@@ -30,6 +32,18 @@ export const FocusTopBar = memo(function FocusTopBar({
             icon={<LinkOutlined />}
           >
             {t('button.connect')}
+          </Button>
+        )}
+        {/* 已连接模式显示断开按钮 */}
+        {!isGuestMode && onDisconnect && (
+          <Button
+            type="text"
+            size="small"
+            onClick={onDisconnect}
+            icon={<DisconnectOutlined />}
+            className="!text-[var(--text-secondary)] hover:!text-[var(--text-primary)]"
+          >
+            {t('button.disconnect')}
           </Button>
         )}
         <ThemeToggle variant="minimal" size="sm" />
