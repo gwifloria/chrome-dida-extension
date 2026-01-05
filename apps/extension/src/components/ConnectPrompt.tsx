@@ -1,5 +1,5 @@
-import { Modal, Button } from 'antd'
-import { LinkOutlined, SyncOutlined, CloseOutlined } from '@ant-design/icons'
+import { CloseOutlined, LinkOutlined, SyncOutlined } from '@ant-design/icons'
+import { Button, Modal } from 'antd'
 import { Trans, useTranslation } from 'react-i18next'
 
 interface ConnectPromptProps {
@@ -29,7 +29,6 @@ export function ConnectPrompt({
       closable={false}
       footer={null}
       width={400}
-      destroyOnClose={false}
       className="connect-prompt-modal"
     >
       <div className="p-6 text-center">
