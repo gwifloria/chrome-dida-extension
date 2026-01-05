@@ -1,16 +1,16 @@
 import { memo } from 'react'
 import { FocusView } from '@/components/FocusView'
 import { Onboarding } from '@/components/Onboarding'
-import type { Task, LocalTask } from '@/types'
+import type { Task } from '@/types'
 
 interface FocusLayoutProps {
-  focusTasks: (Task | LocalTask)[]
+  focusTasks: Task[]
   loading: boolean
   todayTaskCount: number
   isGuestMode: boolean
   canAddMore: boolean
-  onComplete: (task: Task | LocalTask) => void
-  onCreate: (task: Partial<Task>) => Promise<Task | LocalTask | null>
+  onComplete: (task: Task) => void
+  onCreate: (task: Partial<Task>) => Promise<Task | null>
   onSwitchView?: () => void
   onConnect?: () => void
 }

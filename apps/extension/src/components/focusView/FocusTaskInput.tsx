@@ -3,13 +3,13 @@ import { Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { formatDateTimeWithTimezone } from '@/utils/date'
-import type { Task, LocalTask } from '@/types'
+import type { Task } from '@/types'
 
 interface FocusTaskInputProps {
   isGuestMode: boolean
   canAddMore: boolean
   taskCount: number
-  onCreate: (task: Partial<Task>) => Promise<Task | LocalTask | null>
+  onCreate: (task: Partial<Task>) => Promise<Task | null>
 }
 
 export function FocusTaskInput({

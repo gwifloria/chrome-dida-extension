@@ -2,11 +2,11 @@ import { memo } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { useTaskCompletion } from '@/hooks/useTaskCompletion'
 import { TaskCheckbox } from '../common/TaskCheckbox'
-import type { Task, LocalTask } from '@/types'
+import type { Task } from '@/types'
 
 interface FocusTaskItemProps {
-  task: Task | LocalTask
-  onComplete: (task: Task | LocalTask) => void
+  task: Task
+  onComplete: (task: Task) => void
 }
 
 export const FocusTaskItem = memo(function FocusTaskItem({

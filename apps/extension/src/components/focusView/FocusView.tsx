@@ -12,13 +12,13 @@ import { FocusTaskItem } from './FocusTaskItem'
 import { FocusQuote } from './FocusQuote'
 import { PomodoroControls } from './PomodoroControls'
 import { FocusSkeleton } from '../Task/TaskSkeleton'
-import type { Task, LocalTask } from '@/types'
+import type { Task } from '@/types'
 
 interface FocusViewProps {
-  focusTasks: (Task | LocalTask)[]
+  focusTasks: Task[]
   loading: boolean
-  onComplete: (task: Task | LocalTask) => void
-  onCreate: (task: Partial<Task>) => Promise<Task | LocalTask | null>
+  onComplete: (task: Task) => void
+  onCreate: (task: Partial<Task>) => Promise<Task | null>
   onSwitchView?: () => void
   todayTaskCount: number
   isGuestMode?: boolean

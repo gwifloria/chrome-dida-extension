@@ -4,15 +4,17 @@ import { useTranslation } from 'react-i18next'
 import { FocusLayout, ListLayout } from '@/components/layouts'
 import { ConnectPrompt } from '@/components/ConnectPrompt'
 import { useAppMode } from '@/hooks/useAppMode'
-import { useLocalTasks } from '@/hooks/useLocalTasks'
 import { useTasks } from '@/hooks/useTasks'
 import {
   migrateLocalTasksToDidaList,
   clearLocalTasks,
 } from '@/services/taskMigration'
-import { isLocalTask, type Task, type LocalTask } from '@/types'
+import type { Task } from '@/types'
+import type { AdapterType } from '@/api/adapters'
 
 type ViewMode = 'focus' | 'list'
+
+const MAX_LOCAL_TASKS = 3
 
 function AppContent() {
   const { t } = useTranslation('common')
@@ -24,20 +26,12 @@ function AppContent() {
     loading: modeLoading,
   } = useAppMode()
 
-  // Local tasks for guest mode
-  const localTasks = useLocalTasks()
-
-  // Remote tasks for connected mode
-  const { data, actions, views } = useTasks(isConnected)
+  // 根据连接状态选择适配器
+  const adapterType: AdapterType = isConnected ? 'didaList' : 'local'
+  const { data, actions, views } = useTasks(adapterType)
   const { tasks, projects, loading: tasksLoading, error } = data
-  const {
-    completeTask,
-    deleteTask,
-    updateTask,
-    createTask,
-    createInboxTask,
-    refresh: refreshRemoteTasks,
-  } = actions
+  const { completeTask, deleteTask, updateTask, createTask, createInboxTask } =
+    actions
   const { todayFocusTasks, counts } = views
 
   const [viewMode, setViewMode] = useState<ViewMode>('focus')
@@ -65,14 +59,13 @@ function AppContent() {
       if (result.failed > 0) {
         message.warning(t('message.syncFailed', { count: result.failed }))
       }
-      await refreshRemoteTasks()
       setShowConnectPrompt(false)
     } catch {
       message.error(t('message.failedToConnect'))
     } finally {
       setConnectLoading(false)
     }
-  }, [connect, refreshRemoteTasks, t])
+  }, [connect, t])
 
   // Connect without migrating
   const handleConnectWithoutMigrate = useCallback(async () => {
@@ -98,38 +91,35 @@ function AppContent() {
     setViewMode('list')
   }, [])
 
-  // Handle task completion (works for both local and remote)
+  // Handle task completion (统一接口，不再需要类型判断)
   const handleComplete = useCallback(
-    async (task: Task | LocalTask) => {
-      if (isLocalTask(task)) {
-        await localTasks.completeTask(task)
-      } else {
-        await completeTask(task)
-      }
+    async (task: Task) => {
+      await completeTask(task)
     },
-    [localTasks, completeTask]
+    [completeTask]
   )
 
-  // Handle task creation (works for both local and remote)
+  // Handle task creation (统一接口)
   const handleCreate = useCallback(
-    async (taskData: Partial<Task>): Promise<Task | LocalTask | null> => {
-      if (isGuest) {
-        const result = await localTasks.createTask(taskData.title || '')
-        if (!result) {
+    async (taskData: Partial<Task>): Promise<Task | null> => {
+      try {
+        return await createInboxTask(taskData)
+      } catch (err) {
+        // 访客模式任务数量超限
+        if (err instanceof Error && err.message.includes('上限')) {
           message.warning(t('message.taskLimitReached'))
         }
-        return result
-      } else {
-        return createInboxTask(taskData)
+        return null
       }
     },
-    [isGuest, localTasks, createInboxTask, t]
+    [createInboxTask, t]
   )
 
-  // Determine which tasks to show in FocusView
-  const focusTasks = isGuest ? localTasks.tasks : todayFocusTasks
-  const loading = isGuest ? localTasks.loading : tasksLoading
-  const todayCount = isGuest ? localTasks.count : counts.today
+  // Focus view 显示的任务
+  const focusTasks = isGuest ? tasks : todayFocusTasks
+  const todayCount = isGuest ? tasks.length : counts.today
+  // 访客模式：最多 3 个任务
+  const canAddMore = isGuest ? tasks.length < MAX_LOCAL_TASKS : true
 
   // Guest mode: Always show Focus view
   // Connected mode: Show Focus or List based on viewMode
@@ -138,10 +128,10 @@ function AppContent() {
       <>
         <FocusLayout
           focusTasks={focusTasks}
-          loading={modeLoading || loading}
+          loading={modeLoading || tasksLoading}
           todayTaskCount={todayCount}
           isGuestMode={isGuest}
-          canAddMore={isGuest ? localTasks.canAddMore : true}
+          canAddMore={canAddMore}
           onComplete={handleComplete}
           onCreate={handleCreate}
           onSwitchView={isGuest ? undefined : handleSwitchToList}
@@ -150,7 +140,7 @@ function AppContent() {
         {/* ConnectPrompt 独立渲染，避免状态变化导致 FocusLayout 重渲染 */}
         <ConnectPrompt
           open={showConnectPrompt}
-          localTaskCount={localTasks.count}
+          localTaskCount={tasks.length}
           loading={connectLoading}
           onConnectAndMigrate={handleConnectAndMigrate}
           onConnectWithoutMigrate={handleConnectWithoutMigrate}

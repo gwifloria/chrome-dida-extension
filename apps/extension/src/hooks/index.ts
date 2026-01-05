@@ -4,7 +4,6 @@ export { useTaskData } from './useTaskData'
 export { useTaskViews } from './useTaskViews'
 export { useTaskGroups } from './useTaskGroups'
 export { useTaskCompletion } from './useTaskCompletion'
-export { useLocalTasks } from './useLocalTasks'
 
 // 番茄时钟
 export { usePomodoro, formatPomodoroTime } from './usePomodoro'

@@ -10,6 +10,7 @@ export type {
 
 // Adapters
 export { DidaListAdapter, didaListAdapter } from './DidaListAdapter'
+export { LocalAdapter, localAdapter } from './LocalAdapter'
 
 // Factory
 export { createTaskAdapter, getDefaultAdapter } from './factory'
