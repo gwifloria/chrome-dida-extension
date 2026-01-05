@@ -1,0 +1,26 @@
+{
+  "title": "TODAY'S FOCUS",
+  "empty": "No high priority tasks today",
+  "button": {
+    "viewTasks": "View task list ({{count}} tasks)"
+  },
+  "placeholder": {
+    "addFocus": "Add another focus...",
+    "connectToAdd": "Connect to add more..."
+  },
+  "guestLimit": {
+    "available": "{{remaining}}/3 available",
+    "unlock": "Connect to unlock more tasks"
+  },
+  "pomodoro": {
+    "start": "Start Pomodoro",
+    "pause": "Pause",
+    "resume": "Resume",
+    "startBreak": "Start Break",
+    "startWork": "Start Pomodoro",
+    "skip": "Skip",
+    "reset": "Reset",
+    "working": "Focusing",
+    "resting": "Resting"
+  }
+}

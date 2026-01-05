@@ -1,66 +1,103 @@
-import { useState, useEffect, useCallback } from 'react'
-import { api } from '@/services/api'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { createTaskAdapter, type AdapterType } from '@/api/adapters'
 import { storage } from '@/services/storage'
 import type { Task, Project } from '@/types'
+
+export interface TaskData {
+  tasks: Task[]
+  projects: Project[]
+  loading: boolean
+  error: string | null
+}
+
+export interface TaskActions {
+  refresh: () => Promise<void>
+  refreshInbox: () => Promise<void>
+  completeTask: (task: Task) => Promise<void>
+  deleteTask: (task: Task) => Promise<void>
+  updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>
+  createTask: (task: Partial<Task>) => Promise<Task>
+  createInboxTask: (task: Partial<Task>) => Promise<Task>
+}
 
 /**
  * 任务数据管理 Hook
  * 负责：原始数据获取、缓存、CRUD 操作
+ * 通过 adapter 支持多种后端（滴答清单、本地存储等）
  */
-export function useTaskData(isLoggedIn: boolean) {
+export function useTaskData(adapterType: AdapterType) {
+  const adapter = useMemo(() => createTaskAdapter(adapterType), [adapterType])
+  const isLocal = adapterType === 'local'
+
   const [tasks, setTasks] = useState<Task[]>([])
   const [projects, setProjects] = useState<Project[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true) // 默认 loading，等待首次加载
   const [error, setError] = useState<string | null>(null)
+
+  // 防止并发刷新导致竞态条件
+  const refreshingRef = useRef(false)
+  const refreshInboxRef = useRef(false)
 
   // ============ 数据获取 ============
 
   const refresh = useCallback(async () => {
-    if (!isLoggedIn) return
+    // 防止并发刷新
+    if (refreshingRef.current) return
+    refreshingRef.current = true
 
     setLoading(true)
     setError(null)
 
     try {
-      const data = await api.getAllTasks()
+      const data = await adapter.getAllTasks()
       setTasks(data.tasks)
       setProjects(data.projects)
     } catch (err) {
-      setError(err instanceof Error ? err.message : '获取任务失败')
-      // 尝试使用缓存
-      const cachedTasks = await storage.getCachedTasks<Task[]>()
-      const cachedProjects = await storage.getCachedProjects<Project[]>()
-      if (cachedTasks) setTasks(cachedTasks)
-      if (cachedProjects) setProjects(cachedProjects)
+      // 远程模式尝试使用缓存
+      if (!isLocal) {
+        const cachedTasks = await storage.getCachedTasks<Task[]>()
+        const cachedProjects = await storage.getCachedProjects<Project[]>()
+        if (cachedTasks || cachedProjects) {
+          if (cachedTasks) setTasks(cachedTasks)
+          if (cachedProjects) setProjects(cachedProjects)
+        } else {
+          setError(err instanceof Error ? err.message : '获取任务失败')
+        }
+      } else {
+        setError(err instanceof Error ? err.message : '获取任务失败')
+      }
     } finally {
       setLoading(false)
+      refreshingRef.current = false
     }
-  }, [isLoggedIn])
-
-  // 当登录状态变化时自动刷新数据
-  useEffect(() => {
-    if (isLoggedIn) {
-      refresh()
-    }
-  }, [isLoggedIn, refresh])
+  }, [adapter, isLocal])
 
   // 只刷新收集箱任务（用于快速更新）
   const refreshInbox = useCallback(async () => {
-    if (!isLoggedIn) return
+    // 防止并发刷新
+    if (refreshInboxRef.current) return
+    refreshInboxRef.current = true
 
     try {
-      const inboxTasks = await api.getInboxTasks()
+      const inboxTasks = await adapter.getInboxTasks()
       setTasks((prev) => {
+        // 本地模式：所有任务都是收集箱任务
+        if (isLocal) return inboxTasks
+        // 远程模式：合并非收集箱任务
         const nonInboxTasks = prev.filter(
-          (t) => !t.projectId.startsWith('inbox')
+          (t) =>
+            !t.projectId.startsWith('inbox') && t.projectId !== 'local-inbox'
         )
         return [...nonInboxTasks, ...inboxTasks]
       })
     } catch (err) {
-      console.error('刷新收集箱失败:', err)
+      console.error('[useTaskData] 刷新收集箱失败:', err)
+    } finally {
+      refreshInboxRef.current = false
     }
-  }, [isLoggedIn])
+  }, [adapter, isLocal])
 
+  // 组件挂载或 adapter 变化时加载数据
   useEffect(() => {
     refresh()
   }, [refresh])
@@ -70,33 +107,33 @@ export function useTaskData(isLoggedIn: boolean) {
   const completeTask = useCallback(
     async (task: Task) => {
       try {
-        await api.completeTask(task.projectId, task.id)
+        await adapter.completeTask(task)
         setTasks((prev) => prev.filter((t) => t.id !== task.id))
       } catch (err) {
         setError(err instanceof Error ? err.message : '完成任务失败')
         await refresh()
       }
     },
-    [refresh]
+    [adapter, refresh]
   )
 
   const deleteTask = useCallback(
     async (task: Task) => {
       try {
-        await api.deleteTask(task.projectId, task.id)
+        await adapter.deleteTask(task)
         setTasks((prev) => prev.filter((t) => t.id !== task.id))
       } catch (err) {
         setError(err instanceof Error ? err.message : '删除任务失败')
         await refresh()
       }
     },
-    [refresh]
+    [adapter, refresh]
   )
 
   const updateTask = useCallback(
     async (taskId: string, updates: Partial<Task>) => {
       try {
-        const updated = await api.updateTask(taskId, updates)
+        const updated = await adapter.updateTask(taskId, updates)
         setTasks((prev) =>
           prev.map((t) => (t.id === taskId ? { ...t, ...updated } : t))
         )
@@ -105,45 +142,36 @@ export function useTaskData(isLoggedIn: boolean) {
         await refresh()
       }
     },
-    [refresh]
+    [adapter, refresh]
   )
 
   const createTask = useCallback(
     async (task: Partial<Task>) => {
       try {
-        const created = await api.createTask(task)
-        await refresh()
+        const created = await adapter.createTask({
+          title: task.title || '',
+          projectId: task.projectId,
+          content: task.content,
+          priority: task.priority,
+          dueDate: task.dueDate,
+        })
+        setTasks((prev) => [...prev, created])
         return created
       } catch (err) {
         setError(err instanceof Error ? err.message : '创建任务失败')
         throw err
       }
     },
-    [refresh]
+    [adapter]
   )
 
-  const createInboxTask = useCallback(
-    async (task: Partial<Task>) => {
-      try {
-        const created = await api.createTask(task)
-        await refreshInbox()
-        return created
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '创建任务失败')
-        throw err
-      }
-    },
-    [refreshInbox]
-  )
+  // createInboxTask 与 createTask 逻辑相同
+  const createInboxTask = createTask
 
-  return {
-    // 原始数据
-    tasks,
-    projects,
-    loading,
-    error,
+  // 结构化返回
+  const data: TaskData = { tasks, projects, loading, error }
 
-    // 数据操作
+  const actions: TaskActions = {
     refresh,
     refreshInbox,
     completeTask,
@@ -152,4 +180,6 @@ export function useTaskData(isLoggedIn: boolean) {
     createTask,
     createInboxTask,
   }
+
+  return { data, actions }
 }

@@ -1,5 +1,6 @@
 import { Modal, Select, Form } from 'antd'
-import { useSettings } from '@/contexts/SettingsContext'
+import { useTranslation } from 'react-i18next'
+import { useSettings } from '@/hooks/useSettings'
 import { filterActiveProjects } from '@/utils/project'
 import type { Project } from '@/types'
 
@@ -10,6 +11,7 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ open, onClose, projects }: SettingsModalProps) {
+  const { t } = useTranslation('settings')
   const { settings, updateSettings } = useSettings()
 
   // 过滤出未关闭的项目
@@ -24,24 +26,18 @@ export function SettingsModal({ open, onClose, projects }: SettingsModalProps) {
 
   return (
     <Modal
-      title="设置"
+      title={t('title')}
       open={open}
       onCancel={onClose}
       footer={null}
       width={400}
-      className="[&_.ant-modal-content]:!bg-[var(--bg-card)] [&_.ant-modal-header]:!bg-transparent [&_.ant-modal-title]:!text-[var(--text-primary)]"
     >
       <Form layout="vertical" className="mt-4">
-        <Form.Item
-          label={
-            <span className="text-[var(--text-primary)]">新任务默认清单</span>
-          }
-        >
+        <Form.Item label={t('defaultProject.label')}>
           <Select
             value={currentValue}
             onChange={handleChange}
             className="w-full"
-            popupClassName="[&_.ant-select-item]:!text-[var(--text-primary)]"
           >
             {/* 收集箱选项 */}
             <Select.Option key="inbox" value="inbox">
@@ -50,7 +46,7 @@ export function SettingsModal({ open, onClose, projects }: SettingsModalProps) {
                   className="w-2 h-2 rounded-full"
                   style={{ background: '#888' }}
                 />
-                <span>收集箱</span>
+                <span>{t('defaultProject.inbox')}</span>
               </div>
             </Select.Option>
             {availableProjects.map((project) => (
@@ -66,7 +62,7 @@ export function SettingsModal({ open, onClose, projects }: SettingsModalProps) {
             ))}
           </Select>
           <p className="text-xs text-[var(--text-secondary)] mt-2">
-            在智能清单中快速添加任务时，将使用此清单
+            {t('defaultProject.hint')}
           </p>
         </Form.Item>
       </Form>

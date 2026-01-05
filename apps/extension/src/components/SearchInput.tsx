@@ -1,5 +1,6 @@
 import { Input } from 'antd'
 import { SearchOutlined, CloseCircleFilled } from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
 
 interface SearchInputProps {
   value: string
@@ -10,14 +11,16 @@ interface SearchInputProps {
 export function SearchInput({
   value,
   onChange,
-  placeholder = '搜索任务...',
+  placeholder,
 }: SearchInputProps) {
+  const { t } = useTranslation('task')
+  const placeholderText = placeholder ?? t('placeholder.search')
   return (
     <div className="px-3 py-2">
       <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholderText}
         prefix={<SearchOutlined className="text-[var(--text-secondary)]" />}
         suffix={
           value && (
@@ -27,7 +30,7 @@ export function SearchInput({
             />
           )
         }
-        className="!bg-black/[0.04] !rounded-lg !py-1.5 !text-sm [&_.ant-input]:!bg-transparent [&_.ant-input]:!text-[var(--text-primary)] [&_.ant-input::placeholder]:!text-[var(--text-secondary)]"
+        className="!bg-black/[0.04] !rounded-lg !py-1.5 !text-sm [&_.ant-input]:!bg-transparent"
         variant="borderless"
       />
     </div>

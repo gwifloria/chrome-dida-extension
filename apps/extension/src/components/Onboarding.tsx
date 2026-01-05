@@ -1,55 +1,49 @@
 import { useState, useEffect } from 'react'
-import { Modal } from 'antd'
+import { Modal, Button } from 'antd'
 import {
   RocketOutlined,
   CheckCircleOutlined,
   AppstoreOutlined,
   BgColorsOutlined,
 } from '@ant-design/icons'
-
-const ONBOARDING_KEY = 'onboarding_completed'
+import { useTranslation } from 'react-i18next'
+import { shouldShowOnboarding, completeOnboarding } from '@/utils/onboarding'
 
 interface OnboardingProps {
-  onComplete: () => void
+  onComplete?: () => void
 }
 
-const steps = [
-  {
-    icon: <RocketOutlined className="text-4xl text-[var(--text-primary)]" />,
-    title: '欢迎使用',
-    description: '将新标签页变成你的专注任务面板，无需登录即可开始使用。',
-  },
-  {
-    icon: <AppstoreOutlined className="text-4xl text-[var(--text-primary)]" />,
-    title: '专注模式',
-    description:
-      '大时钟配合今日重点任务，让你一眼看到最重要的事。最多添加 3 个专注任务。',
-  },
-  {
-    icon: (
-      <CheckCircleOutlined className="text-4xl text-[var(--text-primary)]" />
-    ),
-    title: '快捷操作',
-    description: '点击任务左侧圆圈完成任务，简单高效。',
-  },
-  {
-    icon: <BgColorsOutlined className="text-4xl text-[var(--text-primary)]" />,
-    title: '个性主题',
-    description: '多种主题可选，点击右上角切换。连接滴答清单可解锁更多功能。',
-  },
+const stepIcons = [
+  <RocketOutlined className="text-4xl text-[var(--text-primary)]" />,
+  <AppstoreOutlined className="text-4xl text-[var(--text-primary)]" />,
+  <CheckCircleOutlined className="text-4xl text-[var(--text-primary)]" />,
+  <BgColorsOutlined className="text-4xl text-[var(--text-primary)]" />,
 ]
 
 export function Onboarding({ onComplete }: OnboardingProps) {
+  const { t } = useTranslation('onboarding')
   const [visible, setVisible] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
 
+  const steps = [
+    { key: 'step1', icon: stepIcons[0] },
+    { key: 'step2', icon: stepIcons[1] },
+    { key: 'step3', icon: stepIcons[2] },
+    { key: 'step4', icon: stepIcons[3] },
+  ]
+
   useEffect(() => {
     // 检查是否已完成引导
-    chrome.storage.local.get(ONBOARDING_KEY, (result) => {
-      if (!result[ONBOARDING_KEY]) {
-        setVisible(true)
-      }
-    })
+    shouldShowOnboarding()
+      .then((shouldShow) => {
+        if (shouldShow) {
+          setVisible(true)
+        }
+      })
+      .catch((err) => {
+        // 出错时默认不显示引导
+        console.error('[Onboarding] 检查引导状态失败:', err)
+      })
   }, [])
 
   const handleNext = () => {
@@ -64,10 +58,14 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     handleComplete()
   }
 
-  const handleComplete = () => {
-    chrome.storage.local.set({ [ONBOARDING_KEY]: true })
+  const handleComplete = async () => {
+    try {
+      await completeOnboarding()
+    } catch (err) {
+      console.error('[Onboarding] 保存完成状态失败:', err)
+    }
     setVisible(false)
-    onComplete()
+    onComplete?.()
   }
 
   const step = steps[currentStep]
@@ -80,7 +78,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
       closable={false}
       centered
       width={400}
-      className="[&_.ant-modal-content]:!bg-[var(--bg-card)] [&_.ant-modal-content]:!rounded-2xl [&_.ant-modal-content]:!p-0"
+      className="[&_.ant-modal-content]:!rounded-2xl [&_.ant-modal-content]:!p-0"
     >
       <div className="p-8 text-center">
         {/* 步骤指示器 */}
@@ -102,50 +100,36 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
         {/* 标题 */}
         <h2 className="text-xl font-medium text-[var(--text-primary)] mb-3">
-          {step.title}
+          {t(`${step.key}.title`)}
         </h2>
 
         {/* 描述 */}
         <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-8">
-          {step.description}
+          {t(`${step.key}.description`)}
         </p>
 
         {/* 按钮 */}
         <div className="flex gap-3">
           {!isLastStep && (
-            <button
+            <Button
+              type="default"
+              size="large"
               onClick={handleSkip}
-              className="flex-1 py-2.5 text-sm text-[var(--text-secondary)] bg-transparent border border-[var(--border)] rounded-xl cursor-pointer hover:text-[var(--text-primary)] hover:border-[var(--text-secondary)] transition-colors"
+              className="onboarding-btn-skip"
             >
-              跳过
-            </button>
+              {t('common:button.skip')}
+            </Button>
           )}
-          <button
+          <Button
+            type="primary"
+            size="large"
             onClick={handleNext}
-            className={`${isLastStep ? 'w-full' : 'flex-1'} py-2.5 text-sm text-white bg-[var(--text-primary)] border-0 rounded-xl cursor-pointer hover:opacity-90 transition-opacity`}
+            className={`onboarding-btn-primary ${isLastStep ? '!w-full' : '!flex-1'}`}
           >
-            {isLastStep ? '开始使用' : '下一步'}
-          </button>
+            {isLastStep ? t('common:button.start') : t('common:button.next')}
+          </Button>
         </div>
       </div>
     </Modal>
   )
-}
-
-/**
- * 检查是否需要显示引导
- */
-export async function shouldShowOnboarding(): Promise<boolean> {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(ONBOARDING_KEY, (result) => {
-      resolve(!result[ONBOARDING_KEY])
-    })
-  })
-}
-
-/**
- * 重置引导状态（用于测试）
- */
-export function resetOnboarding(): void {
-  chrome.storage.local.remove(ONBOARDING_KEY)
 }

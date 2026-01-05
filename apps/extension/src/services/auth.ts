@@ -9,14 +9,35 @@ const REDIRECT_URI = chrome.identity.getRedirectURL()
 const AUTH_URL = 'https://dida365.com/oauth/authorize'
 const TOKEN_URL = 'https://dida365.com/oauth/token'
 
-// Debug: 检查配置
-console.log('[Auth Debug] CLIENT_ID:', CLIENT_ID ? '已配置' : '未配置')
-console.log('[Auth Debug] REDIRECT_URI:', REDIRECT_URI)
+// 开发环境下校验配置
+if (import.meta.env.DEV && (!CLIENT_ID || !CLIENT_SECRET)) {
+  console.warn(
+    '[Auth] 缺少环境变量 VITE_DIDA_CLIENT_ID 或 VITE_DIDA_CLIENT_SECRET，认证功能将不可用'
+  )
+}
+
+export type AuthEventType = 'token_invalid' | 'token_refreshed' | 'logged_out'
+type AuthEventListener = (event: AuthEventType) => void
 
 class AuthService {
   private refreshPromise: Promise<AuthToken | null> | null = null
+  private listeners: Set<AuthEventListener> = new Set()
+
+  /** 订阅认证事件 */
+  onAuthEvent(listener: AuthEventListener): () => void {
+    this.listeners.add(listener)
+    return () => this.listeners.delete(listener)
+  }
+
+  private emit(event: AuthEventType): void {
+    this.listeners.forEach((listener) => listener(event))
+  }
 
   async login(): Promise<AuthToken> {
+    if (!CLIENT_ID || !CLIENT_SECRET) {
+      throw new Error('认证配置缺失，请检查环境变量')
+    }
+
     const authUrl = new URL(AUTH_URL)
     authUrl.searchParams.set('client_id', CLIENT_ID)
     authUrl.searchParams.set('redirect_uri', REDIRECT_URI)
@@ -117,18 +138,24 @@ class AuthService {
           const errorData = await response.json().catch(() => ({}))
           const errorMessage =
             errorData.error_description || errorData.error || 'Token 刷新失败'
-          console.error(`Token 刷新失败 (${response.status}):`, errorMessage)
+          console.error(
+            `[Auth] Token 刷新失败 (${response.status}):`,
+            errorMessage
+          )
           await storage.clearToken()
+          this.emit('token_invalid')
           return null
         }
 
         const token: AuthToken = await response.json()
         await storage.setToken(token)
+        this.emit('token_refreshed')
         return token
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : '未知错误'
-        console.error('Token 刷新异常:', errorMsg)
+        console.error('[Auth] Token 刷新异常:', errorMsg)
         await storage.clearToken()
+        this.emit('token_invalid')
         return null
       } finally {
         this.refreshPromise = null
@@ -140,6 +167,7 @@ class AuthService {
 
   async logout(): Promise<void> {
     await storage.clearToken()
+    this.emit('logged_out')
   }
 
   async getValidToken(): Promise<string | null> {

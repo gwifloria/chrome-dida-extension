@@ -1,6 +1,8 @@
-import { Modal, Form, Input, Select } from 'antd'
+import { useState } from 'react'
+import { Modal, Form, Input, Select, message } from 'antd'
 import { FlagOutlined } from '@ant-design/icons'
-import { PRIORITY_OPTIONS } from '@/constants/task'
+import { useTranslation } from 'react-i18next'
+import { getPriorityOptions } from '@/constants/task'
 import {
   FORM_INPUT_STYLE,
   FORM_SELECT_STYLE,
@@ -26,20 +28,35 @@ export function TaskEditor({
   onCancel,
   onSave,
 }: TaskEditorProps) {
+  const { t } = useTranslation('task')
   const [form] = Form.useForm()
+  const [saving, setSaving] = useState(false)
   const isNew = !task
+  const priorityOptions = getPriorityOptions(t)
 
   const handleOk = async () => {
-    const values = await form.validateFields()
-    const formattedValues: Partial<Task> = {
-      title: values.title,
-      content: values.content,
-      priority: values.priority,
-      projectId: values.projectId,
-      dueDate: task?.dueDate, // 保留原有日期，不提供编辑
+    if (saving) return
+    setSaving(true)
+    try {
+      const values = await form.validateFields()
+      const formattedValues: Partial<Task> = {
+        title: values.title?.trim(),
+        content: values.content?.trim(),
+        priority: values.priority,
+        projectId: values.projectId,
+        dueDate: task?.dueDate, // 保留原有日期，不提供编辑
+      }
+      await onSave(task?.id || null, formattedValues)
+      form.resetFields()
+    } catch (err) {
+      if (err && typeof err === 'object' && 'errorFields' in err) {
+        // 表单验证错误，不需要提示
+        return
+      }
+      message.error(t('common:message.saveFailed'))
+    } finally {
+      setSaving(false)
     }
-    onSave(task?.id || null, formattedValues)
-    form.resetFields()
   }
 
   const handleCancel = () => {
@@ -51,18 +68,18 @@ export function TaskEditor({
     <Modal
       title={
         <span className="text-lg font-medium text-[var(--text-primary)]">
-          {isNew ? '新建任务' : '编辑任务'}
+          {isNew ? t('editor.titleNew') : t('editor.titleEdit')}
         </span>
       }
       open={open}
       onOk={handleOk}
       onCancel={handleCancel}
-      okText="保存"
-      cancelText="取消"
+      okText={t('common:button.save')}
+      cancelText={t('common:button.cancel')}
       destroyOnClose
       width={480}
       className={MODAL_STYLE}
-      okButtonProps={{ className: MODAL_OK_BUTTON_STYLE }}
+      okButtonProps={{ className: MODAL_OK_BUTTON_STYLE, loading: saving }}
       cancelButtonProps={{ className: MODAL_CANCEL_BUTTON_STYLE }}
     >
       <Form
@@ -78,22 +95,32 @@ export function TaskEditor({
       >
         <Form.Item
           name="title"
-          label="标题"
-          rules={[{ required: true, message: '请输入任务标题' }]}
+          label={t('editor.labelTitle')}
+          rules={[
+            { required: true, message: t('validation.titleRequired') },
+            { whitespace: true, message: t('validation.titleRequired') },
+          ]}
         >
-          <Input placeholder="任务标题" className={FORM_INPUT_STYLE} />
+          <Input
+            placeholder={t('editor.placeholderTitle')}
+            className={FORM_INPUT_STYLE}
+          />
         </Form.Item>
 
-        <Form.Item name="content" label="描述">
+        <Form.Item name="content" label={t('editor.labelContent')}>
           <Input.TextArea
             rows={3}
-            placeholder="任务描述（可选）"
+            placeholder={t('editor.placeholderContent')}
             className={`${FORM_INPUT_STYLE} !py-3 [&_.ant-input]:!min-h-[72px]`}
           />
         </Form.Item>
 
         {/* 所属项目 */}
-        <Form.Item name="projectId" label="所属项目" className="!mb-4">
+        <Form.Item
+          name="projectId"
+          label={t('editor.labelProject')}
+          className="!mb-4"
+        >
           <Select className={FORM_SELECT_STYLE}>
             {projects
               .filter((p) => !p.closed)
@@ -111,11 +138,15 @@ export function TaskEditor({
           </Select>
         </Form.Item>
 
-        <Form.Item name="priority" label="优先级" className="!mb-0">
+        <Form.Item
+          name="priority"
+          label={t('editor.labelPriority')}
+          className="!mb-0"
+        >
           <Select
             className={FORM_SELECT_STYLE}
             optionLabelProp="label"
-            options={PRIORITY_OPTIONS.map((opt) => ({
+            options={priorityOptions.map((opt) => ({
               value: opt.value,
               label: (
                 <span className="flex items-center gap-2">

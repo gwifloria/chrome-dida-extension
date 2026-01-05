@@ -1,9 +1,12 @@
+import { memo } from 'react'
 import { Button, Popconfirm } from 'antd'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import { formatDateStr, extractDateStr, formatShortDate } from '@/utils/date'
+import { useTranslation } from 'react-i18next'
+import { formatShortDate } from '@/utils/date'
+import { isOverdue } from '@/utils/taskFilters'
 import { getPriorityColor } from '@/constants/task'
-import { ProjectColorDot } from './ProjectColorDot'
-import { TaskCheckbox } from './common/TaskCheckbox'
+import { ProjectColorDot } from '../ProjectColorDot'
+import { TaskCheckbox } from '../common/TaskCheckbox'
 import { useTaskCompletion } from '@/hooks/useTaskCompletion'
 import type { Task, Project } from '@/types'
 
@@ -15,22 +18,15 @@ interface TaskItemProps {
   onEdit: (task: Task) => void
 }
 
-export function TaskItem({
+export const TaskItem = memo(function TaskItem({
   task,
   project,
   onComplete,
   onDelete,
   onEdit,
 }: TaskItemProps) {
+  const { t } = useTranslation()
   const { completing, handleComplete } = useTaskCompletion(onComplete)
-
-  const isOverdue = () => {
-    if (!task.dueDate) return false
-    const taskDate = extractDateStr(task.dueDate)
-    const todayStr = formatDateStr(new Date())
-    return taskDate < todayStr
-  }
-
   const priorityColor = getPriorityColor(task.priority)
 
   return (
@@ -69,7 +65,7 @@ export function TaskItem({
             )}
             {task.dueDate && (
               <span
-                className={`text-xs ${isOverdue() ? 'text-[var(--danger)]/70' : 'text-[var(--accent)]'}`}
+                className={`text-xs ${isOverdue(task.dueDate) ? 'text-[var(--danger)]/70' : 'text-[var(--accent)]'}`}
               >
                 {formatShortDate(task.dueDate)}
               </span>
@@ -84,23 +80,25 @@ export function TaskItem({
           size="small"
           icon={<EditOutlined />}
           onClick={() => onEdit(task)}
-          className="!w-7 !h-7 !text-[var(--text-secondary)] hover:!text-[var(--accent)] hover:!bg-[var(--accent-light)]"
+          className="!w-7 !h-7"
+          aria-label={t('common:button.edit')}
         />
         <Popconfirm
-          title="确定删除此任务？"
+          title={t('task:confirm.delete')}
           onConfirm={() => onDelete(task)}
-          okText="删除"
-          cancelText="取消"
+          okText={t('common:button.delete')}
+          cancelText={t('common:button.cancel')}
         >
           <Button
             type="text"
             size="small"
             danger
             icon={<DeleteOutlined />}
-            className="!w-7 !h-7 !text-[var(--text-secondary)] hover:!text-[var(--danger)]/70 hover:!bg-[var(--danger)]/5"
+            className="!w-7 !h-7"
+            aria-label={t('common:button.delete')}
           />
         </Popconfirm>
       </div>
     </div>
   )
-}
+})

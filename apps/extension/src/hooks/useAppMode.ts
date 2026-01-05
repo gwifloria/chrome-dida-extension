@@ -9,14 +9,21 @@ export function useAppMode() {
 
   // Check if user is connected to DidaList
   const checkMode = useCallback(async () => {
-    const token = await storage.getToken()
-    setMode(token ? 'connected' : 'guest')
-    setLoading(false)
+    try {
+      const token = await storage.getToken()
+      setMode(token ? 'connected' : 'guest')
+    } catch {
+      // 存储读取失败时默认为访客模式
+      setMode('guest')
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {
     checkMode()
-  }, [checkMode])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const connect = useCallback(async () => {
     setLoading(true)
