@@ -1,7 +1,7 @@
 /**
  * 适配器工厂
  */
-import { DidaListAdapter } from './DidaListAdapter'
+import { DidaListAdapter } from './dida'
 import { LocalAdapter } from './LocalAdapter'
 import type { ITaskAdapter, AdapterType } from './types'
 

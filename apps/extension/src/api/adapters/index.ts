@@ -9,7 +9,7 @@ export type {
 } from './types'
 
 // Adapters
-export { DidaListAdapter, didaListAdapter } from './DidaListAdapter'
+export { DidaListAdapter, didaListAdapter } from './dida'
 export { LocalAdapter, localAdapter } from './LocalAdapter'
 
 // Factory

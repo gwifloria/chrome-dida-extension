@@ -1,16 +1,15 @@
 /**
  * 滴答清单适配器
- * 包装现有的滴答清单 API 实现
  */
-import { tasksApi } from '../tasks'
-import { projectsApi } from '../projects'
+import { tasksApi } from './tasks'
+import { projectsApi } from './projects'
 import type { Task, Project } from '@/types'
 import type {
   ITaskAdapter,
   CreateTaskInput,
   UpdateTaskInput,
   GetAllTasksResult,
-} from './types'
+} from '../types'
 
 export class DidaListAdapter implements ITaskAdapter {
   readonly name = 'didaList'

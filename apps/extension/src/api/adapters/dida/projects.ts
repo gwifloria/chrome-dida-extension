@@ -1,5 +1,5 @@
 /**
- * 项目相关 API
+ * 滴答清单项目 API
  */
 import { request } from './client'
 import { endpoints } from './endpoints'
@@ -54,7 +54,7 @@ export const projectsApi = {
           .then((data) => data.tasks || [])
           .catch((err) => {
             const errorMsg = err instanceof Error ? err.message : '未知错误'
-            console.error(`[API] 获取项目 ${p.name} 的任务失败:`, errorMsg)
+            console.error(`[DidaAPI] 获取项目 ${p.name} 的任务失败:`, errorMsg)
             return [] as Task[]
           })
       )
@@ -64,7 +64,7 @@ export const projectsApi = {
       .then((data) => data.tasks || [])
       .catch((err) => {
         const errorMsg = err instanceof Error ? err.message : '未知错误'
-        console.error('[API] 获取收集箱任务失败:', errorMsg)
+        console.error('[DidaAPI] 获取收集箱任务失败:', errorMsg)
         return [] as Task[]
       })
 

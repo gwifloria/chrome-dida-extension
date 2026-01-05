@@ -1,17 +1,13 @@
 /**
  * API 层统一导出
  */
-export { API_BASE, endpoints } from './endpoints'
-export { request } from './client'
-export { tasksApi } from './tasks'
-export { projectsApi } from './projects'
 
-// Adapters
+// Adapters（推荐使用）
 export * from './adapters'
 
-// 兼容旧 API 接口
-import { tasksApi } from './tasks'
-import { projectsApi } from './projects'
+// 兼容旧 API 接口（供 services/api.ts 使用）
+import { tasksApi } from './adapters/dida/tasks'
+import { projectsApi } from './adapters/dida/projects'
 
 export const api = {
   // 项目
