@@ -1,6 +1,9 @@
 {
   "title": "TODAY'S FOCUS",
   "empty": "今天没有高优先级任务",
+  "button": {
+    "viewTasks": "查看任务列表（{{count}}个任务）"
+  },
   "placeholder": {
     "addFocus": "Add another focus...",
     "connectToAdd": "Connect to add more..."

@@ -101,7 +101,7 @@ export const storage = {
         try {
           callback(changes[STORAGE_KEYS.POMODORO].newValue || null)
         } catch (err) {
-          console.error('Error in pomodoro change callback:', err)
+          console.error('[Storage] Error in pomodoro change callback:', err)
         }
       }
     }

@@ -29,7 +29,7 @@ export const FocusLayout = memo(function FocusLayout({
 }: FocusLayoutProps) {
   return (
     <>
-      <Onboarding onComplete={() => {}} />
+      <Onboarding />
       <FocusView
         focusTasks={focusTasks}
         loading={loading}

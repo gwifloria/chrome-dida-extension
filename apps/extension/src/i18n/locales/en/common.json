@@ -18,7 +18,10 @@
     "taskLimitReached": "Task limit reached. Connect to add more.",
     "failedToConnect": "Failed to connect",
     "syncSuccess": "Synced {{count}} task(s) to TickTick",
-    "syncFailed": "Failed to sync {{count}} task(s)"
+    "syncFailed": "Failed to sync {{count}} task(s)",
+    "saveFailed": "Failed to save",
+    "loadSettingsFailed": "Failed to load settings",
+    "updateSettingsFailed": "Failed to update settings"
   },
   "connectPrompt": {
     "title": "Connect to TickTick",

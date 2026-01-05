@@ -26,7 +26,12 @@ export const FilterItem = memo(function FilterItem({
 }: FilterItemProps) {
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={name}
+      aria-pressed={active}
       onClick={onClick}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
       title={collapsed ? name : undefined}
       className={`
         flex items-center gap-2.5 py-2 cursor-pointer rounded-lg my-0.5

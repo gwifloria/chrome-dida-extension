@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import { shouldShowOnboarding, completeOnboarding } from '@/utils/onboarding'
 
 interface OnboardingProps {
-  onComplete: () => void
+  onComplete?: () => void
 }
 
 const stepIcons = [
@@ -60,7 +60,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const handleComplete = () => {
     completeOnboarding()
     setVisible(false)
-    onComplete()
+    onComplete?.()
   }
 
   const step = steps[currentStep]

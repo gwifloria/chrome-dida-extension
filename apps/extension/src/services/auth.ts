@@ -117,7 +117,10 @@ class AuthService {
           const errorData = await response.json().catch(() => ({}))
           const errorMessage =
             errorData.error_description || errorData.error || 'Token 刷新失败'
-          console.error(`Token 刷新失败 (${response.status}):`, errorMessage)
+          console.error(
+            `[Auth] Token 刷新失败 (${response.status}):`,
+            errorMessage
+          )
           await storage.clearToken()
           return null
         }
@@ -127,7 +130,7 @@ class AuthService {
         return token
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : '未知错误'
-        console.error('Token 刷新异常:', errorMsg)
+        console.error('[Auth] Token 刷新异常:', errorMsg)
         await storage.clearToken()
         return null
       } finally {

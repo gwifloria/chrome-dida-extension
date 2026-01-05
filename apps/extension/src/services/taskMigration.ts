@@ -35,7 +35,10 @@ export async function migrateLocalTasksToDidaList(): Promise<MigrationResult> {
       migratedTasks.push(task)
       success++
     } catch (err) {
-      console.error(`Failed to migrate task: ${task.title}`, err)
+      console.error(
+        `[TaskMigration] Failed to migrate task: ${task.title}`,
+        err
+      )
       failed++
     }
   }

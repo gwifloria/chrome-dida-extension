@@ -3,6 +3,7 @@ import { Input } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { useSettings } from '@/hooks/useSettings'
 import { formatDateTimeWithTimezone } from '@/utils/date'
+import { FILTER_NAMES } from '@/constants/task'
 import type { Task, Project } from '@/types'
 
 interface QuickAddInputProps {
@@ -38,9 +39,9 @@ export function QuickAddInput({
     }
 
     // 根据 filter 设置 dueDate
-    if (filter === 'today') {
+    if (filter === FILTER_NAMES.TODAY) {
       dueDate = formatDateTimeWithTimezone(new Date())
-    } else if (filter === 'tomorrow') {
+    } else if (filter === FILTER_NAMES.TOMORROW) {
       const tomorrow = new Date()
       tomorrow.setDate(tomorrow.getDate() + 1)
       dueDate = formatDateTimeWithTimezone(tomorrow)

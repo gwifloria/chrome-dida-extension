@@ -1,6 +1,20 @@
 import type { TFunction } from 'i18next'
 
 /**
+ * 过滤器名称常量
+ */
+export const FILTER_NAMES = {
+  TODAY: 'today',
+  TOMORROW: 'tomorrow',
+  WEEK: 'week',
+  OVERDUE: 'overdue',
+  NODATE: 'nodate',
+  ALL: 'all',
+} as const
+
+export type FilterName = (typeof FILTER_NAMES)[keyof typeof FILTER_NAMES]
+
+/**
  * 任务状态常量
  */
 export const TASK_STATUS = {

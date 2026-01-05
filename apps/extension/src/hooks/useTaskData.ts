@@ -72,7 +72,7 @@ export function useTaskData(isLoggedIn: boolean) {
         return [...nonInboxTasks, ...inboxTasks]
       })
     } catch (err) {
-      console.error('刷新收集箱失败:', err)
+      console.error('[useTaskData] 刷新收集箱失败:', err)
     }
   }, [isLoggedIn])
 

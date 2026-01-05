@@ -1,6 +1,9 @@
 {
   "title": "TODAY'S FOCUS",
   "empty": "No high priority tasks today",
+  "button": {
+    "viewTasks": "View task list ({{count}} tasks)"
+  },
   "placeholder": {
     "addFocus": "Add another focus...",
     "connectToAdd": "Connect to add more..."

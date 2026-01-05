@@ -18,7 +18,10 @@
     "taskLimitReached": "任务数量已达上限，请连接以添加更多",
     "failedToConnect": "连接失败",
     "syncSuccess": "已同步 {{count}} 个任务到滴答清单",
-    "syncFailed": "{{count}} 个任务同步失败"
+    "syncFailed": "{{count}} 个任务同步失败",
+    "saveFailed": "保存失败",
+    "loadSettingsFailed": "加载设置失败",
+    "updateSettingsFailed": "更新设置失败"
   },
   "connectPrompt": {
     "title": "连接滴答清单",

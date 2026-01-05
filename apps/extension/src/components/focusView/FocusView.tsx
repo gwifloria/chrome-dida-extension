@@ -126,6 +126,7 @@ export function FocusView({
           shape="round"
           onClick={onSwitchView}
           className="todo-float-btn"
+          aria-label={t('button.viewTasks', { count: todayTaskCount })}
         >
           Todo
           <span className="bg-[var(--accent)] text-white text-xs px-2 py-0.5 rounded-full">
