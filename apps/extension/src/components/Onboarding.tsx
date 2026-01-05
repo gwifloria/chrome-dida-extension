@@ -58,8 +58,12 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     handleComplete()
   }
 
-  const handleComplete = () => {
-    completeOnboarding()
+  const handleComplete = async () => {
+    try {
+      await completeOnboarding()
+    } catch (err) {
+      console.error('[Onboarding] 保存完成状态失败:', err)
+    }
     setVisible(false)
     onComplete?.()
   }

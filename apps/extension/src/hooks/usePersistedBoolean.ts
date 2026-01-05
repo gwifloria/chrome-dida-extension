@@ -27,7 +27,9 @@ export function usePersistedBoolean(
   const toggle = useCallback(() => {
     setValue((prev) => {
       const next = !prev
-      chrome.storage.local.set({ [storageKey]: next })
+      chrome.storage.local.set({ [storageKey]: next }).catch((err) => {
+        console.error(`[usePersistedBoolean] 保存失败 (${storageKey}):`, err)
+      })
       return next
     })
   }, [storageKey])

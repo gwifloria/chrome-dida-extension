@@ -32,7 +32,9 @@ export function usePersistedSet(
         } else {
           next.add(id)
         }
-        chrome.storage.local.set({ [storageKey]: [...next] })
+        chrome.storage.local.set({ [storageKey]: [...next] }).catch((err) => {
+          console.error(`[usePersistedSet] 保存失败 (${storageKey}):`, err)
+        })
         return next
       })
     },

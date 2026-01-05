@@ -10,7 +10,10 @@ function subscribe(callback: () => void): () => void {
   listeners.add(callback)
   startTimer()
   return () => {
-    listeners.delete(callback)
+    // 防御性删除：确保 callback 确实存在
+    if (listeners.has(callback)) {
+      listeners.delete(callback)
+    }
     stopTimerIfNoListeners()
   }
 }

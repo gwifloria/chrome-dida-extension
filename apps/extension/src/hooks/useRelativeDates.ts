@@ -27,36 +27,25 @@ export function useRelativeDates(): RelativeDates {
   }))
 
   useEffect(() => {
-    let intervalId: number | null = null
+    // 记录当前日期，用于检测日期变化
+    let lastTodayStr = getTodayStr()
 
-    const updateDates = () => {
-      setDates({
-        todayStr: getTodayStr(),
-        tomorrowStr: getTomorrowStr(),
-        dayAfterStr: getDayAfterStr(),
-        nextWeekStr: getNextWeekStr(),
-      })
-    }
-
-    // 计算到下一个午夜的毫秒数
-    const now = new Date()
-    const tomorrow = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + 1
-    )
-    const msUntilMidnight = tomorrow.getTime() - now.getTime()
-
-    // 在午夜时更新日期
-    const timeoutId = setTimeout(() => {
-      updateDates()
-      // 之后每24小时更新一次
-      intervalId = window.setInterval(updateDates, 24 * 60 * 60 * 1000)
-    }, msUntilMidnight)
+    // 每分钟检查日期是否变化（简单可靠，避免复杂的午夜计算）
+    const intervalId = window.setInterval(() => {
+      const currentTodayStr = getTodayStr()
+      if (currentTodayStr !== lastTodayStr) {
+        lastTodayStr = currentTodayStr
+        setDates({
+          todayStr: currentTodayStr,
+          tomorrowStr: getTomorrowStr(),
+          dayAfterStr: getDayAfterStr(),
+          nextWeekStr: getNextWeekStr(),
+        })
+      }
+    }, 60 * 1000) // 每分钟检查一次
 
     return () => {
-      clearTimeout(timeoutId)
-      if (intervalId) clearInterval(intervalId)
+      clearInterval(intervalId)
     }
   }, [])
 
