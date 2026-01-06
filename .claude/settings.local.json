@@ -18,7 +18,12 @@
       "WebSearch",
       "Bash(pnpm add:*)",
       "Bash(cat:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(git -C /Users/guihuajiu/wonderland/first-glance show 8a6bc6d --stat)",
+      "Bash(git -C /Users/guihuajiu/wonderland/first-glance log --all --oneline)",
+      "Bash(git -C /Users/guihuajiu/wonderland/first-glance diff HEAD -- apps/extension/vite.config.ts)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
