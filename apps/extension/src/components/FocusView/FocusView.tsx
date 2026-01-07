@@ -1,18 +1,17 @@
-import { useState, useMemo } from 'react'
-import { Button } from 'antd'
-import { useTranslation } from 'react-i18next'
-import { useTheme } from '@/hooks/useTheme'
-import { usePomodoro } from '@/hooks/usePomodoro'
-import { getGreeting } from '@/utils/greeting'
 import { getRandomQuote, type Quote } from '@/data/quotes'
+import { usePomodoro } from '@/hooks/usePomodoro'
+import { useTheme } from '@/hooks/useTheme'
+import type { Task } from '@/types'
+import { Button } from 'antd'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Clock } from '../common/Clock'
-import { FocusTopBar } from './FocusTopBar'
+import { FocusSkeleton } from '../Task/TaskSkeleton'
+import { FocusQuote } from './FocusQuote'
 import { FocusTaskInput } from './FocusTaskInput'
 import { FocusTaskItem } from './FocusTaskItem'
-import { FocusQuote } from './FocusQuote'
+import { FocusTopBar } from './FocusTopBar'
 import { PomodoroControls } from './PomodoroControls'
-import { FocusSkeleton } from '../Task/TaskSkeleton'
-import type { Task } from '@/types'
 
 interface FocusViewProps {
   focusTasks: Task[]
@@ -46,9 +45,6 @@ export function FocusView({
   // 番茄时钟
   const pomodoro = usePomodoro()
 
-  // 缓存问候语（避免每次渲染重新计算）
-  const greeting = useMemo(() => getGreeting(), [])
-
   return (
     <div className="h-screen bg-[var(--bg-primary)] flex flex-col relative overflow-hidden animate-fadeIn">
       {/* 背景纹理层 */}
@@ -67,6 +63,7 @@ export function FocusView({
         {/* 大时钟 / 番茄倒计时 */}
         <Clock
           variant="large"
+          showGreeting
           pomodoroMode={pomodoro.mode}
           pomodoroTimeLeft={pomodoro.timeLeft}
         />
@@ -83,16 +80,9 @@ export function FocusView({
           onSkip={pomodoro.skip}
         />
 
-        {/* 问候语 - 番茄模式时隐藏 */}
-        {pomodoro.mode === 'idle' && (
-          <div className="text-2xl text-[var(--text-primary)] mt-4 font-light">
-            {greeting}
-          </div>
-        )}
-
         {/* TODAY'S FOCUS */}
-        <div className="mt-16 w-full max-w-md">
-          <h2 className="text-xs font-medium tracking-[3px] text-center text-[var(--text-secondary)] mb-8">
+        <div className="mt-6 w-full max-w-md">
+          <h2 className="text-xs font-medium tracking-[3px] text-center text-[var(--text-secondary)] mb-5">
             {t('title')}
           </h2>
 

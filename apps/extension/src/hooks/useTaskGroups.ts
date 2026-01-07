@@ -57,53 +57,32 @@ export function useTaskGroups({
       }
     }
 
-    // 构建结果（保持原有顺序）
-    const result: TaskGroup[] = []
+    // 排序函数
+    const byPriority = (a: Task, b: Task) => b.priority - a.priority
+    const bySortOrder = (a: Task, b: Task) => b.sortOrder - a.sortOrder
 
-    if (categorized.pinned.length > 0) {
-      result.push({
-        id: 'pinned',
-        title: t('group.pinned'),
-        tasks: categorized.pinned.sort((a, b) => b.sortOrder - a.sortOrder),
-      })
-    }
-    if (categorized.overdue.length > 0) {
-      result.push({
-        id: 'overdue',
-        title: t('group.overdue'),
-        tasks: categorized.overdue.sort((a, b) => b.priority - a.priority),
-      })
-    }
-    if (categorized.today.length > 0) {
-      result.push({
-        id: 'today',
-        title: t('group.today'),
-        tasks: categorized.today.sort((a, b) => b.priority - a.priority),
-      })
-    }
-    if (categorized.tomorrow.length > 0) {
-      result.push({
-        id: 'tomorrow',
-        title: t('group.tomorrow'),
-        tasks: categorized.tomorrow.sort((a, b) => b.priority - a.priority),
-      })
-    }
-    if (categorized.later.length > 0) {
-      result.push({
-        id: 'later',
-        title: t('group.later'),
-        tasks: categorized.later.sort((a, b) => b.priority - a.priority),
-      })
-    }
-    if (categorized.nodate.length > 0) {
-      result.push({
-        id: 'nodate',
-        title: t('group.noDate'),
-        tasks: categorized.nodate.sort((a, b) => b.priority - a.priority),
-      })
-    }
+    // 分组配置（顺序即显示顺序）
+    const groupConfigs: {
+      id: keyof typeof categorized
+      titleKey: string
+      sort: (a: Task, b: Task) => number
+    }[] = [
+      { id: 'pinned', titleKey: 'group.pinned', sort: bySortOrder },
+      { id: 'overdue', titleKey: 'group.overdue', sort: byPriority },
+      { id: 'today', titleKey: 'group.today', sort: byPriority },
+      { id: 'tomorrow', titleKey: 'group.tomorrow', sort: byPriority },
+      { id: 'later', titleKey: 'group.later', sort: byPriority },
+      { id: 'nodate', titleKey: 'group.noDate', sort: byPriority },
+    ]
 
-    return result
+    // 构建结果
+    return groupConfigs
+      .filter((cfg) => categorized[cfg.id].length > 0)
+      .map((cfg) => ({
+        id: cfg.id,
+        title: t(cfg.titleKey),
+        tasks: categorized[cfg.id].sort(cfg.sort),
+      }))
   }, [filteredTasks, todayStr, tomorrowStr, t])
 
   return groups

@@ -4,17 +4,11 @@ import {
   FieldTimeOutlined,
   InboxOutlined,
 } from '@ant-design/icons'
+import { memo, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { TaskCounts } from '@/utils/taskFilters'
 import { SectionTitle } from '../common/SectionTitle'
 import { FilterItem } from './FilterItem'
-
-interface SmartFilter {
-  id: string
-  name: string
-  icon: React.ReactNode
-  count: number
-}
 
 interface SmartFilterListProps {
   counts: TaskCounts
@@ -23,7 +17,7 @@ interface SmartFilterListProps {
   onFilterChange: (filter: string) => void
 }
 
-export function SmartFilterList({
+export const SmartFilterList = memo(function SmartFilterList({
   counts,
   selectedFilter,
   collapsed,
@@ -31,38 +25,16 @@ export function SmartFilterList({
 }: SmartFilterListProps) {
   const { t } = useTranslation('sidebar')
 
-  const smartFilters: SmartFilter[] = [
-    {
-      id: 'inbox',
-      name: t('smartList.inbox'),
-      icon: <InboxOutlined />,
-      count: counts.inbox,
-    },
-    {
-      id: 'today',
-      name: t('smartList.today'),
-      icon: <FieldTimeOutlined />,
-      count: counts.today,
-    },
-    {
-      id: 'tomorrow',
-      name: t('smartList.tomorrow'),
-      icon: <CalendarOutlined />,
-      count: counts.tomorrow,
-    },
-    {
-      id: 'week',
-      name: t('smartList.week'),
-      icon: <CalendarOutlined />,
-      count: counts.week,
-    },
-    {
-      id: 'overdue',
-      name: t('smartList.overdue'),
-      icon: <ClockCircleOutlined />,
-      count: counts.overdue,
-    },
-  ]
+  const smartFilters = useMemo(
+    () => [
+      { id: 'inbox', icon: <InboxOutlined />, count: counts.inbox },
+      { id: 'today', icon: <FieldTimeOutlined />, count: counts.today },
+      { id: 'tomorrow', icon: <CalendarOutlined />, count: counts.tomorrow },
+      { id: 'week', icon: <CalendarOutlined />, count: counts.week },
+      { id: 'overdue', icon: <ClockCircleOutlined />, count: counts.overdue },
+    ],
+    [counts]
+  )
 
   return (
     <div className="mb-2">
@@ -73,11 +45,11 @@ export function SmartFilterList({
           active={selectedFilter === filter.id}
           onClick={() => onFilterChange(filter.id)}
           icon={filter.icon}
-          name={filter.name}
+          name={t(`smartList.${filter.id}`)}
           count={filter.count}
           collapsed={collapsed}
         />
       ))}
     </div>
   )
-}
+})

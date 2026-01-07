@@ -29,9 +29,11 @@ export function TaskCheckbox({
           ) : undefined
         }
         className={`
-          !w-6 !h-6 !min-w-0 !p-0 !rounded !border-2 !border-[var(--border)] !flex !items-center !justify-center
+          !w-6 !h-6 !min-w-0 !p-0 !rounded-md !border-2 !border-[var(--border)] !flex !items-center !justify-center
           !bg-transparent hover:!border-[var(--accent)] hover:!bg-[var(--accent-light)]
-          ${completing ? '!opacity-50' : ''}
+          !transition-all !duration-300 !ease-out
+          !-rotate-6 hover:!rotate-0 hover:!scale-110
+          ${completing ? '!opacity-50 !rotate-0' : ''}
         `}
       />
     )
