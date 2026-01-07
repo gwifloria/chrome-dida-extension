@@ -55,9 +55,8 @@ export function FocusTaskList() {
   const { data, actions, views } = useTasks()
   const { tasks, loading: tasksLoading } = data
   const { completeTask, createInboxTask } = actions
-  const { todayFocusTasks } = views
+  const { focusTasks } = views
 
-  const focusTasks = isGuest ? tasks : todayFocusTasks
   // 只在初始加载时显示 skeleton，连接过程中保持显示原内容
   const loading = tasksLoading && tasks.length === 0
   const canAddMore = isGuest ? focusTasks.length < MAX_LOCAL_TASKS : true

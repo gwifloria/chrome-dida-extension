@@ -1,21 +1,17 @@
-import { memo } from 'react'
-import { useTheme } from '@/hooks/useTheme'
 import type { Quote } from '@/data/quotes'
+import { memo } from 'react'
 
 interface FocusQuoteProps {
   quote: Quote
 }
 
 export const FocusQuote = memo(function FocusQuote({ quote }: FocusQuoteProps) {
-  const { theme } = useTheme()
-
   return (
     <div className="text-center pb-8 px-6 relative z-10">
       <p
         className="text-lg text-[var(--text-primary)] italic opacity-70 max-w-3xl mx-auto"
         style={{
-          fontFamily:
-            theme.type === 'journal' ? 'var(--font-heading)' : 'inherit',
+          fontFamily: 'var(--font-heading)',
         }}
       >
         "{quote.text}"
