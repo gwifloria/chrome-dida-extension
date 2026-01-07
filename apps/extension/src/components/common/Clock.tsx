@@ -1,4 +1,3 @@
-import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCurrentTime } from '@/hooks/useCurrentTime'
 import { formatPomodoroTime, type PomodoroMode } from '@/hooks/usePomodoro'
@@ -17,7 +16,7 @@ interface ClockProps {
 /**
  * 时钟组件 - 支持普通时钟和番茄时钟模式
  */
-export const Clock = memo(function Clock({
+export function Clock({
   variant,
   showDate = false,
   showGreeting = false,
@@ -96,4 +95,4 @@ export const Clock = memo(function Clock({
       )}
     </div>
   )
-})
+}

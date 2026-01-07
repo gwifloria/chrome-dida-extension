@@ -1,4 +1,4 @@
-import { useState, useCallback, memo } from 'react'
+import { useState, useCallback } from 'react'
 import { Button } from 'antd'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
@@ -20,7 +20,7 @@ interface SidebarProps {
   onSearch?: (query: string) => void
 }
 
-const SidebarHeader = memo(function SidebarHeader({
+function SidebarHeader({
   collapsed,
   onToggleCollapse,
   toggleTitle,
@@ -46,9 +46,9 @@ const SidebarHeader = memo(function SidebarHeader({
       </div>
     </div>
   )
-})
+}
 
-export const Sidebar = memo(function Sidebar({
+export function Sidebar({
   tasks,
   projects,
   counts,
@@ -107,4 +107,4 @@ export const Sidebar = memo(function Sidebar({
       <SidebarFooter collapsed={collapsed} projects={projects} />
     </aside>
   )
-})
+}

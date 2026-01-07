@@ -1,11 +1,10 @@
 import type { Quote } from '@/data/quotes'
-import { memo } from 'react'
 
 interface FocusQuoteProps {
   quote: Quote
 }
 
-export const FocusQuote = memo(function FocusQuote({ quote }: FocusQuoteProps) {
+export function FocusQuote({ quote }: FocusQuoteProps) {
   return (
     <div className="text-center pb-8 px-6 relative z-10">
       <p
@@ -21,4 +20,4 @@ export const FocusQuote = memo(function FocusQuote({ quote }: FocusQuoteProps) {
       </p>
     </div>
   )
-})
+}
