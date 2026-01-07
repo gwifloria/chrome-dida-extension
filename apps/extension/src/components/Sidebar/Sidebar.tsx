@@ -8,13 +8,14 @@ import { SearchInput } from '../SearchInput'
 import { SmartFilterList } from './SmartFilterList'
 import { ProjectList } from './ProjectList'
 import { SidebarFooter } from './SidebarFooter'
-import type { Project, Task } from '@/types'
+import type { Project } from '@/types'
 import type { TaskCounts } from '@/utils/taskFilters'
 
 interface SidebarProps {
-  tasks: Task[]
   projects: Project[]
   counts: TaskCounts
+  /** 每个项目的任务数量，从统一数据源获取 */
+  projectCounts: Map<string, number>
   selectedFilter: string
   onFilterChange: (filter: string) => void
   onSearch?: (query: string) => void
@@ -49,9 +50,9 @@ function SidebarHeader({
 }
 
 export function Sidebar({
-  tasks,
   projects,
   counts,
+  projectCounts,
   selectedFilter,
   onFilterChange,
   onSearch,
@@ -97,7 +98,7 @@ export function Sidebar({
 
         <ProjectList
           projects={projects}
-          tasks={tasks}
+          projectCounts={projectCounts}
           selectedFilter={selectedFilter}
           collapsed={collapsed}
           onFilterChange={onFilterChange}

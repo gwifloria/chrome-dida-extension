@@ -1,32 +1,37 @@
 import { useMemo, useCallback, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
+  computeTaskViews,
+  getFocusTasks,
   filterTasks,
   sortTasks,
-  groupTasks,
-  getTodayTasks,
-  getTodayFocusTasks,
-  getInboxTasks,
-  getOverdueTasks,
-  getTomorrowTasks,
-  getWeekTasks,
-  getTaskCounts,
   type SortOption,
   type GroupOption,
   type TaskGroup,
   type TaskCounts,
+  type ComputedViews,
 } from '@/utils/taskFilters'
-import type { Task, Project } from '@/types'
+import type { Task } from '@/types'
 
-export type { SortOption, GroupOption, TaskGroup, TaskCounts }
+export type { SortOption, GroupOption, TaskGroup, TaskCounts, ComputedViews }
 
 export interface TaskViews {
+  /** 今日任务 */
   todayTasks: Task[]
+  /** 今日专注任务（最多3个） */
   todayFocusTasks: Task[]
+  /** 收集箱任务 */
   inboxTasks: Task[]
+  /** 过期任务 */
   overdueTasks: Task[]
+  /** 明日任务 */
   tomorrowTasks: Task[]
+  /** 本周任务 */
   weekTasks: Task[]
+  /** 各筛选器的任务数量 */
   counts: TaskCounts
+  /** 每个项目的任务数量 */
+  projectCounts: Map<string, number>
 }
 
 export interface TaskFilters {
@@ -34,30 +39,38 @@ export interface TaskFilters {
   setSortBy: (sort: SortOption) => void
   groupBy: GroupOption
   setGroupBy: (group: GroupOption) => void
+  /** 获取指定筛选器的任务列表 */
   getFilteredTasks: (filter: string, searchQuery?: string) => Task[]
-  getGroupedTasks: (filter: string, searchQuery?: string) => TaskGroup[]
+  /** 获取指定筛选器的分组任务（用于 TaskList 显示） */
+  getTaskGroups: (filter: string, searchQuery?: string) => TaskGroup[]
 }
 
 /**
  * 任务视图计算 Hook
- * 负责：计算派生视图、筛选、分组、排序
+ * 核心：单次遍历计算所有派生数据
  */
-export function useTaskViews(tasks: Task[], projects: Project[]) {
+export function useTaskViews(tasks: Task[]) {
+  const { t } = useTranslation('task')
   const [sortBy, setSortBy] = useState<SortOption>('priority')
   const [groupBy, setGroupBy] = useState<GroupOption>('none')
 
-  // ============ 计算视图 ============
+  // ============ 核心计算（单次遍历）============
+  const computed = useMemo(() => computeTaskViews(tasks), [tasks])
 
-  const todayTasks = useMemo(() => getTodayTasks(tasks), [tasks])
-  const todayFocusTasks = useMemo(() => getTodayFocusTasks(tasks), [tasks])
-  const inboxTasks = useMemo(() => getInboxTasks(tasks), [tasks])
-  const overdueTasks = useMemo(() => getOverdueTasks(tasks), [tasks])
-  const tomorrowTasks = useMemo(() => getTomorrowTasks(tasks), [tasks])
-  const weekTasks = useMemo(() => getWeekTasks(tasks), [tasks])
-  const counts = useMemo(() => getTaskCounts(tasks), [tasks])
+  // ============ 派生视图 ============
+  const todayFocusTasks = useMemo(() => getFocusTasks(computed, 3), [computed])
 
-  // ============ 筛选和分组 ============
+  // 本周任务（合并 today + tomorrow + later 中本周的）
+  const weekTasks = useMemo(
+    () => [
+      ...computed.byDate.today,
+      ...computed.byDate.tomorrow,
+      ...computed.byDate.later,
+    ],
+    [computed]
+  )
 
+  // ============ 筛选函数 ============
   const getFilteredTasks = useCallback(
     (filter: string, searchQuery?: string) => {
       const filtered = filterTasks(tasks, filter, searchQuery)
@@ -66,24 +79,78 @@ export function useTaskViews(tasks: Task[], projects: Project[]) {
     [tasks, sortBy]
   )
 
-  const getGroupedTasks = useCallback(
+  // ============ 分组函数（基于 computed.byDate）============
+  const getTaskGroups = useCallback(
     (filter: string, searchQuery?: string): TaskGroup[] => {
+      // 先筛选
       const filtered = filterTasks(tasks, filter, searchQuery)
-      const sorted = sortTasks(filtered, sortBy)
-      return groupTasks(sorted, groupBy, projects)
+
+      // 基于筛选结果重新分组（复用 computed 的日期字符串缓存）
+      const categorized = {
+        pinned: [] as Task[],
+        overdue: [] as Task[],
+        today: [] as Task[],
+        tomorrow: [] as Task[],
+        later: [] as Task[],
+        nodate: [] as Task[],
+      }
+
+      // 创建快速查找集合
+      const filteredSet = new Set(filtered.map((t) => t.id))
+
+      // 从 computed.byDate 中筛选
+      for (const task of computed.byDate.pinned) {
+        if (filteredSet.has(task.id)) categorized.pinned.push(task)
+      }
+      for (const task of computed.byDate.overdue) {
+        if (filteredSet.has(task.id)) categorized.overdue.push(task)
+      }
+      for (const task of computed.byDate.today) {
+        if (filteredSet.has(task.id)) categorized.today.push(task)
+      }
+      for (const task of computed.byDate.tomorrow) {
+        if (filteredSet.has(task.id)) categorized.tomorrow.push(task)
+      }
+      for (const task of computed.byDate.later) {
+        if (filteredSet.has(task.id)) categorized.later.push(task)
+      }
+      for (const task of computed.byDate.nodate) {
+        if (filteredSet.has(task.id)) categorized.nodate.push(task)
+      }
+
+      // 分组配置
+      const groupConfigs: { id: keyof typeof categorized; titleKey: string }[] =
+        [
+          { id: 'pinned', titleKey: 'group.pinned' },
+          { id: 'overdue', titleKey: 'group.overdue' },
+          { id: 'today', titleKey: 'group.today' },
+          { id: 'tomorrow', titleKey: 'group.tomorrow' },
+          { id: 'later', titleKey: 'group.later' },
+          { id: 'nodate', titleKey: 'group.noDate' },
+        ]
+
+      // 构建结果（已排序，因为 computed.byDate 中已排序）
+      return groupConfigs
+        .filter((cfg) => categorized[cfg.id].length > 0)
+        .map((cfg) => ({
+          id: cfg.id,
+          title: t(cfg.titleKey),
+          tasks: categorized[cfg.id],
+        }))
     },
-    [tasks, sortBy, groupBy, projects]
+    [tasks, computed, t]
   )
 
-  // 结构化返回
+  // ============ 结构化返回 ============
   const views: TaskViews = {
-    todayTasks,
+    todayTasks: computed.byDate.today,
     todayFocusTasks,
-    inboxTasks,
-    overdueTasks,
-    tomorrowTasks,
+    inboxTasks: computed.inbox,
+    overdueTasks: computed.byDate.overdue,
+    tomorrowTasks: computed.byDate.tomorrow,
     weekTasks,
-    counts,
+    counts: computed.counts,
+    projectCounts: computed.projectCounts,
   }
 
   const filters: TaskFilters = {
@@ -92,7 +159,7 @@ export function useTaskViews(tasks: Task[], projects: Project[]) {
     groupBy,
     setGroupBy,
     getFilteredTasks,
-    getGroupedTasks,
+    getTaskGroups,
   }
 
   return { views, filters }

@@ -11,10 +11,11 @@ interface ListLayoutProps {
 export function ListLayout({ onFocus }: ListLayoutProps) {
   const { theme } = useTheme()
 
-  const { data, actions, views } = useTasks()
-  const { tasks, projects, loading, error } = data
+  const { data, actions, views, filters } = useTasks()
+  const { projects, loading, error } = data
   const { completeTask, deleteTask, updateTask, createTask } = actions
-  const { counts } = views
+  const { counts, projectCounts } = views
+  const { getTaskGroups } = filters
 
   const [selectedFilter, setSelectedFilter] = useState('today')
   const [searchQuery, setSearchQuery] = useState('')
@@ -28,9 +29,9 @@ export function ListLayout({ onFocus }: ListLayoutProps) {
 
       {/* 侧边栏 */}
       <Sidebar
-        tasks={tasks}
         projects={projects}
         counts={counts}
+        projectCounts={projectCounts}
         selectedFilter={selectedFilter}
         onFilterChange={setSelectedFilter}
         onSearch={setSearchQuery}
@@ -51,12 +52,12 @@ export function ListLayout({ onFocus }: ListLayoutProps) {
 
           <main className="h-full overflow-y-auto relative z-10">
             <TaskList
-              tasks={tasks}
               projects={projects}
               loading={loading}
               error={error}
               filter={selectedFilter}
               searchQuery={searchQuery}
+              getTaskGroups={getTaskGroups}
               onComplete={completeTask}
               onDelete={deleteTask}
               onUpdate={updateTask}

@@ -16,6 +16,8 @@ export {
   type GroupOption,
   type TaskGroup,
   type TaskCounts,
+  type TasksByDate,
+  type ComputedViews,
   // 日期判断
   isToday,
   isTomorrow,
@@ -25,13 +27,9 @@ export {
   filterTasks,
   sortTasks,
   groupTasks,
-  // 视图计算
-  getTodayTasks,
-  getTodayFocusTasks,
-  getInboxTasks,
-  getOverdueTasks,
-  getTomorrowTasks,
-  getWeekTasks,
+  // 视图计算（核心）
+  computeTaskViews,
+  getFocusTasks,
   getTaskCounts,
 } from './taskFilters'
 

@@ -22,7 +22,7 @@ const TRANSLATABLE_GROUPS = new Set([
   'pinned',
 ])
 
-interface TaskGroupSectionProps {
+interface TaskDateGroupProps {
   group: TaskGroup
   projects: Project[]
   isCollapsed: boolean
@@ -33,7 +33,7 @@ interface TaskGroupSectionProps {
   onEdit: (task: Task) => void
 }
 
-export const TaskGroupSection = memo(function TaskGroupSection({
+export const TaskDateGroup = memo(function TaskDateGroup({
   group,
   projects,
   isCollapsed,
@@ -42,7 +42,7 @@ export const TaskGroupSection = memo(function TaskGroupSection({
   onComplete,
   onDelete,
   onEdit,
-}: TaskGroupSectionProps) {
+}: TaskDateGroupProps) {
   const { t } = useTranslation('task')
 
   const getProjectById = (projectId: string) =>

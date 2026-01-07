@@ -1,5 +1,12 @@
 // 类型
-export type { SortOption, GroupOption, TaskGroup, TaskCounts } from './types'
+export type {
+  SortOption,
+  GroupOption,
+  TaskGroup,
+  TaskCounts,
+  TasksByDate,
+  ComputedViews,
+} from './types'
 
 // 日期判断
 export { isToday, isTomorrow, isThisWeek, isOverdue } from './predicates'
@@ -13,13 +20,5 @@ export { sortTasks } from './sort'
 // 分组
 export { groupTasks } from './group'
 
-// 视图计算
-export {
-  getTodayTasks,
-  getTodayFocusTasks,
-  getInboxTasks,
-  getOverdueTasks,
-  getTomorrowTasks,
-  getWeekTasks,
-  getTaskCounts,
-} from './views'
+// 视图计算（核心）
+export { computeTaskViews, getFocusTasks, getTaskCounts } from './views'

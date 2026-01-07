@@ -1,22 +1,23 @@
-import { useState, useCallback, memo } from 'react'
+import { useState, useCallback, memo, useMemo } from 'react'
 import { Empty, Alert } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { TaskEditor } from '../Task/TaskEditor'
 import { TaskSkeleton } from '../Task/TaskSkeleton'
 import { TaskListHeader } from './TaskListHeader'
 import { QuickAddInput } from './QuickAddInput'
-import { TaskGroupSection } from './TaskGroupSection'
+import { TaskDateGroup } from './TaskDateGroup'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
-import { useTaskGroups } from '@/hooks/useTaskGroups'
 import type { Task, Project } from '@/types'
+import type { TaskGroup } from '@/utils/taskFilters'
 
 interface TaskListProps {
-  tasks: Task[]
   projects: Project[]
   loading: boolean
   error: string | null
   filter: string
   searchQuery?: string
+  /** 从 useTasks().filters 传入的分组函数 */
+  getTaskGroups: (filter: string, searchQuery?: string) => TaskGroup[]
   onComplete: (task: Task) => void
   onDelete: (task: Task) => void
   onUpdate: (taskId: string, updates: Partial<Task>) => void
@@ -25,12 +26,12 @@ interface TaskListProps {
 }
 
 export const TaskList = memo(function TaskList({
-  tasks,
   projects,
   loading,
   error,
   filter,
   searchQuery,
+  getTaskGroups,
   onComplete,
   onDelete,
   onUpdate,
@@ -42,8 +43,11 @@ export const TaskList = memo(function TaskList({
   const [isEditorOpen, setIsEditorOpen] = useState(false)
   const [collapsedGroups, toggleGroup] = usePersistedSet('taskGroupCollapsed')
 
-  // 使用抽取的分组 hook
-  const groups = useTaskGroups({ tasks, filter, searchQuery })
+  // 使用传入的分组函数
+  const groups = useMemo(
+    () => getTaskGroups(filter, searchQuery),
+    [getTaskGroups, filter, searchQuery]
+  )
   const taskCount = groups.reduce((sum, g) => sum + g.tasks.length, 0)
 
   const handleEdit = useCallback((task: Task) => {
@@ -110,7 +114,7 @@ export const TaskList = memo(function TaskList({
           />
         ) : (
           groups.map((group) => (
-            <TaskGroupSection
+            <TaskDateGroup
               key={group.id}
               group={group}
               projects={projects}

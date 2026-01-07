@@ -8,7 +8,7 @@ import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { TaskCounts } from '@/utils/taskFilters'
 import { SectionTitle } from '../common/SectionTitle'
-import { FilterItem } from './FilterItem'
+import { NavItem } from './NavItem'
 
 interface SmartFilterListProps {
   counts: TaskCounts
@@ -37,7 +37,7 @@ export const SmartFilterList = memo(function SmartFilterList({
     <div className="mb-2">
       {!collapsed && <SectionTitle title={t('smartList.title')} />}
       {smartFilters.map((filter) => (
-        <FilterItem
+        <NavItem
           key={filter.id}
           active={selectedFilter === filter.id}
           onClick={() => onFilterChange(filter.id)}

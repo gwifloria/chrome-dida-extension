@@ -1,9 +1,9 @@
 import { memo } from 'react'
 import { RightOutlined } from '@ant-design/icons'
-import { FilterItem } from './FilterItem'
+import { NavItem } from './NavItem'
 import type { FolderGroup } from './types'
 
-interface FolderItemProps {
+interface NavFolderProps {
   folder: FolderGroup
   collapsed: boolean
   isFolderCollapsed: boolean
@@ -15,14 +15,14 @@ interface FolderItemProps {
 const baseButtonClass =
   'flex items-center cursor-pointer rounded-lg transition-all duration-200 ease-out hover:bg-black/[0.04] select-none'
 
-export const FolderItem = memo(function FolderItem({
+export const NavFolder = memo(function NavFolder({
   folder,
   collapsed,
   isFolderCollapsed,
   selectedFilter,
   onToggleFolder,
   onFilterChange,
-}: FolderItemProps) {
+}: NavFolderProps) {
   const opacityClass = isFolderCollapsed ? 'opacity-80' : ''
 
   return (
@@ -53,7 +53,7 @@ export const FolderItem = memo(function FolderItem({
       {!isFolderCollapsed && (
         <div className={collapsed ? '' : 'ml-1'}>
           {folder.projects.map((project) => (
-            <FilterItem
+            <NavItem
               key={project.id}
               active={selectedFilter === `project:${project.id}`}
               onClick={() => onFilterChange(`project:${project.id}`)}

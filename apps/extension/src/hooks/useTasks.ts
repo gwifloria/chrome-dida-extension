@@ -37,7 +37,7 @@ export function useTasks(): UseTasksReturn {
   const adapterType = isConnected ? 'didaList' : 'local'
 
   const { data, actions } = useTaskData(adapterType)
-  const { views: baseViews, filters } = useTaskViews(data.tasks, data.projects)
+  const { views: baseViews, filters } = useTaskViews(data.tasks)
 
   // 聚焦任务：guest 模式显示所有本地任务，connected 模式显示今日聚焦任务
   const focusTasks = useMemo(
