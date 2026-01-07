@@ -12,6 +12,9 @@ export interface Theme {
     accent: string
     accentLight: string
     border: string
+    // 时钟颜色
+    clockPrimary: string
+    clockSecondary: string
     // 侧边栏颜色
     sidebarText: string
     sidebarHover: string

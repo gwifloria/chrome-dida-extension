@@ -11,6 +11,8 @@ export const milkTheme: Theme = {
     bgCard: '#ffffff',
     textPrimary: '#292524',
     textSecondary: '#a8a29e',
+    clockPrimary: '#3d3937',
+    clockSecondary: '#78716c',
     accent: '#57534e',
     accentLight: '#f5f5f4',
     border: '#e7e5e4',

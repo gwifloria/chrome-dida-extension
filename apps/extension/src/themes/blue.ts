@@ -11,6 +11,8 @@ export const blueTheme: Theme = {
     bgCard: '#ffffff',
     textPrimary: '#334155',
     textSecondary: '#64748b',
+    clockPrimary: '#1e293b',
+    clockSecondary: '#475569',
     accent: '#475569',
     accentLight: '#e2e8f0',
     border: '#cbd5e1',

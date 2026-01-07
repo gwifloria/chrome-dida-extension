@@ -47,7 +47,7 @@ export const Clock = memo(function Clock({
         role="timer"
         aria-label={displayTime}
         onClick={onClick}
-        className={`text-[120px] font-extralight leading-none tracking-tight transition-all duration-700 cursor-pointer hover:scale-105 ${isPomodoroActive ? pomodoroColor : 'text-[var(--text-primary)]'} ${className}`}
+        className={`text-[120px] font-extralight leading-none tracking-tight transition-all duration-700 cursor-pointer hover:scale-105 ${isPomodoroActive ? pomodoroColor : 'text-[var(--clock-primary)]'} ${className}`}
       >
         {displayTime}
         {isPomodoroActive && (
@@ -64,7 +64,7 @@ export const Clock = memo(function Clock({
   return (
     <div className={className} onClick={onClick}>
       <div
-        className={`text-4xl max-md:text-2xl font-extralight leading-none ${isPomodoroActive ? pomodoroColor : 'text-[var(--text-secondary)]'}`}
+        className={`text-4xl max-md:text-2xl font-extralight leading-none ${isPomodoroActive ? pomodoroColor : 'text-[var(--clock-secondary)]'}`}
       >
         {displayTime}
       </div>

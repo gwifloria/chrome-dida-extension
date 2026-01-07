@@ -1,4 +1,4 @@
-import { StrictMode, useState, useEffect } from 'react'
+import { StrictMode, useState, useEffect, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ConfigProvider } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
@@ -7,13 +7,16 @@ import { useTranslation } from 'react-i18next'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { SettingsProvider } from '@/contexts/SettingsContext'
 import { ErrorBoundary } from '@/components/common'
-import { antdTheme } from '@/themes/antdTheme'
+import { useTheme } from '@/hooks/useTheme'
+import { createAntdTheme } from '@/themes/antdTheme'
 import '@/i18n'
 import App from './App'
 import '@/styles/index.css'
 
-export function Root() {
+// Ant Design 配置包装器，响应主题变化
+function AntdConfigProvider({ children }: { children: ReactNode }) {
   const { i18n } = useTranslation()
+  const { theme } = useTheme()
   const [antdLocale, setAntdLocale] = useState(
     i18n.language.startsWith('zh') ? zhCN : enUS
   )
@@ -30,15 +33,23 @@ export function Root() {
   }, [i18n])
 
   return (
-    <ConfigProvider locale={antdLocale} theme={antdTheme}>
-      <ErrorBoundary>
-        <SettingsProvider>
-          <ThemeProvider>
-            <App />
-          </ThemeProvider>
-        </SettingsProvider>
-      </ErrorBoundary>
+    <ConfigProvider locale={antdLocale} theme={createAntdTheme(theme)}>
+      {children}
     </ConfigProvider>
+  )
+}
+
+export function Root() {
+  return (
+    <ErrorBoundary>
+      <SettingsProvider>
+        <ThemeProvider>
+          <AntdConfigProvider>
+            <App />
+          </AntdConfigProvider>
+        </ThemeProvider>
+      </SettingsProvider>
+    </ErrorBoundary>
   )
 }
 

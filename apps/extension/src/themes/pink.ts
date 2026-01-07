@@ -11,6 +11,8 @@ export const pinkTheme: Theme = {
     bgCard: '#ffffff',
     textPrimary: '#5d5555',
     textSecondary: '#9c9492',
+    clockPrimary: '#6e5d5b',
+    clockSecondary: '#8a807e',
     accent: '#d4a5a5',
     accentLight: '#f5eeec',
     border: '#e8e4e2',
