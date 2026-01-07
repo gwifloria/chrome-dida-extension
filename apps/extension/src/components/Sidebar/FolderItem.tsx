@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { CollapseArrow } from '../CollapseArrow'
+import { RightOutlined } from '@ant-design/icons'
 import { FilterItem } from './FilterItem'
 import type { FolderGroup } from './types'
 
@@ -33,14 +33,18 @@ export const FolderItem = memo(function FolderItem({
           title={folder.name}
           className={`${baseButtonClass} justify-center py-2 px-2 ${opacityClass}`}
         >
-          <CollapseArrow isCollapsed={isFolderCollapsed} />
+          <RightOutlined
+            className={`text-[10px] text-[var(--text-secondary)] transition-transform duration-200 ${isFolderCollapsed ? '' : 'rotate-90'}`}
+          />
         </div>
       ) : (
         <div
           onClick={onToggleFolder}
           className={`${baseButtonClass} gap-1 py-2 px-3 hover:translate-x-0.5 ${opacityClass}`}
         >
-          <CollapseArrow isCollapsed={isFolderCollapsed} />
+          <RightOutlined
+            className={`text-[10px] text-[var(--text-secondary)] transition-transform duration-200 ${isFolderCollapsed ? '' : 'rotate-90'}`}
+          />
           <span className="text-[11px] font-medium text-[var(--text-secondary)] tracking-wide">
             {folder.name.toUpperCase()}
           </span>

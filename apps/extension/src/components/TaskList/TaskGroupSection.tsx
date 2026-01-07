@@ -1,6 +1,6 @@
 import { memo } from 'react'
+import { RightOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { CollapseArrow } from '../CollapseArrow'
 import { TaskItem } from '../Task/TaskItem'
 import type { Task, Project } from '@/types'
 import type { TaskGroup } from '@/utils/taskFilters'
@@ -60,7 +60,9 @@ export const TaskGroupSection = memo(function TaskGroupSection({
           className="flex items-center gap-2 py-3 cursor-pointer select-none border-b border-[var(--border)] mb-2 hover:opacity-80"
           onClick={onToggle}
         >
-          <CollapseArrow isCollapsed={isCollapsed} />
+          <RightOutlined
+            className={`text-[10px] text-[var(--text-secondary)] transition-transform duration-200 ${isCollapsed ? '' : 'rotate-90'}`}
+          />
           <span className="text-[11px] font-medium text-[var(--text-secondary)] tracking-[1px]">
             {groupTitle.toUpperCase()}
           </span>
