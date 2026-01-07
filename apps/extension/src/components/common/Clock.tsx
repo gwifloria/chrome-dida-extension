@@ -2,6 +2,12 @@ import { useTranslation } from 'react-i18next'
 import { useCurrentTime } from '@/hooks/useCurrentTime'
 import { formatPomodoroTime, type PomodoroMode } from '@/hooks/usePomodoro'
 
+const GREETINGS = {
+  morning: 'Good morning',
+  afternoon: 'Good afternoon',
+  evening: 'Good evening',
+} as const
+
 interface ClockProps {
   variant: 'small' | 'large'
   showDate?: boolean
@@ -25,7 +31,7 @@ export function Clock({
   pomodoroTimeLeft = 0,
   onClick,
 }: ClockProps) {
-  const { t } = useTranslation('focus')
+  const { t } = useTranslation('common')
   const { formattedTime, formattedDate, hours } = useCurrentTime()
 
   // 番茄模式下显示倒计时
@@ -44,9 +50,9 @@ export function Clock({
 
   // 问候语
   const getGreeting = () => {
-    if (hours < 12) return 'Good morning'
-    if (hours < 18) return 'Good afternoon'
-    return 'Good evening'
+    if (hours < 12) return GREETINGS.morning
+    if (hours < 18) return GREETINGS.afternoon
+    return GREETINGS.evening
   }
 
   if (variant === 'large') {
@@ -66,8 +72,8 @@ export function Clock({
           <div className="text-3xl mt-4 font-bold font-hand text-[var(--clock-primary)] opacity-90">
             {isPomodoroActive
               ? pomodoroMode === 'work'
-                ? t('pomodoro.working')
-                : t('pomodoro.resting')
+                ? t('focus:pomodoro.working')
+                : t('focus:pomodoro.resting')
               : `${getGreeting()}.`}
           </div>
         )}
@@ -81,7 +87,7 @@ export function Clock({
       onClick={onClick}
     >
       <div className="text-sm italic mb-1 opacity-80 font-hand text-[var(--text-secondary)]">
-        Today is a gift
+        {t('message.todayIsGift')}
       </div>
       <div
         className={`text-4xl max-md:text-2xl font-medium leading-none tracking-tight ${isPomodoroActive ? pomodoroColor : 'text-[var(--clock-secondary)]'}`}
