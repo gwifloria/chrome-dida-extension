@@ -34,9 +34,6 @@ export {
   getTaskCounts,
 } from './taskFilters'
 
-// 问候语
-export { getGreeting } from './greeting'
-
 // 项目工具
 export { filterActiveProjects } from './project'
 

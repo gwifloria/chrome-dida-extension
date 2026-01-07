@@ -17,7 +17,6 @@ export interface TaskActions {
   deleteTask: (task: Task) => Promise<void>
   updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>
   createTask: (task: Partial<Task>) => Promise<Task>
-  createInboxTask: (task: Partial<Task>) => Promise<Task>
 }
 
 /**
@@ -165,9 +164,6 @@ export function useTaskData(adapterType: AdapterType) {
     [adapter]
   )
 
-  // createInboxTask 与 createTask 逻辑相同
-  const createInboxTask = createTask
-
   // 结构化返回
   const data: TaskData = { tasks, projects, loading, error }
 
@@ -178,7 +174,6 @@ export function useTaskData(adapterType: AdapterType) {
     deleteTask,
     updateTask,
     createTask,
-    createInboxTask,
   }
 
   return { data, actions }

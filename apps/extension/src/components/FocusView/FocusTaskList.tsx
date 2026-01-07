@@ -54,7 +54,7 @@ export function FocusTaskList() {
 
   const { data, actions, views } = useTasks()
   const { tasks, loading: tasksLoading } = data
-  const { completeTask, createInboxTask } = actions
+  const { completeTask, createTask } = actions
   const { focusTasks } = views
 
   // 只在初始加载时显示 skeleton，连接过程中保持显示原内容
@@ -64,7 +64,7 @@ export function FocusTaskList() {
   const handleCreate = useCallback(
     async (taskData: Partial<Task>): Promise<Task | null> => {
       try {
-        return await createInboxTask(taskData)
+        return await createTask(taskData)
       } catch (err) {
         if (err instanceof Error && err.message.includes('上限')) {
           message.warning(tCommon('message.taskLimitReached'))
@@ -72,7 +72,7 @@ export function FocusTaskList() {
         return null
       }
     },
-    [createInboxTask, tCommon]
+    [createTask, tCommon]
   )
 
   return (
