@@ -11,6 +11,8 @@ export const beigeTheme: Theme = {
     bgCard: '#ffffff',
     textPrimary: '#44403c',
     textSecondary: '#78716c',
+    clockPrimary: '#292524',
+    clockSecondary: '#57534e',
     accent: '#57534e',
     accentLight: '#f5f5f4',
     border: '#d6d3d1',

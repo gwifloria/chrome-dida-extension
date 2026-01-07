@@ -76,6 +76,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     root.style.setProperty('--accent', theme.colors.accent)
     root.style.setProperty('--accent-light', theme.colors.accentLight)
     root.style.setProperty('--border', theme.colors.border)
+    // 时钟色
+    root.style.setProperty('--clock-primary', theme.colors.clockPrimary)
+    root.style.setProperty('--clock-secondary', theme.colors.clockSecondary)
     // 侧边栏色
     root.style.setProperty('--sidebar-text', theme.colors.sidebarText)
     root.style.setProperty('--sidebar-hover', theme.colors.sidebarHover)
