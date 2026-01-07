@@ -1,47 +1,27 @@
+import { useState } from 'react'
 import { Button } from 'antd'
 import { LogoutOutlined } from '@ant-design/icons'
+import { useAppMode } from '@/contexts/AppModeContext'
+import { useTasks } from '@/hooks/useTasks'
 import { Sidebar } from '@/components/Sidebar'
 import { TaskList } from '@/components/TaskList'
 import { useTheme } from '@/hooks/useTheme'
-import type { Task, Project } from '@/types'
-import type { TaskCounts } from '@/utils/taskFilters'
 
 interface ListLayoutProps {
-  tasks: Task[]
-  projects: Project[]
-  counts: TaskCounts
-  loading: boolean
-  error: string | null
-  selectedFilter: string
-  searchQuery: string
-  onFilterChange: (filter: string) => void
-  onSearch: (query: string) => void
-  onComplete: (task: Task) => void
-  onDelete: (task: Task) => void
-  onUpdate: (taskId: string, updates: Partial<Task>) => void
-  onCreate: (task: Partial<Task>) => Promise<Task>
   onFocus: () => void
-  onDisconnect: () => void
 }
 
-export function ListLayout({
-  tasks,
-  projects,
-  counts,
-  loading,
-  error,
-  selectedFilter,
-  searchQuery,
-  onFilterChange,
-  onSearch,
-  onComplete,
-  onDelete,
-  onUpdate,
-  onCreate,
-  onFocus,
-  onDisconnect,
-}: ListLayoutProps) {
+export function ListLayout({ onFocus }: ListLayoutProps) {
   const { theme } = useTheme()
+  const { disconnect } = useAppMode()
+
+  const { data, actions, views } = useTasks()
+  const { tasks, projects, loading, error } = data
+  const { completeTask, deleteTask, updateTask, createTask } = actions
+  const { counts } = views
+
+  const [selectedFilter, setSelectedFilter] = useState('today')
+  const [searchQuery, setSearchQuery] = useState('')
 
   return (
     <div className="h-screen bg-[var(--bg-primary)] flex overflow-hidden relative animate-fadeIn">
@@ -56,8 +36,8 @@ export function ListLayout({
         projects={projects}
         counts={counts}
         selectedFilter={selectedFilter}
-        onFilterChange={onFilterChange}
-        onSearch={onSearch}
+        onFilterChange={setSelectedFilter}
+        onSearch={setSearchQuery}
       />
 
       {/* 右侧内容区域 - 纸张容器 */}
@@ -79,7 +59,7 @@ export function ListLayout({
               type="text"
               size="small"
               icon={<LogoutOutlined />}
-              onClick={onDisconnect}
+              onClick={disconnect}
               className="text-[var(--text-secondary)] text-xs hover:text-[var(--text-primary)]"
             />
           </div>
@@ -92,10 +72,10 @@ export function ListLayout({
               error={error}
               filter={selectedFilter}
               searchQuery={searchQuery}
-              onComplete={onComplete}
-              onDelete={onDelete}
-              onUpdate={onUpdate}
-              onCreate={onCreate}
+              onComplete={completeTask}
+              onDelete={deleteTask}
+              onUpdate={updateTask}
+              onCreate={createTask}
               onFocus={onFocus}
             />
           </main>

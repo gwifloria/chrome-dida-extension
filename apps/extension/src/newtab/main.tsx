@@ -4,6 +4,7 @@ import { ConfigProvider } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
 import enUS from 'antd/locale/en_US'
 import { useTranslation } from 'react-i18next'
+import { AppModeProvider } from '@/contexts/AppModeContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { SettingsProvider } from '@/contexts/SettingsContext'
 import { ErrorBoundary } from '@/components/common'
@@ -43,11 +44,13 @@ export function Root() {
   return (
     <ErrorBoundary>
       <SettingsProvider>
-        <ThemeProvider>
-          <AntdConfigProvider>
-            <App />
-          </AntdConfigProvider>
-        </ThemeProvider>
+        <AppModeProvider>
+          <ThemeProvider>
+            <AntdConfigProvider>
+              <App />
+            </AntdConfigProvider>
+          </ThemeProvider>
+        </AppModeProvider>
       </SettingsProvider>
     </ErrorBoundary>
   )

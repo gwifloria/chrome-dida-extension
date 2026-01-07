@@ -1,3 +1,4 @@
+import { useAppMode } from '@/contexts/AppModeContext'
 import { useTaskData, type TaskData, type TaskActions } from './useTaskData'
 import {
   useTaskViews,
@@ -8,7 +9,6 @@ import {
   type TaskGroup,
   type TaskCounts,
 } from './useTaskViews'
-import type { AdapterType } from '@/api/adapters'
 
 export type { TaskData, TaskActions, TaskViews, TaskFilters }
 export type { SortOption, GroupOption, TaskGroup, TaskCounts }
@@ -23,9 +23,12 @@ export interface UseTasksReturn {
 /**
  * 任务管理主 Hook
  * 组合 useTaskData 和 useTaskViews，提供结构化 API
- * @param adapterType 适配器类型（'didaList' | 'local'）
+ * 自动根据连接状态选择适配器
  */
-export function useTasks(adapterType: AdapterType): UseTasksReturn {
+export function useTasks(): UseTasksReturn {
+  const { isConnected } = useAppMode()
+  const adapterType = isConnected ? 'didaList' : 'local'
+
   const { data, actions } = useTaskData(adapterType)
   const { views, filters } = useTaskViews(data.tasks, data.projects)
 
