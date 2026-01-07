@@ -52,10 +52,10 @@ jobs:
       - name: Upload to Chrome Web Store
         run: npx chrome-webstore-upload-cli upload --source first-glance-${{ github.ref_name }}.zip --auto-publish
         env:
-          EXTENSION_ID: ${{ secrets.EXTENSION_ID }}
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+          EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
