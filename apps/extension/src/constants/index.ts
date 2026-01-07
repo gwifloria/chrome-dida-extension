@@ -10,11 +10,13 @@ export {
 
 // 任务常量
 export {
+  FILTER_NAMES,
   TASK_STATUS,
   TASK_PRIORITY,
   PRIORITY_COLORS,
   getPriorityColor,
   getPriorityOptions,
+  type FilterName,
   type TaskStatus,
   type TaskPriority,
 } from './task'
