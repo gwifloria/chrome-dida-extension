@@ -1,6 +1,3 @@
-// API
-export { api, tasksApi, projectsApi } from './api'
-
 // 认证
 export { auth } from './auth'
 

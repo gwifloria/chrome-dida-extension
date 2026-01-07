@@ -6,6 +6,7 @@ export {
   getTodayStr,
   getTomorrowStr,
   getNextWeekStr,
+  getDayAfterStr,
 } from './date'
 
 // 任务筛选/排序/分组
@@ -38,8 +39,4 @@ export {
 export { filterActiveProjects } from './project'
 
 // Onboarding
-export {
-  shouldShowOnboarding,
-  completeOnboarding,
-  resetOnboarding,
-} from './onboarding'
+export { shouldShowOnboarding, completeOnboarding } from './onboarding'

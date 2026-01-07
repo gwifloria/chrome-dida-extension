@@ -67,6 +67,3 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     </SettingsContext.Provider>
   )
 }
-
-// 导出类型供外部使用
-export type { AppSettings } from '@/types/settings'
