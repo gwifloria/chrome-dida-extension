@@ -1,4 +1,6 @@
 import { useMemo } from 'react'
+import { Button } from 'antd'
+import { AppstoreOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { Clock } from '../common/Clock'
 import type { Project } from '@/types'
@@ -16,12 +18,14 @@ interface TaskListHeaderProps {
   filter: string
   projects: Project[]
   taskCount: number
+  onFocus?: () => void
 }
 
 export function TaskListHeader({
   filter,
   projects,
   taskCount,
+  onFocus,
 }: TaskListHeaderProps) {
   const { t } = useTranslation('task')
 
@@ -57,7 +61,27 @@ export function TaskListHeader({
           </span>
         </div>
       </div>
-      <Clock variant="small" showDate />
+      <div className="flex items-start gap-6">
+        {onFocus && (
+          <Button
+            type="default"
+            shape="round"
+            size="large"
+            onClick={onFocus}
+            className="focus-btn"
+          >
+            <span className="focus-btn-border">
+              <span className="focus-btn-gradient animate-spin-slow" />
+            </span>
+            <span className="focus-btn-bg" />
+            <span className="focus-btn-content">
+              <AppstoreOutlined />
+              <span>FOCUS</span>
+            </span>
+          </Button>
+        )}
+        <Clock variant="small" showDate />
+      </div>
     </div>
   )
 }

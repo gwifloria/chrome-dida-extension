@@ -21,6 +21,7 @@ interface TaskListProps {
   onDelete: (task: Task) => void
   onUpdate: (taskId: string, updates: Partial<Task>) => void
   onCreate: (task: Partial<Task>) => Promise<Task>
+  onFocus?: () => void
 }
 
 export const TaskList = memo(function TaskList({
@@ -34,6 +35,7 @@ export const TaskList = memo(function TaskList({
   onDelete,
   onUpdate,
   onCreate,
+  onFocus,
 }: TaskListProps) {
   const { t } = useTranslation('task')
   const [editingTask, setEditingTask] = useState<Task | null>(null)
@@ -78,6 +80,7 @@ export const TaskList = memo(function TaskList({
         filter={filter}
         projects={projects}
         taskCount={taskCount}
+        onFocus={onFocus}
       />
 
       <QuickAddInput

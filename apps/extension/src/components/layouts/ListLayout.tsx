@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import { Button } from 'antd'
-import { AppstoreOutlined } from '@ant-design/icons'
 import { useTasks } from '@/hooks/useTasks'
 import { Sidebar } from '@/components/Sidebar'
 import { TaskList } from '@/components/TaskList'
@@ -63,27 +61,10 @@ export function ListLayout({ onFocus }: ListLayoutProps) {
               onDelete={deleteTask}
               onUpdate={updateTask}
               onCreate={createTask}
+              onFocus={onFocus}
             />
           </main>
         </div>
-
-        {/* FOCUS 按钮 - 右上角固定 */}
-        <Button
-          type="default"
-          shape="round"
-          size="large"
-          onClick={onFocus}
-          className="focus-btn absolute top-10 right-10"
-        >
-          <span className="focus-btn-border">
-            <span className="focus-btn-gradient animate-spin-slow" />
-          </span>
-          <span className="focus-btn-bg" />
-          <span className="focus-btn-content">
-            <AppstoreOutlined />
-            <span>FOCUS</span>
-          </span>
-        </Button>
       </div>
     </div>
   )
