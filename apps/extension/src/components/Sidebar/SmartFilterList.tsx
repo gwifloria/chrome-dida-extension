@@ -4,7 +4,7 @@ import {
   FieldTimeOutlined,
   InboxOutlined,
 } from '@ant-design/icons'
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { TaskCounts } from '@/utils/taskFilters'
 import { SectionTitle } from '../common/SectionTitle'
@@ -25,16 +25,13 @@ export const SmartFilterList = memo(function SmartFilterList({
 }: SmartFilterListProps) {
   const { t } = useTranslation('sidebar')
 
-  const smartFilters = useMemo(
-    () => [
-      { id: 'inbox', icon: <InboxOutlined />, count: counts.inbox },
-      { id: 'today', icon: <FieldTimeOutlined />, count: counts.today },
-      { id: 'tomorrow', icon: <CalendarOutlined />, count: counts.tomorrow },
-      { id: 'week', icon: <CalendarOutlined />, count: counts.week },
-      { id: 'overdue', icon: <ClockCircleOutlined />, count: counts.overdue },
-    ],
-    [counts]
-  )
+  const smartFilters = [
+    { id: 'inbox', icon: <InboxOutlined />, count: counts.inbox },
+    { id: 'today', icon: <FieldTimeOutlined />, count: counts.today },
+    { id: 'tomorrow', icon: <CalendarOutlined />, count: counts.tomorrow },
+    { id: 'week', icon: <CalendarOutlined />, count: counts.week },
+    { id: 'overdue', icon: <ClockCircleOutlined />, count: counts.overdue },
+  ]
 
   return (
     <div className="mb-2">

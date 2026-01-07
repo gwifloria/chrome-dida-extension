@@ -1,4 +1,4 @@
-import { useState, useCallback, memo } from 'react'
+import { useState, memo } from 'react'
 import { Input } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { useSettings } from '@/hooks/useSettings'
@@ -23,7 +23,7 @@ export const QuickAddInput = memo(function QuickAddInput({
   const { settings } = useSettings()
   const [quickAddValue, setQuickAddValue] = useState('')
 
-  const handleQuickAdd = useCallback(async () => {
+  const handleQuickAdd = async () => {
     if (!quickAddValue.trim()) return
 
     let projectId: string | undefined
@@ -54,18 +54,14 @@ export const QuickAddInput = memo(function QuickAddInput({
       dueDate,
     })
     setQuickAddValue('')
-  }, [quickAddValue, filter, settings.defaultProjectId, projects, onCreate])
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuickAddValue(e.target.value)
-  }, [])
+  }
 
   return (
     <div className="mb-6">
       <Input
         placeholder={t('placeholder.quickAdd')}
         value={quickAddValue}
-        onChange={handleChange}
+        onChange={(e) => setQuickAddValue(e.target.value)}
         onPressEnter={handleQuickAdd}
         className="quick-add-input"
         variant="borderless"

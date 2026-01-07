@@ -45,10 +45,7 @@ export function useTasks(): UseTasksReturn {
     [isGuest, data.tasks, baseViews.todayFocusTasks]
   )
 
-  const views: TaskViews = useMemo(
-    () => ({ ...baseViews, focusTasks }),
-    [baseViews, focusTasks]
-  )
+  const views: TaskViews = { ...baseViews, focusTasks }
 
   return { data, actions, views, filters }
 }

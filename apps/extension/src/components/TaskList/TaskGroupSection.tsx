@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react'
+import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CollapseArrow } from '../CollapseArrow'
 import { TaskItem } from '../Task/TaskItem'
@@ -45,10 +45,8 @@ export const TaskGroupSection = memo(function TaskGroupSection({
 }: TaskGroupSectionProps) {
   const { t } = useTranslation('task')
 
-  const getProjectById = useCallback(
-    (projectId: string) => projects.find((p) => p.id === projectId),
-    [projects]
-  )
+  const getProjectById = (projectId: string) =>
+    projects.find((p) => p.id === projectId)
 
   // 根据分组 ID 获取翻译后的标题，项目名称直接使用
   const groupTitle = TRANSLATABLE_GROUPS.has(group.id)
