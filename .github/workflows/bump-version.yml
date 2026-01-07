@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # 获取完整历史和 tags
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -41,6 +41,12 @@ jobs:
           NEW_VERSION=$(npm version ${{ inputs.bump_type }} --no-git-tag-version)
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
+          # 检查 tag 是否已存在
+          if git tag -l | grep -q "^${NEW_VERSION}$"; then
+            echo "❌ Tag $NEW_VERSION already exists!"
+            exit 1
+          fi
+
           # 同步更新 manifest.json
           VERSION_NUM=${NEW_VERSION#v}
           node -e "
@@ -50,7 +56,7 @@ jobs:
             fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2) + '\n');
           "
 
-          echo "Bumped to version: $NEW_VERSION"
+          echo "✅ Bumped to version: $NEW_VERSION"
 
       - name: Commit and push
         run: |
