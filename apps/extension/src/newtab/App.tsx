@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useAppMode } from '@/contexts/AppModeContext'
+import { useAppMode } from '@/contexts/useAppMode'
 import { FocusLayout, ListLayout } from '@/components/layouts'
 
 type ViewMode = 'focus' | 'list'

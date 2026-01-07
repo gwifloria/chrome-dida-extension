@@ -1,5 +1,10 @@
 // App Mode Context
-export { AppModeProvider, useAppMode } from './AppModeContext'
+export { AppModeProvider } from './AppModeProvider'
+export { useAppMode } from './useAppMode'
+
+// Connect Prompt Context
+export { ConnectPromptProvider } from './ConnectPromptProvider'
+export { useConnectPrompt } from './useConnectPrompt'
 
 // Settings Context
 export { SettingsContext, SettingsProvider } from './SettingsContext'

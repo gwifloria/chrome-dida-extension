@@ -1,19 +1,56 @@
-import { useCallback } from 'react'
+import { useCallback, memo } from 'react'
 import { message } from 'antd'
 import { useTranslation } from 'react-i18next'
-import { useAppMode } from '@/contexts/AppModeContext'
+import { useAppMode } from '@/contexts/useAppMode'
 import { useTasks } from '@/hooks/useTasks'
+import { useTaskCompletion } from '@/hooks/useTaskCompletion'
 import { FocusSkeleton } from '../Task/TaskSkeleton'
 import { FocusTaskInput } from './FocusTaskInput'
-import { FocusTaskItem } from './FocusTaskItem'
+import { TaskCheckbox } from '../common/TaskCheckbox'
 import type { Task } from '@/types'
 
 const MAX_LOCAL_TASKS = 3
 
+interface FocusTaskItemProps {
+  task: Task
+  onComplete: (task: Task) => void
+}
+
+const FocusTaskItem = memo(function FocusTaskItem({
+  task,
+  onComplete,
+}: FocusTaskItemProps) {
+  const { completing, handleComplete } = useTaskCompletion(onComplete, {
+    delayBefore: false,
+  })
+
+  return (
+    <div
+      className={`
+        flex items-center gap-5 py-4 px-5 bg-[var(--bg-card)] rounded-xl shadow-sm
+        transition-all duration-300 ease-out
+        ${completing ? 'animate-[taskComplete_0.4s_ease-out_forwards]' : ''}
+      `}
+    >
+      <TaskCheckbox
+        completing={completing}
+        onComplete={() => handleComplete(task)}
+        variant="focus"
+        disabled={completing}
+      />
+      <span
+        className={`flex-1 text-2xl text-[var(--text-primary)] transition-all duration-200 font-hand ${completing ? 'line-through text-[var(--text-secondary)]' : ''}`}
+      >
+        {task.title}
+      </span>
+    </div>
+  )
+})
+
 export function FocusTaskList() {
   const { t } = useTranslation('focus')
   const { t: tCommon } = useTranslation('common')
-  const { isGuest, loading: modeLoading } = useAppMode()
+  const { isGuest } = useAppMode()
 
   const { data, actions, views } = useTasks()
   const { tasks, loading: tasksLoading } = data
@@ -21,7 +58,8 @@ export function FocusTaskList() {
   const { todayFocusTasks } = views
 
   const focusTasks = isGuest ? tasks : todayFocusTasks
-  const loading = modeLoading || tasksLoading
+  // 只在初始加载时显示 skeleton，连接过程中保持显示原内容
+  const loading = tasksLoading && tasks.length === 0
   const canAddMore = isGuest ? focusTasks.length < MAX_LOCAL_TASKS : true
 
   const handleCreate = useCallback(

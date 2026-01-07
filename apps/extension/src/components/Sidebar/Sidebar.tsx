@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, memo } from 'react'
 import { Button } from 'antd'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
@@ -20,7 +20,7 @@ interface SidebarProps {
   onSearch?: (query: string) => void
 }
 
-function SidebarHeader({
+const SidebarHeader = memo(function SidebarHeader({
   collapsed,
   onToggleCollapse,
   toggleTitle,
@@ -46,9 +46,9 @@ function SidebarHeader({
       </div>
     </div>
   )
-}
+})
 
-export function Sidebar({
+export const Sidebar = memo(function Sidebar({
   tasks,
   projects,
   counts,
@@ -60,10 +60,13 @@ export function Sidebar({
   const [searchQuery, setSearchQuery] = useState('')
   const [collapsed, toggleCollapsed] = usePersistedBoolean('sidebarCollapsed')
 
-  const handleSearch = (value: string) => {
-    setSearchQuery(value)
-    onSearch?.(value)
-  }
+  const handleSearch = useCallback(
+    (value: string) => {
+      setSearchQuery(value)
+      onSearch?.(value)
+    },
+    [onSearch]
+  )
 
   return (
     <aside
@@ -104,4 +107,4 @@ export function Sidebar({
       <SidebarFooter collapsed={collapsed} projects={projects} />
     </aside>
   )
-}
+})

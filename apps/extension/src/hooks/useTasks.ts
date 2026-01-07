@@ -1,4 +1,4 @@
-import { useAppMode } from '@/contexts/AppModeContext'
+import { useAppMode } from '@/contexts/useAppMode'
 import { useTaskData, type TaskData, type TaskActions } from './useTaskData'
 import {
   useTaskViews,

@@ -1,6 +1,6 @@
 import { Button } from 'antd'
 import { useTranslation } from 'react-i18next'
-import { useAppMode } from '@/contexts/AppModeContext'
+import { useAppMode } from '@/contexts/useAppMode'
 import { useTasks } from '@/hooks/useTasks'
 
 interface FocusFloatButtonProps {

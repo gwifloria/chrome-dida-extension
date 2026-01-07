@@ -1,7 +1,4 @@
 import { useState } from 'react'
-import { Button } from 'antd'
-import { LogoutOutlined } from '@ant-design/icons'
-import { useAppMode } from '@/contexts/AppModeContext'
 import { useTasks } from '@/hooks/useTasks'
 import { Sidebar } from '@/components/Sidebar'
 import { TaskList } from '@/components/TaskList'
@@ -13,7 +10,6 @@ interface ListLayoutProps {
 
 export function ListLayout({ onFocus }: ListLayoutProps) {
   const { theme } = useTheme()
-  const { disconnect } = useAppMode()
 
   const { data, actions, views } = useTasks()
   const { tasks, projects, loading, error } = data
@@ -52,17 +48,6 @@ export function ListLayout({ onFocus }: ListLayoutProps) {
           {theme.showTexture && (
             <div className="absolute inset-0 pointer-events-none dot-grid z-0" />
           )}
-
-          {/* 登出按钮 */}
-          <div className="absolute top-3 right-3 z-50">
-            <Button
-              type="text"
-              size="small"
-              icon={<LogoutOutlined />}
-              onClick={disconnect}
-              className="text-[var(--text-secondary)] text-xs hover:text-[var(--text-primary)]"
-            />
-          </div>
 
           <main className="h-full overflow-y-auto relative z-10">
             <TaskList

@@ -1,29 +1,11 @@
 /**
- * 应用模式 Context
- * 管理连接状态，供全局使用
+ * 应用模式 Provider
  */
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-  type ReactNode,
-} from 'react'
+import { useState, useEffect, useCallback, type ReactNode } from 'react'
 import { auth } from '@/services/auth'
 import { storage } from '@/services/storage'
 import type { AppMode } from '@/types'
-
-interface AppModeContextValue {
-  mode: AppMode
-  loading: boolean
-  isGuest: boolean
-  isConnected: boolean
-  connect: () => Promise<void>
-  disconnect: () => Promise<void>
-}
-
-const AppModeContext = createContext<AppModeContextValue | null>(null)
+import { AppModeContext } from './AppModeContext'
 
 export function AppModeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<AppMode>('guest')
@@ -73,12 +55,4 @@ export function AppModeProvider({ children }: { children: ReactNode }) {
       {children}
     </AppModeContext.Provider>
   )
-}
-
-export function useAppMode() {
-  const context = useContext(AppModeContext)
-  if (!context) {
-    throw new Error('useAppMode must be used within AppModeProvider')
-  }
-  return context
 }

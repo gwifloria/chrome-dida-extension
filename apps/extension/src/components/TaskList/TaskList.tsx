@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, memo } from 'react'
 import { Empty, Alert } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { TaskEditor } from '../Task/TaskEditor'
@@ -24,7 +24,7 @@ interface TaskListProps {
   onFocus?: () => void
 }
 
-export function TaskList({
+export const TaskList = memo(function TaskList({
   tasks,
   projects,
   loading,
@@ -46,25 +46,33 @@ export function TaskList({
   const groups = useTaskGroups({ tasks, filter, searchQuery })
   const taskCount = groups.reduce((sum, g) => sum + g.tasks.length, 0)
 
-  const handleEdit = (task: Task) => {
+  const handleEdit = useCallback((task: Task) => {
     setEditingTask(task)
     setIsEditorOpen(true)
-  }
+  }, [])
 
-  const handleNew = () => {
+  const handleNew = useCallback(() => {
     setEditingTask(null)
     setIsEditorOpen(true)
-  }
+  }, [])
 
-  const handleSave = async (taskId: string | null, values: Partial<Task>) => {
-    if (taskId) {
-      onUpdate(taskId, values)
-    } else {
-      await onCreate(values)
-    }
+  const handleSave = useCallback(
+    async (taskId: string | null, values: Partial<Task>) => {
+      if (taskId) {
+        onUpdate(taskId, values)
+      } else {
+        await onCreate(values)
+      }
+      setIsEditorOpen(false)
+      setEditingTask(null)
+    },
+    [onUpdate, onCreate]
+  )
+
+  const handleCloseEditor = useCallback(() => {
     setIsEditorOpen(false)
     setEditingTask(null)
-  }
+  }, [])
 
   return (
     <div className="flex flex-col h-full bg-transparent relative py-10 px-[60px] overflow-hidden max-md:p-5">
@@ -126,12 +134,9 @@ export function TaskList({
         task={editingTask}
         projects={projects}
         open={isEditorOpen}
-        onCancel={() => {
-          setIsEditorOpen(false)
-          setEditingTask(null)
-        }}
+        onCancel={handleCloseEditor}
         onSave={handleSave}
       />
     </div>
   )
-}
+})
