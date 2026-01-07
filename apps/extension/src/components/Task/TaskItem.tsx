@@ -48,7 +48,7 @@ export const TaskItem = memo(function TaskItem({
         <div className="flex-1 min-w-0">
           <div
             className={`
-              text-sm text-[var(--text-primary)] leading-relaxed break-words mb-1
+              text-sm text-[var(--text-primary)] leading-relaxed break-words mb-1 font-hand
               ${completing ? 'line-through text-[var(--text-secondary)]' : ''}
             `}
           >

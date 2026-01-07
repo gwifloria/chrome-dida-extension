@@ -44,9 +44,9 @@ export function TaskCheckbox({
       style={{ borderColor: priorityColor }}
       className={`
         w-5 h-5 rounded-full border-2 bg-transparent cursor-pointer
-        transition-all shrink-0 mt-0.5 flex items-center justify-center
-        hover:bg-[var(--accent-light)]
-        ${completing ? '!bg-[var(--accent)] !border-[var(--accent)]' : ''}
+        transition-all duration-300 ease-out shrink-0 mt-0.5 flex items-center justify-center
+        -rotate-12 hover:rotate-0 hover:bg-[var(--accent-light)] hover:scale-110
+        ${completing ? '!bg-[var(--accent)] !border-[var(--accent)] !rotate-0' : ''}
       `}
     >
       <div

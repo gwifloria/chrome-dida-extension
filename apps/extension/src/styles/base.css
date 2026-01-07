@@ -3,8 +3,13 @@
  */
 @import 'tailwindcss';
 
-/* 手写字体 */
-@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap');
+/* 字体 */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap');
+
+/* Lora 字体类 */
+.font-hand {
+  font-family: 'Lora', serif;
+}
 
 :root {
   /* 默认主题变量（会被 ThemeContext 覆盖） */
