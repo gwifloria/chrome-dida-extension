@@ -23,6 +23,29 @@ async function withRetry<T>(
   throw new Error('Retry exhausted')
 }
 
+/** 并发限制器：限制同时进行的请求数量 */
+async function withConcurrencyLimit<T, R>(
+  items: T[],
+  fn: (item: T) => Promise<R>,
+  limit = 5
+): Promise<R[]> {
+  const results: R[] = []
+  let index = 0
+
+  async function worker(): Promise<void> {
+    while (index < items.length) {
+      const currentIndex = index++
+      results[currentIndex] = await fn(items[currentIndex])
+    }
+  }
+
+  // 创建 limit 个 worker 并行执行
+  const workers = Array.from({ length: Math.min(limit, items.length) }, worker)
+  await Promise.all(workers)
+
+  return results
+}
+
 export const projectsApi = {
   /** 获取所有项目 */
   async getAll(): Promise<Project[]> {
@@ -46,21 +69,28 @@ export const projectsApi = {
   async getAllTasks(): Promise<{ tasks: Task[]; projects: Project[] }> {
     const projects = await this.getAll()
 
-    // 并行获取所有项目的任务（带重试）
-    const projectDataPromises = projects
-      .filter((p) => !p.closed)
-      .map((p) =>
-        withRetry(() => this.getData(p.id))
-          .then((data) => data.tasks || [])
-          .catch((err) => {
-            const errorMsg = err instanceof Error ? err.message : '未知错误'
-            console.error(`[DidaAPI] 获取项目 ${p.name} 的任务失败:`, errorMsg)
-            return [] as Task[]
-          })
-      )
+    // 过滤未关闭的项目
+    const activeProjects = projects.filter(
+      (p) => !p.closed && p.kind !== 'FOLDER'
+    )
 
-    // 并行获取收集箱任务（带重试）
-    const inboxPromise = withRetry(() => this.getData('inbox'))
+    // 使用并发限制器获取任务（最多 5 个并发请求）
+    const fetchProjectTasks = async (project: Project): Promise<Task[]> => {
+      try {
+        const data = await withRetry(() => this.getData(project.id))
+        return data.tasks || []
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : '未知错误'
+        console.error(
+          `[DidaAPI] 获取项目 ${project.name} 的任务失败:`,
+          errorMsg
+        )
+        return []
+      }
+    }
+
+    // 先获取收集箱任务
+    const inboxTasks = await withRetry(() => this.getData('inbox'))
       .then((data) => data.tasks || [])
       .catch((err) => {
         const errorMsg = err instanceof Error ? err.message : '未知错误'
@@ -68,9 +98,15 @@ export const projectsApi = {
         return [] as Task[]
       })
 
-    // 等待所有请求完成
-    const taskArrays = await Promise.all([...projectDataPromises, inboxPromise])
-    const allTasks = taskArrays.flat()
+    // 使用并发限制获取项目任务
+    const projectTaskArrays = await withConcurrencyLimit(
+      activeProjects,
+      fetchProjectTasks,
+      5 // 最多 5 个并发请求
+    )
+
+    // 合并所有任务
+    const allTasks = [inboxTasks, ...projectTaskArrays].flat()
 
     // 只返回未完成的任务
     const incompleteTasks = allTasks.filter((task) => task.status === 0)
