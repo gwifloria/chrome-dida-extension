@@ -27,6 +27,9 @@ export interface Theme {
     priorityHigh: string
     priorityMedium: string
     priorityLow: string
+    // 番茄时钟颜色
+    pomodoroWork: string
+    pomodoroBreak: string
   }
   borderRadius: {
     small: string

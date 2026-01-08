@@ -40,12 +40,12 @@ export function Clock({
     ? formatPomodoroTime(pomodoroTimeLeft)
     : formattedTime
 
-  // 番茄模式颜色（莫兰迪色系）
+  // 番茄模式颜色（使用主题色）
   const pomodoroColor =
     pomodoroMode === 'work'
-      ? 'text-[#c9a89a]' // 莫兰迪砖红
+      ? 'text-[var(--pomodoro-work)]'
       : pomodoroMode === 'break'
-        ? 'text-[#9eb0a2]' // 莫兰迪灰绿
+        ? 'text-[var(--pomodoro-break)]'
         : ''
 
   // 问候语

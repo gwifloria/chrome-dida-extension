@@ -26,6 +26,8 @@ export const beigeTheme: Theme = {
     priorityHigh: '#dc2626',
     priorityMedium: '#f59e0b',
     priorityLow: '#a8a29e',
+    pomodoroWork: '#b5a08a',
+    pomodoroBreak: '#8ab5a0',
   },
   borderRadius: {
     small: '8px',

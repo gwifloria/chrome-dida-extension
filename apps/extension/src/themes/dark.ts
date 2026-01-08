@@ -26,6 +26,8 @@ export const darkTheme: Theme = {
     priorityHigh: '#f87171',
     priorityMedium: '#fbbf24',
     priorityLow: '#71717a',
+    pomodoroWork: '#e8a07a',
+    pomodoroBreak: '#7ae8a0',
   },
   borderRadius: {
     small: '8px',

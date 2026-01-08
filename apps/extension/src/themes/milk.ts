@@ -26,6 +26,8 @@ export const milkTheme: Theme = {
     priorityHigh: '#dc2626',
     priorityMedium: '#f59e0b',
     priorityLow: '#a8a29e',
+    pomodoroWork: '#a09080',
+    pomodoroBreak: '#8a9a8a',
   },
   borderRadius: {
     small: '8px',

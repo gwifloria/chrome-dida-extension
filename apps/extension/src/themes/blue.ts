@@ -26,6 +26,8 @@ export const blueTheme: Theme = {
     priorityHigh: '#dc2626',
     priorityMedium: '#f59e0b',
     priorityLow: '#64748b',
+    pomodoroWork: '#9a8a7a',
+    pomodoroBreak: '#7a9a8a',
   },
   borderRadius: {
     small: '8px',
