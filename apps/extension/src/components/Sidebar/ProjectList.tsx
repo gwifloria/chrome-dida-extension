@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
+import { usePersistedBoolean } from '@/hooks/usePersistedBoolean'
 import type { Project } from '@/types'
 import { SectionTitle } from '../common/SectionTitle'
 import { NavItem } from './NavItem'
@@ -27,11 +28,22 @@ export function ProjectList({
   const [collapsedFolders, toggleFolder] = usePersistedSet(
     'sidebarFoldersCollapsed'
   )
+  const [sectionCollapsed, toggleSection] = usePersistedBoolean(
+    'projectListCollapsed'
+  )
 
   const { folders, ungroupedProjects } = useMemo(() => {
-    // 直接使用统一数据源的 projectCounts，无需再遍历 tasks
+    // 从 projects 中提取文件夹（kind='FOLDER'）
+    const folderProjectsMap = new Map<string, Project>()
+    for (const p of projects) {
+      if (p.kind === 'FOLDER') {
+        folderProjectsMap.set(p.id, p)
+      }
+    }
+
+    // 过滤出非文件夹的项目，并附加任务数
     const projectsWithCount: ProjectWithCount[] = projects
-      .filter((p) => !p.closed)
+      .filter((p) => !p.closed && p.kind !== 'FOLDER')
       .map((p) => ({
         ...p,
         count: projectCounts.get(p.id) ?? 0,
@@ -49,15 +61,18 @@ export function ProjectList({
       }
     })
 
-    // Open API 不返回文件夹项目，只返回子项目及其 groupId
-    // 因此无法获取文件夹名称，只能显示默认名称
+    // 构建文件夹列表，使用真实文件夹名称
     const folderList: FolderGroup[] = []
-    let folderIndex = 0
+    let defaultIndex = 0
     folderMap.forEach((projectList, groupId) => {
-      folderIndex++
+      const folderProject = folderProjectsMap.get(groupId)
+      const folderName =
+        folderProject?.name ||
+        t('folder.defaultName', { index: ++defaultIndex })
+
       folderList.push({
         id: groupId,
-        name: t('folder.defaultName', { index: folderIndex }),
+        name: folderName,
         projects: projectList.sort((a, b) => a.sortOrder - b.sortOrder),
       })
     })
@@ -70,31 +85,41 @@ export function ProjectList({
 
   return (
     <div className="mb-4">
-      {!collapsed && <SectionTitle title={t('section.lists')} />}
-
-      {ungroupedProjects.map((project) => (
-        <NavItem
-          key={project.id}
-          active={selectedFilter === `project:${project.id}`}
-          onClick={() => onFilterChange(`project:${project.id}`)}
-          name={project.name}
-          count={project.count}
-          color={project.color}
-          collapsed={collapsed}
+      {!collapsed && (
+        <SectionTitle
+          title={t('section.lists')}
+          collapsed={sectionCollapsed}
+          onToggle={toggleSection}
         />
-      ))}
+      )}
 
-      {folders.map((folder) => (
-        <NavFolder
-          key={folder.id}
-          folder={folder}
-          collapsed={collapsed}
-          isFolderCollapsed={collapsedFolders.has(folder.id)}
-          selectedFilter={selectedFilter}
-          onToggleFolder={() => toggleFolder(folder.id)}
-          onFilterChange={onFilterChange}
-        />
-      ))}
+      {!sectionCollapsed && (
+        <>
+          {ungroupedProjects.map((project) => (
+            <NavItem
+              key={project.id}
+              active={selectedFilter === `project:${project.id}`}
+              onClick={() => onFilterChange(`project:${project.id}`)}
+              name={project.name}
+              count={project.count}
+              color={project.color}
+              collapsed={collapsed}
+            />
+          ))}
+
+          {folders.map((folder) => (
+            <NavFolder
+              key={folder.id}
+              folder={folder}
+              collapsed={collapsed}
+              isFolderCollapsed={collapsedFolders.has(folder.id)}
+              selectedFilter={selectedFilter}
+              onToggleFolder={() => toggleFolder(folder.id)}
+              onFilterChange={onFilterChange}
+            />
+          ))}
+        </>
+      )}
     </div>
   )
 }

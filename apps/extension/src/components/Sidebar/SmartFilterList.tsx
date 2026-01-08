@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons'
 import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { usePersistedBoolean } from '@/hooks/usePersistedBoolean'
 import type { TaskCounts } from '@/utils/taskFilters'
 import { SectionTitle } from '../common/SectionTitle'
 import { NavItem } from './NavItem'
@@ -24,6 +25,8 @@ export const SmartFilterList = memo(function SmartFilterList({
   onFilterChange,
 }: SmartFilterListProps) {
   const { t } = useTranslation('sidebar')
+  const [sectionCollapsed, toggleSection] =
+    usePersistedBoolean('smartListCollapsed')
 
   const smartFilters = [
     { id: 'inbox', icon: <InboxOutlined />, count: counts.inbox },
@@ -35,18 +38,25 @@ export const SmartFilterList = memo(function SmartFilterList({
 
   return (
     <div className="mb-2">
-      {!collapsed && <SectionTitle title={t('smartList.title')} />}
-      {smartFilters.map((filter) => (
-        <NavItem
-          key={filter.id}
-          active={selectedFilter === filter.id}
-          onClick={() => onFilterChange(filter.id)}
-          icon={filter.icon}
-          name={t(`smartList.${filter.id}`)}
-          count={filter.count}
-          collapsed={collapsed}
+      {!collapsed && (
+        <SectionTitle
+          title={t('smartList.title')}
+          collapsed={sectionCollapsed}
+          onToggle={toggleSection}
         />
-      ))}
+      )}
+      {!sectionCollapsed &&
+        smartFilters.map((filter) => (
+          <NavItem
+            key={filter.id}
+            active={selectedFilter === filter.id}
+            onClick={() => onFilterChange(filter.id)}
+            icon={filter.icon}
+            name={t(`smartList.${filter.id}`)}
+            count={filter.count}
+            collapsed={collapsed}
+          />
+        ))}
     </div>
   )
 })

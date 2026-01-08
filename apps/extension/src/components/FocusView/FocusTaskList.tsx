@@ -1,13 +1,13 @@
-import { useCallback, memo } from 'react'
-import { message } from 'antd'
-import { useTranslation } from 'react-i18next'
 import { useAppMode } from '@/contexts/useAppMode'
-import { useTasks } from '@/hooks/useTasks'
 import { useTaskCompletion } from '@/hooks/useTaskCompletion'
+import { useTasks } from '@/hooks/useTasks'
+import type { Task } from '@/types'
+import { message } from 'antd'
+import { memo, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
+import { TaskCheckbox } from '../common/TaskCheckbox'
 import { FocusSkeleton } from '../Task/TaskSkeleton'
 import { FocusTaskInput } from './FocusTaskInput'
-import { TaskCheckbox } from '../common/TaskCheckbox'
-import type { Task } from '@/types'
 
 const MAX_LOCAL_TASKS = 3
 
@@ -39,7 +39,7 @@ const FocusTaskItem = memo(function FocusTaskItem({
         disabled={completing}
       />
       <span
-        className={`flex-1 text-2xl text-[var(--text-primary)] transition-all duration-200 font-hand ${completing ? 'line-through text-[var(--text-secondary)]' : ''}`}
+        className={`flex-1 text-xl text-[var(--text-primary)] transition-all duration-200 font-hand ${completing ? 'line-through text-[var(--text-secondary)]' : ''}`}
       >
         {task.title}
       </span>
