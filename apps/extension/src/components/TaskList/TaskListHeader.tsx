@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
+import { Button } from 'antd'
+import { AppstoreOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { FocusButton } from '../FocusButton'
 import { Clock } from '../common/Clock'
 import type { Project } from '@/types'
 
@@ -61,13 +62,25 @@ export function TaskListHeader({
         </div>
       </div>
       <div className="flex items-start gap-6">
-        {onFocus && <FocusButton onClick={onFocus} size="large" />}
-        <div className="text-right">
-          <div className="text-xs text-[var(--text-secondary)] mb-1">
-            {t('common:message.todayIsGift')}
-          </div>
-          <Clock variant="small" showDate />
-        </div>
+        {onFocus && (
+          <Button
+            type="default"
+            shape="round"
+            size="large"
+            onClick={onFocus}
+            className="focus-btn"
+          >
+            <span className="focus-btn-border">
+              <span className="focus-btn-gradient animate-spin-slow" />
+            </span>
+            <span className="focus-btn-bg" />
+            <span className="focus-btn-content">
+              <AppstoreOutlined />
+              <span>FOCUS</span>
+            </span>
+          </Button>
+        )}
+        <Clock variant="small" showDate />
       </div>
     </div>
   )

@@ -1,26 +1,22 @@
-import { CloseOutlined, LinkOutlined, SyncOutlined } from '@ant-design/icons'
+import { memo } from 'react'
+import { CloseOutlined, LinkOutlined } from '@ant-design/icons'
 import { Button, Modal } from 'antd'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 
 interface ConnectPromptProps {
   open: boolean
-  localTaskCount: number
   loading?: boolean
-  onConnectAndMigrate: () => void
-  onConnectWithoutMigrate: () => void
+  onConnect: () => void
   onCancel: () => void
 }
 
-export function ConnectPrompt({
+export const ConnectPrompt = memo(function ConnectPrompt({
   open,
-  localTaskCount,
   loading = false,
-  onConnectAndMigrate,
-  onConnectWithoutMigrate,
+  onConnect,
   onCancel,
 }: ConnectPromptProps) {
   const { t } = useTranslation('common')
-  const hasLocalTasks = localTaskCount > 0
 
   return (
     <Modal
@@ -32,61 +28,29 @@ export function ConnectPrompt({
       className="connect-prompt-modal"
     >
       <div className="p-6 text-center">
-        {/* Icon */}
         <div className="text-5xl mb-4">
           <LinkOutlined className="text-[var(--accent)]" />
         </div>
 
-        {/* Title */}
         <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
           {t('connectPrompt.title')}
         </h2>
 
-        {/* Description */}
         <p className="text-[var(--text-secondary)] mb-6">
-          {hasLocalTasks ? (
-            <Trans
-              i18nKey="connectPrompt.descriptionWithTasks"
-              values={{ count: localTaskCount }}
-              components={{
-                strong: (
-                  <span className="font-semibold text-[var(--text-primary)]" />
-                ),
-              }}
-            />
-          ) : (
-            t('connectPrompt.descriptionNoTasks')
-          )}
+          {t('connectPrompt.description')}
         </p>
 
-        {/* Buttons */}
         <div className="flex flex-col gap-3">
-          {hasLocalTasks && (
-            <Button
-              type="primary"
-              size="large"
-              block
-              onClick={onConnectAndMigrate}
-              disabled={loading}
-              icon={<SyncOutlined spin={loading} />}
-              className="!h-12 !rounded-lg"
-            >
-              {t('connectPrompt.connectAndSync')}
-            </Button>
-          )}
-
           <Button
-            type={hasLocalTasks ? 'default' : 'primary'}
+            type="primary"
             size="large"
             block
-            onClick={onConnectWithoutMigrate}
-            disabled={loading}
+            onClick={onConnect}
+            loading={loading}
             icon={<LinkOutlined />}
             className="!h-12 !rounded-lg"
           >
-            {hasLocalTasks
-              ? t('connectPrompt.connectWithoutSync')
-              : t('connectPrompt.connectOnly')}
+            {t('connectPrompt.connect')}
           </Button>
 
           <Button
@@ -101,14 +65,7 @@ export function ConnectPrompt({
             {t('button.maybeLater')}
           </Button>
         </div>
-
-        {/* Note for local tasks */}
-        {hasLocalTasks && (
-          <p className="text-xs text-[var(--text-secondary)] mt-4 opacity-60">
-            {t('connectPrompt.syncNote')}
-          </p>
-        )}
       </div>
     </Modal>
   )
-}
+})

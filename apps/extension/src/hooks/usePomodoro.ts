@@ -31,20 +31,27 @@ const DEFAULT_CONFIG: PomodoroConfig = {
   breakDuration: 5,
 }
 
+// 获取指定模式的总时长（秒）
+function getDurationSeconds(
+  mode: PomodoroMode,
+  config: PomodoroConfig
+): number {
+  if (mode === 'work') return config.workDuration * 60
+  if (mode === 'break') return config.breakDuration * 60
+  return config.workDuration * 60 // idle 默认返回工作时长
+}
+
 // 计算剩余时间
 function calculateTimeLeft(stored: PomodoroStorage): number {
+  const duration = getDurationSeconds(stored.mode, stored.config)
+
   if (stored.mode === 'idle') {
-    return stored.config.workDuration * 60
+    return duration
   }
 
   if (!stored.isRunning) {
-    return stored.pausedTimeLeft ?? stored.config.workDuration * 60
+    return stored.pausedTimeLeft ?? duration
   }
-
-  const duration =
-    stored.mode === 'work'
-      ? stored.config.workDuration * 60
-      : stored.config.breakDuration * 60
 
   // 防御性检查：startTime 应该在 isRunning 时存在
   if (!stored.startTime) {
@@ -106,10 +113,7 @@ export function usePomodoro(
 
     const now = Date.now()
     const nextMode = stored.mode === 'work' ? 'break' : 'work'
-    const nextDuration =
-      nextMode === 'work'
-        ? stored.config.workDuration * 60
-        : stored.config.breakDuration * 60
+    const nextDuration = getDurationSeconds(nextMode, stored.config)
 
     const newStored: PomodoroStorage = {
       ...stored,
@@ -209,20 +213,15 @@ export function usePomodoro(
     const stored = storageRef.current
     if (!stored || stored.isRunning || stored.mode === 'idle') return
 
+    // 计算新的 startTime，使得 timeLeft = pausedTimeLeft
+    const duration = getDurationSeconds(stored.mode, stored.config)
+    const elapsed = duration - (stored.pausedTimeLeft ?? duration)
+
     const newStored: PomodoroStorage = {
       ...stored,
       isRunning: true,
-      startTime: Date.now(),
-      // startTime 基于 pausedTimeLeft 反推
+      startTime: Date.now() - elapsed * 1000,
     }
-
-    // 计算新的 startTime，使得 timeLeft = pausedTimeLeft
-    const duration =
-      stored.mode === 'work'
-        ? stored.config.workDuration * 60
-        : stored.config.breakDuration * 60
-    const elapsed = duration - (stored.pausedTimeLeft ?? duration)
-    newStored.startTime = Date.now() - elapsed * 1000
 
     await storage.setPomodoro(newStored)
   }, [])

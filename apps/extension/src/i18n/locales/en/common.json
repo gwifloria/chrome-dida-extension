@@ -2,7 +2,9 @@
   "button": {
     "save": "Save",
     "cancel": "Cancel",
+    "confirm": "Confirm",
     "delete": "Delete",
+    "edit": "Edit",
     "skip": "Skip",
     "next": "Next",
     "start": "Get Started",
@@ -18,19 +20,17 @@
     "todayIsGift": "Today is a gift",
     "taskLimitReached": "Task limit reached. Connect to add more.",
     "failedToConnect": "Failed to connect",
-    "syncSuccess": "Synced {{count}} task(s) to TickTick",
-    "syncFailed": "Failed to sync {{count}} task(s)",
     "saveFailed": "Failed to save",
     "loadSettingsFailed": "Failed to load settings",
     "updateSettingsFailed": "Failed to update settings"
   },
   "connectPrompt": {
     "title": "Connect to TickTick",
-    "descriptionWithTasks": "You have <strong>{{count}}</strong> local task(s). Would you like to sync them to TickTick?",
-    "descriptionNoTasks": "Sync your tasks with TickTick for full functionality.",
-    "connectAndSync": "Connect & Sync Tasks",
-    "connectWithoutSync": "Connect Without Syncing",
-    "connectOnly": "Connect to TickTick",
-    "syncNote": "Synced tasks will be added to your TickTick inbox"
+    "description": "Connect to TickTick to sync your tasks",
+    "connect": "Connect"
+  },
+  "disconnectConfirm": {
+    "title": "Disconnect",
+    "description": "Are you sure you want to disconnect from TickTick?"
   }
 }

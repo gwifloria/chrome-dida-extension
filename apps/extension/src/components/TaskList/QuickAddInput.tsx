@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { Input } from 'antd'
-import { useTranslation } from 'react-i18next'
-import { useSettings } from '@/hooks/useSettings'
-import { formatDateTimeWithTimezone } from '@/utils/date'
 import { FILTER_NAMES } from '@/constants/task'
-import type { Task, Project } from '@/types'
+import { useSettings } from '@/hooks/useSettings'
+import type { Project, Task } from '@/types'
+import { formatDateTimeWithTimezone } from '@/utils/date'
+import { Input } from 'antd'
+import { memo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface QuickAddInputProps {
   filter: string
@@ -13,7 +13,7 @@ interface QuickAddInputProps {
   onOpenEditor: () => void
 }
 
-export function QuickAddInput({
+export const QuickAddInput = memo(function QuickAddInput({
   filter,
   projects,
   onCreate,
@@ -70,10 +70,10 @@ export function QuickAddInput({
             className="text-[11px] text-[var(--text-secondary)] bg-[var(--bg-card)] py-0.5 px-1.5 rounded cursor-pointer hover:bg-[var(--border)]"
             onClick={onOpenEditor}
           >
-            ⌘ K
+            +
           </span>
         }
       />
     </div>
   )
-}
+})

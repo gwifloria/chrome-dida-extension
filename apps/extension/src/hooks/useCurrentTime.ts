@@ -47,6 +47,7 @@ export function useCurrentTime() {
 
   return {
     time,
+    hours: time.getHours(),
     formattedTime: formatTime(time),
     formattedDate: formatDisplayDate(time),
   }

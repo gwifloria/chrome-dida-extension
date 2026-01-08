@@ -1,15 +1,17 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePersistedSet } from '@/hooks/usePersistedSet'
-import type { Project, Task } from '@/types'
+import { usePersistedBoolean } from '@/hooks/usePersistedBoolean'
+import type { Project } from '@/types'
 import { SectionTitle } from '../common/SectionTitle'
-import { FilterItem } from './FilterItem'
-import { FolderItem } from './FolderItem'
+import { NavItem } from './NavItem'
+import { NavFolder } from './NavFolder'
 import type { ProjectWithCount, FolderGroup } from './types'
 
 interface ProjectListProps {
   projects: Project[]
-  tasks: Task[]
+  /** 每个项目的任务数量，从统一数据源获取 */
+  projectCounts: Map<string, number>
   selectedFilter: string
   collapsed: boolean
   onFilterChange: (filter: string) => void
@@ -17,7 +19,7 @@ interface ProjectListProps {
 
 export function ProjectList({
   projects,
-  tasks,
+  projectCounts,
   selectedFilter,
   collapsed,
   onFilterChange,
@@ -26,22 +28,17 @@ export function ProjectList({
   const [collapsedFolders, toggleFolder] = usePersistedSet(
     'sidebarFoldersCollapsed'
   )
+  const [sectionCollapsed, toggleSection] = usePersistedBoolean(
+    'projectListCollapsed'
+  )
 
   const { folders, ungroupedProjects } = useMemo(() => {
-    // 预处理：创建项目ID到任务计数的映射（避免为每个项目遍历整个 tasks 数组）
-    const taskCountMap = new Map<string, number>()
-    for (const task of tasks) {
-      taskCountMap.set(
-        task.projectId,
-        (taskCountMap.get(task.projectId) ?? 0) + 1
-      )
-    }
-
+    // 过滤出非文件夹的项目，并附加任务数
     const projectsWithCount: ProjectWithCount[] = projects
-      .filter((p) => !p.closed)
+      .filter((p) => !p.closed && p.kind !== 'FOLDER')
       .map((p) => ({
         ...p,
-        count: taskCountMap.get(p.id) ?? 0,
+        count: projectCounts.get(p.id) ?? 0,
       }))
 
     const folderMap = new Map<string, ProjectWithCount[]>()
@@ -56,15 +53,13 @@ export function ProjectList({
       }
     })
 
-    // Open API 不返回文件夹项目，只返回子项目及其 groupId
-    // 因此无法获取文件夹名称，只能显示默认名称
+    // 构建文件夹列表（官方 API 不返回文件夹名称，使用默认名称）
     const folderList: FolderGroup[] = []
-    let folderIndex = 0
+    let defaultIndex = 0
     folderMap.forEach((projectList, groupId) => {
-      folderIndex++
       folderList.push({
         id: groupId,
-        name: t('folder.defaultName', { index: folderIndex }),
+        name: t('folder.defaultName', { index: ++defaultIndex }),
         projects: projectList.sort((a, b) => a.sortOrder - b.sortOrder),
       })
     })
@@ -73,35 +68,45 @@ export function ProjectList({
       folders: folderList.sort((a, b) => a.id.localeCompare(b.id)),
       ungroupedProjects: ungrouped.sort((a, b) => a.sortOrder - b.sortOrder),
     }
-  }, [projects, t, tasks])
+  }, [projects, projectCounts, t])
 
   return (
     <div className="mb-4">
-      {!collapsed && <SectionTitle title={t('section.lists')} />}
-
-      {ungroupedProjects.map((project) => (
-        <FilterItem
-          key={project.id}
-          active={selectedFilter === `project:${project.id}`}
-          onClick={() => onFilterChange(`project:${project.id}`)}
-          name={project.name}
-          count={project.count}
-          color={project.color}
-          collapsed={collapsed}
+      {!collapsed && (
+        <SectionTitle
+          title={t('section.lists')}
+          collapsed={sectionCollapsed}
+          onToggle={toggleSection}
         />
-      ))}
+      )}
 
-      {folders.map((folder) => (
-        <FolderItem
-          key={folder.id}
-          folder={folder}
-          collapsed={collapsed}
-          isFolderCollapsed={collapsedFolders.has(folder.id)}
-          selectedFilter={selectedFilter}
-          onToggleFolder={() => toggleFolder(folder.id)}
-          onFilterChange={onFilterChange}
-        />
-      ))}
+      {!sectionCollapsed && (
+        <>
+          {ungroupedProjects.map((project) => (
+            <NavItem
+              key={project.id}
+              active={selectedFilter === `project:${project.id}`}
+              onClick={() => onFilterChange(`project:${project.id}`)}
+              name={project.name}
+              count={project.count}
+              color={project.color}
+              collapsed={collapsed}
+            />
+          ))}
+
+          {folders.map((folder) => (
+            <NavFolder
+              key={folder.id}
+              folder={folder}
+              collapsed={collapsed}
+              isFolderCollapsed={collapsedFolders.has(folder.id)}
+              selectedFilter={selectedFilter}
+              onToggleFolder={() => toggleFolder(folder.id)}
+              onFilterChange={onFilterChange}
+            />
+          ))}
+        </>
+      )}
     </div>
   )
 }

@@ -1,10 +1,7 @@
-import { useContext } from 'react'
 import { SettingsContext } from '@/contexts/SettingsContext'
+import { createContextHook } from './createContextHook'
 
-export function useSettings() {
-  const context = useContext(SettingsContext)
-  if (!context) {
-    throw new Error('useSettings must be used within a SettingsProvider')
-  }
-  return context
-}
+export const useSettings = createContextHook(
+  SettingsContext,
+  'SettingsProvider'
+)

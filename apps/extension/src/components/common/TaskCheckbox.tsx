@@ -29,9 +29,11 @@ export function TaskCheckbox({
           ) : undefined
         }
         className={`
-          !w-6 !h-6 !min-w-0 !p-0 !rounded !border-2 !border-[var(--border)] !flex !items-center !justify-center
+          !w-6 !h-6 !min-w-0 !p-0 !rounded-md !border-2 !border-[var(--border)] !flex !items-center !justify-center
           !bg-transparent hover:!border-[var(--accent)] hover:!bg-[var(--accent-light)]
-          ${completing ? '!opacity-50' : ''}
+          !transition-all !duration-300 !ease-out
+          !-rotate-6 hover:!rotate-0 hover:!scale-110
+          ${completing ? '!opacity-50 !rotate-0' : ''}
         `}
       />
     )
@@ -44,9 +46,9 @@ export function TaskCheckbox({
       style={{ borderColor: priorityColor }}
       className={`
         w-5 h-5 rounded-full border-2 bg-transparent cursor-pointer
-        transition-all shrink-0 mt-0.5 flex items-center justify-center
-        hover:bg-[var(--accent-light)]
-        ${completing ? '!bg-[var(--accent)] !border-[var(--accent)]' : ''}
+        transition-all duration-300 ease-out shrink-0 mt-0.5 flex items-center justify-center
+        -rotate-12 hover:rotate-0 hover:bg-[var(--accent-light)] hover:scale-110
+        ${completing ? '!bg-[var(--accent)] !border-[var(--accent)] !rotate-0' : ''}
       `}
     >
       <div

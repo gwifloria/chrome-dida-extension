@@ -3,7 +3,7 @@ import { ProjectColorDot } from '../ProjectColorDot'
 
 const MAX_VISIBLE_COUNT = 99
 
-interface FilterItemProps {
+interface NavItemProps {
   active: boolean
   onClick: () => void
   icon?: React.ReactNode
@@ -14,7 +14,7 @@ interface FilterItemProps {
   collapsed?: boolean
 }
 
-export const FilterItem = memo(function FilterItem({
+export const NavItem = memo(function NavItem({
   active,
   onClick,
   icon,
@@ -23,7 +23,7 @@ export const FilterItem = memo(function FilterItem({
   nested = false,
   color,
   collapsed = false,
-}: FilterItemProps) {
+}: NavItemProps) {
   return (
     <div
       role="button"

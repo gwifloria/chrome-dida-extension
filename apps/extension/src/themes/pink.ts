@@ -26,6 +26,8 @@ export const pinkTheme: Theme = {
     priorityHigh: '#E88A8A',
     priorityMedium: '#F0C78A',
     priorityLow: '#7EC699',
+    pomodoroWork: '#c9a89a',
+    pomodoroBreak: '#9eb0a2',
   },
   borderRadius: {
     small: '8px',

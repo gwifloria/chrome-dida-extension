@@ -1,16 +1,36 @@
-import { memo } from 'react'
+import { RightOutlined } from '@ant-design/icons'
 
 interface SectionTitleProps {
   title: string
+  collapsed?: boolean
+  onToggle?: () => void
 }
 
-export const SectionTitle = memo(function SectionTitle({
+export function SectionTitle({
   title,
+  collapsed,
+  onToggle,
 }: SectionTitleProps) {
+  const isCollapsible = onToggle !== undefined
+
+  if (!isCollapsible) {
+    return (
+      <div className="px-3 py-2 text-[11px] font-medium text-[var(--text-secondary)] tracking-wide flex items-center gap-1">
+        <span className="text-xs">›</span>
+        {title}
+      </div>
+    )
+  }
+
   return (
-    <div className="px-3 py-2 text-[11px] font-medium text-[var(--text-secondary)] tracking-wide flex items-center gap-1">
-      <span className="text-xs">›</span>
+    <div
+      onClick={onToggle}
+      className="px-3 py-2 text-[11px] font-medium text-[var(--text-secondary)] tracking-wide flex items-center gap-1 cursor-pointer hover:opacity-80 select-none"
+    >
+      <RightOutlined
+        className={`text-[10px] transition-transform duration-200 ${collapsed ? '' : 'rotate-90'}`}
+      />
       {title}
     </div>
   )
-})
+}

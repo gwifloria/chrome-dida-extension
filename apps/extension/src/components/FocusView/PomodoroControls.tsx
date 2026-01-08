@@ -12,6 +12,11 @@ import {
 import { useTranslation } from 'react-i18next'
 import type { PomodoroMode } from '@/hooks/usePomodoro'
 
+// 按钮样式常量
+const BTN_PRIMARY = '!text-[var(--text-secondary)] hover:!text-[var(--accent)]'
+const BTN_SECONDARY =
+  '!text-[var(--text-secondary)] hover:!text-[var(--text-primary)]'
+
 interface PomodoroControlsProps {
   mode: PomodoroMode
   isRunning: boolean
@@ -44,7 +49,7 @@ export const PomodoroControls = memo(function PomodoroControls({
           size="large"
           icon={<PlayCircleOutlined />}
           onClick={onStart}
-          className="!text-[var(--text-secondary)] hover:!text-[var(--accent)] !text-base"
+          className={`${BTN_PRIMARY} !text-base`}
         >
           {t('pomodoro.start')}
         </Button>
@@ -62,7 +67,7 @@ export const PomodoroControls = memo(function PomodoroControls({
           size="large"
           icon={<PauseCircleOutlined />}
           onClick={onPause}
-          className="!text-[var(--text-secondary)] hover:!text-[var(--accent)]"
+          className={BTN_PRIMARY}
         >
           {t('pomodoro.pause')}
         </Button>
@@ -72,7 +77,7 @@ export const PomodoroControls = memo(function PomodoroControls({
           size="large"
           icon={<PlayCircleOutlined />}
           onClick={onResume}
-          className="!text-[var(--text-secondary)] hover:!text-[var(--accent)]"
+          className={BTN_PRIMARY}
         >
           {mode === 'break'
             ? t('pomodoro.startBreak')
@@ -86,7 +91,7 @@ export const PomodoroControls = memo(function PomodoroControls({
         size="small"
         icon={<ForwardOutlined />}
         onClick={onSkip}
-        className="!text-[var(--text-secondary)] hover:!text-[var(--text-primary)]"
+        className={BTN_SECONDARY}
       >
         {t('pomodoro.skip')}
       </Button>
@@ -97,7 +102,7 @@ export const PomodoroControls = memo(function PomodoroControls({
         size="small"
         icon={<RedoOutlined />}
         onClick={onReset}
-        className="!text-[var(--text-secondary)] hover:!text-[var(--text-primary)]"
+        className={BTN_SECONDARY}
       >
         {t('pomodoro.reset')}
       </Button>

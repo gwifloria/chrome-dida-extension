@@ -94,6 +94,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     root.style.setProperty('--priority-high', theme.colors.priorityHigh)
     root.style.setProperty('--priority-medium', theme.colors.priorityMedium)
     root.style.setProperty('--priority-low', theme.colors.priorityLow)
+    // 番茄时钟色
+    root.style.setProperty('--pomodoro-work', theme.colors.pomodoroWork)
+    root.style.setProperty('--pomodoro-break', theme.colors.pomodoroBreak)
     // 圆角
     root.style.setProperty('--radius-small', theme.borderRadius.small)
     root.style.setProperty('--radius-medium', theme.borderRadius.medium)

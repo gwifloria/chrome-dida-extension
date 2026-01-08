@@ -10,9 +10,6 @@ export const FORM_INPUT_STYLE =
 export const FORM_SELECT_STYLE =
   '[&_.ant-select-selector]:!bg-[var(--bg-secondary)] [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!border-0 [&_.ant-select-selector]:!py-2 [&_.ant-select-selector]:!px-4 [&_.ant-select-selector]:!h-auto [&_.ant-select-selector]:!shadow-none [&_.ant-select-selection-item]:!text-sm'
 
-export const FORM_DATEPICKER_STYLE =
-  '!bg-[var(--bg-secondary)] !rounded-xl !border-0 !py-2.5 !px-4 !shadow-none [&_.ant-picker-input>input]:!text-sm'
-
 export const MODAL_STYLE =
   '[&_.ant-modal-content]:!rounded-2xl [&_.ant-modal-header]:!border-0 [&_.ant-modal-header]:!pb-0 [&_.ant-modal-body]:!pt-4 [&_.ant-modal-footer]:!border-t [&_.ant-modal-footer]:!border-dashed [&_.ant-modal-footer]:!border-[var(--border)] [&_.ant-modal-footer]:!mt-2 [&_.ant-modal-footer]:!pt-4'
 

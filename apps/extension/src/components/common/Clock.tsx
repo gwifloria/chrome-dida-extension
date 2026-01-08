@@ -1,11 +1,17 @@
-import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCurrentTime } from '@/hooks/useCurrentTime'
 import { formatPomodoroTime, type PomodoroMode } from '@/hooks/usePomodoro'
 
+const GREETINGS = {
+  morning: 'Good morning',
+  afternoon: 'Good afternoon',
+  evening: 'Good evening',
+} as const
+
 interface ClockProps {
   variant: 'small' | 'large'
   showDate?: boolean
+  showGreeting?: boolean
   className?: string
   // 番茄时钟模式
   pomodoroMode?: PomodoroMode
@@ -16,16 +22,17 @@ interface ClockProps {
 /**
  * 时钟组件 - 支持普通时钟和番茄时钟模式
  */
-export const Clock = memo(function Clock({
+export function Clock({
   variant,
   showDate = false,
+  showGreeting = false,
   className = '',
   pomodoroMode,
   pomodoroTimeLeft = 0,
   onClick,
 }: ClockProps) {
-  const { t } = useTranslation('focus')
-  const { formattedTime, formattedDate } = useCurrentTime()
+  const { t } = useTranslation('common')
+  const { formattedTime, formattedDate, hours } = useCurrentTime()
 
   // 番茄模式下显示倒计时
   const isPomodoroActive = pomodoroMode && pomodoroMode !== 'idle'
@@ -33,13 +40,20 @@ export const Clock = memo(function Clock({
     ? formatPomodoroTime(pomodoroTimeLeft)
     : formattedTime
 
-  // 番茄模式颜色（莫兰迪色系）
+  // 番茄模式颜色（使用主题色）
   const pomodoroColor =
     pomodoroMode === 'work'
-      ? 'text-[#c9a89a]' // 莫兰迪砖红
+      ? 'text-[var(--pomodoro-work)]'
       : pomodoroMode === 'break'
-        ? 'text-[#9eb0a2]' // 莫兰迪灰绿
+        ? 'text-[var(--pomodoro-break)]'
         : ''
+
+  // 问候语
+  const getGreeting = () => {
+    if (hours < 12) return GREETINGS.morning
+    if (hours < 18) return GREETINGS.afternoon
+    return GREETINGS.evening
+  }
 
   if (variant === 'large') {
     return (
@@ -47,14 +61,20 @@ export const Clock = memo(function Clock({
         role="timer"
         aria-label={displayTime}
         onClick={onClick}
-        className={`text-[120px] font-extralight leading-none tracking-tight transition-all duration-700 cursor-pointer hover:scale-105 ${isPomodoroActive ? pomodoroColor : 'text-[var(--clock-primary)]'} ${className}`}
+        className={`flex flex-col items-center select-none text-center ${className}`}
       >
-        {displayTime}
-        {isPomodoroActive && (
-          <div className="text-sm font-normal tracking-widest text-center mt-2 uppercase opacity-60">
-            {pomodoroMode === 'work'
-              ? t('pomodoro.working')
-              : t('pomodoro.resting')}
+        <div
+          className={`text-[10rem] leading-none font-medium tracking-tighter transition-all duration-700 cursor-pointer hover:scale-105 ${isPomodoroActive ? pomodoroColor : 'text-[var(--clock-primary)]'}`}
+        >
+          {displayTime}
+        </div>
+        {showGreeting && (
+          <div className="text-3xl mt-4 font-bold font-hand text-[var(--clock-primary)] opacity-90">
+            {isPomodoroActive
+              ? pomodoroMode === 'work'
+                ? t('focus:pomodoro.working')
+                : t('focus:pomodoro.resting')
+              : `${getGreeting()}.`}
           </div>
         )}
       </div>
@@ -62,17 +82,23 @@ export const Clock = memo(function Clock({
   }
 
   return (
-    <div className={className} onClick={onClick}>
+    <div
+      className={`flex flex-col items-start select-none ${className}`}
+      onClick={onClick}
+    >
+      <div className="text-sm italic mb-1 opacity-80 font-hand text-[var(--text-secondary)]">
+        {t('message.todayIsGift')}
+      </div>
       <div
-        className={`text-4xl max-md:text-2xl font-extralight leading-none ${isPomodoroActive ? pomodoroColor : 'text-[var(--clock-secondary)]'}`}
+        className={`text-4xl max-md:text-2xl font-medium leading-none tracking-tight ${isPomodoroActive ? pomodoroColor : 'text-[var(--clock-secondary)]'}`}
       >
         {displayTime}
       </div>
       {showDate && !isPomodoroActive && (
-        <div className="text-xs text-[var(--text-secondary)] mt-1">
+        <div className="text-sm font-medium mt-1 text-[var(--text-secondary)]">
           {formattedDate}
         </div>
       )}
     </div>
   )
-})
+}

@@ -16,3 +16,30 @@ export interface TaskCounts {
   week: number
   overdue: number
 }
+
+/**
+ * 按日期分组的任务
+ */
+export interface TasksByDate {
+  pinned: Task[]
+  overdue: Task[]
+  today: Task[]
+  tomorrow: Task[]
+  later: Task[]
+  nodate: Task[]
+}
+
+/**
+ * 统一计算的视图数据
+ * 一次遍历 tasks 数组，输出所有派生数据
+ */
+export interface ComputedViews {
+  /** 各筛选器的任务数量 */
+  counts: TaskCounts
+  /** 每个项目的任务数量 Map<projectId, count> */
+  projectCounts: Map<string, number>
+  /** 按日期分组的任务 */
+  byDate: TasksByDate
+  /** 收集箱任务 */
+  inbox: Task[]
+}
