@@ -12,6 +12,9 @@
     "disconnect": "断开连接",
     "maybeLater": "以后再说"
   },
+  "action": {
+    "refresh": "刷新"
+  },
   "label": {
     "list": "清单",
     "smartList": "SMART LIST"

@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react'
 import { useAppMode } from '@/contexts/useAppMode'
+import { TaskProvider } from '@/contexts/TaskProvider'
 import { FocusLayout, ListLayout } from '@/components/layouts'
 
 type ViewMode = 'focus' | 'list'
 
-function App() {
+function AppContent() {
   const { isGuest } = useAppMode()
   const [viewMode, setViewMode] = useState<ViewMode>('focus')
 
@@ -18,6 +19,14 @@ function App() {
 
   // 已连接：列表视图
   return <ListLayout onFocus={handleSwitchToFocus} />
+}
+
+function App() {
+  return (
+    <TaskProvider>
+      <AppContent />
+    </TaskProvider>
+  )
 }
 
 export default App

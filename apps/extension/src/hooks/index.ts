@@ -1,5 +1,4 @@
-// 任务相关
-export { useTasks } from './useTasks'
+// 任务相关（useTaskData/useTaskViews 仅供 TaskProvider 内部使用）
 export { useTaskData } from './useTaskData'
 export { useTaskViews } from './useTaskViews'
 export { useTaskCompletion } from './useTaskCompletion'
@@ -20,16 +19,12 @@ export { usePersistedBoolean } from './usePersistedBoolean'
 export { usePersistedSet } from './usePersistedSet'
 
 // 类型导出
+export type { TaskData, TaskActions } from './useTaskData'
 export type {
-  // useTasks 结构化类型
-  UseTasksReturn,
-  TaskData,
-  TaskActions,
   TaskViews,
   TaskFilters,
-  // 通用类型
   SortOption,
   GroupOption,
   TaskGroup,
   TaskCounts,
-} from './useTasks'
+} from './useTaskViews'

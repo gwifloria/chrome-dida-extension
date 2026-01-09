@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useTasks } from '@/hooks/useTasks'
+import { useTaskContext } from '@/contexts/TaskContext'
 import { Sidebar } from '@/components/Sidebar'
 import { TaskList } from '@/components/TaskList'
 import { useTheme } from '@/hooks/useTheme'
@@ -11,8 +11,10 @@ interface ListLayoutProps {
 export function ListLayout({ onFocus }: ListLayoutProps) {
   const { theme } = useTheme()
 
-  const { data, actions, views, filters } = useTasks()
-  const { projects, loading, error } = data
+  const { data, actions, views, filters } = useTaskContext()
+  const { tasks, projects, loading: dataLoading, error } = data
+  // 只在初始加载（无数据）时显示骨架屏，刷新时保持显示原内容
+  const loading = dataLoading && tasks.length === 0
   const { completeTask, deleteTask, updateTask, createTask } = actions
   const { counts, projectCounts } = views
   const { getTaskGroups } = filters

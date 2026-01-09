@@ -1,7 +1,7 @@
 import { Button } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { useAppMode } from '@/contexts/useAppMode'
-import { useTasks } from '@/hooks/useTasks'
+import { useTaskContext } from '@/contexts/TaskContext'
 
 interface FocusFloatButtonProps {
   onSwitchView?: () => void
@@ -10,9 +10,10 @@ interface FocusFloatButtonProps {
 export function FocusFloatButton({ onSwitchView }: FocusFloatButtonProps) {
   const { t } = useTranslation('focus')
   const { isGuest } = useAppMode()
-  const { data, views } = useTasks()
+  const { data, views } = useTaskContext()
 
-  const todayCount = isGuest ? data.tasks.length : views.counts.today
+  // 使用 focusTasks.length 保持与 Focus 列表一致（包含过期任务）
+  const todayCount = isGuest ? data.tasks.length : views.focusTasks.length
 
   // 访客模式或无切换回调时不显示
   if (isGuest || !onSwitchView) {
