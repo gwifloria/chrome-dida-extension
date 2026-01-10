@@ -12,6 +12,9 @@
     "disconnect": "Disconnect",
     "maybeLater": "Maybe Later"
   },
+  "action": {
+    "refresh": "Refresh"
+  },
   "label": {
     "list": "List",
     "smartList": "SMART LIST"

@@ -3,6 +3,7 @@ import { Button } from 'antd'
 import { AppstoreOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { Clock } from '../common/Clock'
+import { RefreshButton } from '../common/RefreshButton'
 import type { Project } from '@/types'
 
 const FILTER_KEYS: Record<string, string> = {
@@ -61,7 +62,8 @@ export function TaskListHeader({
           </span>
         </div>
       </div>
-      <div className="flex items-start gap-6">
+      <div className="flex items-start gap-4">
+        <RefreshButton className="mt-1" />
         {onFocus && (
           <Button
             type="default"

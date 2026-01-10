@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Modal, Form, Input, Select, message } from 'antd'
 import { FlagOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
@@ -33,6 +33,18 @@ export function TaskEditor({
   const [saving, setSaving] = useState(false)
   const isNew = !task
   const priorityOptions = getPriorityOptions(t)
+
+  // 弹窗打开时同步表单值
+  useEffect(() => {
+    if (open) {
+      form.setFieldsValue({
+        title: task?.title || '',
+        content: task?.content || '',
+        priority: task?.priority || 0,
+        projectId: task?.projectId || projects[0]?.id,
+      })
+    }
+  }, [open, task, form, projects])
 
   const handleOk = async () => {
     if (saving) return

@@ -1,11 +1,12 @@
 import { useAppMode } from '@/contexts/useAppMode'
+import { useTaskContext } from '@/contexts/TaskContext'
 import { useTaskCompletion } from '@/hooks/useTaskCompletion'
-import { useTasks } from '@/hooks/useTasks'
 import type { Task } from '@/types'
 import { message } from 'antd'
 import { memo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { TaskCheckbox } from '../common/TaskCheckbox'
+import { RefreshButton } from '../common/RefreshButton'
 import { FocusSkeleton } from '../Task/TaskSkeleton'
 import { FocusTaskInput } from './FocusTaskInput'
 
@@ -52,7 +53,7 @@ export function FocusTaskList() {
   const { t: tCommon } = useTranslation('common')
   const { isGuest } = useAppMode()
 
-  const { data, actions, views } = useTasks()
+  const { data, actions, views } = useTaskContext()
   const { tasks, loading: tasksLoading } = data
   const { completeTask, createTask } = actions
   const { focusTasks } = views
@@ -77,27 +78,32 @@ export function FocusTaskList() {
 
   return (
     <div className="mt-6 w-full max-w-md">
-      <h2 className="text-xs font-medium tracking-[3px] text-center text-[var(--text-secondary)] mb-5">
-        {t('title')}
-      </h2>
+      <div className="flex items-center justify-center gap-2 mb-5">
+        <h2 className="text-xs font-medium tracking-[3px] text-center text-[var(--text-secondary)]">
+          {t('title')}
+        </h2>
+        <RefreshButton className="!text-[var(--text-secondary)] hover:!text-[var(--text-primary)]" />
+      </div>
 
-      {loading ? (
-        <FocusSkeleton />
-      ) : focusTasks.length === 0 ? (
-        <div className="text-center text-[var(--text-secondary)] text-lg">
-          {t('empty')}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {focusTasks.map((task) => (
-            <FocusTaskItem
-              key={task.id}
-              task={task}
-              onComplete={completeTask}
-            />
-          ))}
-        </div>
-      )}
+      <div className="min-h-[200px]">
+        {loading ? (
+          <FocusSkeleton />
+        ) : focusTasks.length === 0 ? (
+          <div className="text-center text-[var(--text-secondary)] text-lg">
+            {t('empty')}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {focusTasks.map((task) => (
+              <FocusTaskItem
+                key={task.id}
+                task={task}
+                onComplete={completeTask}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       <FocusTaskInput
         isGuestMode={isGuest}

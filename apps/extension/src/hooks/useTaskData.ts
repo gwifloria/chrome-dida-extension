@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useCallback, useMemo, useRef } from 'react'
 import { createTaskAdapter, type AdapterType } from '@/api/adapters'
 import { storage } from '@/services/storage'
 import type { Task, Project } from '@/types'
@@ -96,10 +96,8 @@ export function useTaskData(adapterType: AdapterType) {
     }
   }, [adapter, isLocal])
 
-  // 组件挂载或 adapter 变化时加载数据
-  useEffect(() => {
-    refresh()
-  }, [refresh])
+  // 注意：不再自动刷新，由 TaskProvider 控制首次加载
+  // 组件可以通过 actions.refresh() 手动刷新
 
   // ============ 操作 ============
 

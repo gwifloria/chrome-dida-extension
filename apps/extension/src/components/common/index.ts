@@ -1,5 +1,6 @@
 export { Clock } from './Clock'
 export { ErrorBoundary } from './ErrorBoundary'
+export { RefreshButton } from './RefreshButton'
 export { TaskCheckbox } from './TaskCheckbox'
 export { ThemeToggle } from './ThemeToggle'
 export { SectionTitle } from './SectionTitle'
